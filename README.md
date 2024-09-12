@@ -1,48 +1,31 @@
-# How to setup dev environment
+Setup postgres and redis
+-> Using docker
+    docker compose -f .\docker-compose-uat.yml up -d
+-> Using aiven or any other platform
 
-### Setting up Redis and Postgres Database
+Database Setup
+-> Enter in db folder
+-> yarn
+-> yarn db:push
 
-Run the following command (Make sure docker is installed on your machine):
+Backend
 
-```sh
-docker compose -f docker-compose-yml up -d
-```
-This will start a docker instance for postgres and redis
+-> Enter in backend folder
+-> Copy paste .env.example into .env
+-> Modify the redis and postgres details (if required)
+-> yarn
+-> yarn build
+-> yarn dev
 
-### Setup Database
+WS
+-> Open new terminal
+-> Enter in ws folder
+-> Copy paste .env.example into .env
+-> Modify the redis and postgres details (if required)
+-> yarn
+-> yarn build
+-> yarn dev
 
-```sh
-cd .\packages\db
-
-yarn
-```
-Create .env and copy .env.example into ./packages/db/prisma/.env
-
-```sh
-yarn db:push
-```
-
-
-### Setup env variables, install all packages, setup the prisma and build the backend
-
-Use git bash for below command
-```bash
-cd ..
-cd ..
-yarn dev:setup
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```bash
-yarn run dev
-```
-### Production
-
-To run the app on production, run the following commands:
-
-```bash
-yarn run prod
-```
+Frontend
+-> yarn
+-> yarn dev

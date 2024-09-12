@@ -209,9 +209,11 @@ export class GameManager {
       },
     });
     if (db_game) {
+      console.log("Game is present in DB, recreating it")
       // Check for the game locally
       const game = this.games.find((item) => item.getGameId() === db_game?.id);
       if (game) {
+        console.log("Game found locally -> ", game.getGameId())
         const restartedPlayer =
           game.getPlayer1().getPlayerId() === user.id
             ? game.getPlayer1()
@@ -240,13 +242,13 @@ export class GameManager {
         // and wait for the friend
         const player1 = new Player(
           socket,
-          BLACK,
+          WHITE,
           token,
           user.name,
           user.id,
           user.rating
         );
-        const player2 = new Player(null, WHITE, null, "", "", 0);
+        const player2 = new Player(null, BLACK, null, "", "", 0);
         const game = new Game(player1, player2, true, stake);
         this.games.push(game);
         // Send this game id to frontend
@@ -262,7 +264,7 @@ export class GameManager {
           game.stake === stake
         );
       });
-      console.log("Matched Games", game)
+      console.log("Matched Games -> ", game?.getGameId())
       if (!game) {
         // Push the game in this.games with a null player 2
         const player1 = new Player(
@@ -275,9 +277,9 @@ export class GameManager {
         );
         const player2 = new Player(null, WHITE, null, "", "", 0);
         const game = new Game(player1, player2, false, stake);
+        console.log("Creating new game -> ", game.getGameId())
         this.games.push(game);
       } else {
-        console.log("Creating Game")
         // match the opponent and start the game
         const player2 = game?.getPlayer2();
         player2?.setPlayerToken(token);
@@ -285,7 +287,7 @@ export class GameManager {
         player2?.setPlayerId(user.id);
         player2?.setPlayerName(user.name);
         player2?.setPlayerRating(user.rating);
-        console.log(player2)
+        console.log("Adding new player to game -> ", game.getGameId())
         await game?.createGame();
       }
     }

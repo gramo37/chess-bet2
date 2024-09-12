@@ -18,6 +18,7 @@ import {
   GAMERESTARTED,
   GAMESTARTED,
   GET_TIME,
+  GETFRIENDLYMATCHID,
   INVALID_MOVE,
   MOVE,
   MOVESUCCESS,
@@ -49,7 +50,9 @@ export default function Game() {
     opponent,
     setOpponent,
     player,
-    setPlayer
+    setPlayer,
+    gameId,
+    setGameId
   } = useGameStore([
     "board",
     "setBoard",
@@ -65,7 +68,9 @@ export default function Game() {
     "opponent",
     "setOpponent",
     "player",
-    "setPlayer"
+    "setPlayer",
+    "gameId",
+    "setGameId"
   ]);
   useInitSocket();
   // const queryClient = useQueryClient();
@@ -173,6 +178,8 @@ export default function Game() {
       } else if(message.type === GET_TIME) {
         setPlayer1TimeLeft(message.payload.player1TimeLeft)
         setPlayer2TimeLeft(message.payload.player2TimeLeft)
+      } else if(message.type === GETFRIENDLYMATCHID) {
+        setGameId(message.payload.gameId)
       }
     };
     return () => {
@@ -301,6 +308,7 @@ export default function Game() {
                 : formatTime(player1timeLeft)}
             </p>
           </div>
+          {gameId && <p className="text-white">Game ID - {gameId}</p>}
           <Chessboard
             position={board}
             showPromotionDialog={showPromotionDialog}

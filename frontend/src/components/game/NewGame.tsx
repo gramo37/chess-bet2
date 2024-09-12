@@ -6,15 +6,25 @@ import { useGameStore } from "../../contexts/game.context";
 // import axios from "axios";
 
 const NewGame = () => {
-  const { setIsGameStarted, setResult, socket, setColor, stake, setStake } =
-    useGameStore([
-      "setIsGameStarted",
-      "setResult",
-      "socket",
-      "setColor",
-      "stake",
-      "setStake",
-    ]);
+  const {
+    setIsGameStarted,
+    setResult,
+    socket,
+    setColor,
+    stake,
+    setStake,
+    gameId,
+    setGameId,
+  } = useGameStore([
+    "setIsGameStarted",
+    "setResult",
+    "socket",
+    "setColor",
+    "stake",
+    "setStake",
+    "gameId",
+    "setGameId",
+  ]);
   // const updateUser = usePersonStore((state) => state.updateUser);
   // const navigate = useNavigate();
 
@@ -65,7 +75,9 @@ const NewGame = () => {
       <button
         disabled={socket === null}
         onClick={startGame}
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${socket === null && "bg-gray-500"}`}
+        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+          socket === null && "bg-gray-500"
+        }`}
       >
         Play
       </button>
@@ -80,17 +92,22 @@ const NewGame = () => {
         value={stake}
         onChange={(e) => setStake(Number(e.target.value))}
       />
+      <input type="text" value={gameId ?? ""} onChange={(e) => setGameId(e.target.value)} />
       <button
         disabled={socket === null}
         onClick={startGame}
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${socket === null && "bg-gray-500"}`}
+        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+          socket === null && "bg-gray-500"
+        }`}
       >
         Start friendly
       </button>
       <button
         disabled={socket === null}
         onClick={startGame}
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${socket === null && "bg-gray-500"}`}
+        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+          socket === null && "bg-gray-500"
+        }`}
       >
         Join friendly Game
       </button>

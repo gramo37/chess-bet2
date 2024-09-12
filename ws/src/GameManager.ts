@@ -13,6 +13,7 @@ import {
   GAMEABORTED,
   GET_TIME,
   NOT_YET_STARTED,
+  GETFRIENDLYMATCHID,
 } from "./constants";
 import { Game } from "./Game";
 import { Player } from "./Player";
@@ -227,8 +228,10 @@ export class GameManager {
 
     if (type === "friend") {
       // In this case don't check for ratings
-      if (gameId) {
-        // Create the game
+      console.log("Creating a friendly match", gameId)
+      if (Boolean(gameId)) {
+        console.log("Starting the game", gameId, Boolean(gameId))
+        // Start the game
         const game = this.games.find((item) => item.getGameId() === gameId);
         const player2 = game?.getPlayer2();
         player2?.setPlayerToken(token);
@@ -250,9 +253,16 @@ export class GameManager {
         );
         const player2 = new Player(null, BLACK, null, "", "", 0);
         const game = new Game(player1, player2, true, stake);
+        console.log("Creating a friendly match -> ", game.getGameId())
         this.games.push(game);
         // Send this game id to frontend
-        console.log("Sending this to frontend", game)
+        console.log("Sending this to frontend", game.getGameId())
+        sendMessage(socket, {
+          type: GETFRIENDLYMATCHID,
+          payload: {
+            gameId: game.getGameId()
+          }
+        })
       }
     } else {
       // Check for ratings and match the players

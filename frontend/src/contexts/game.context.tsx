@@ -55,7 +55,7 @@ const INITIAL_STATE = {
   player: null,
   stake: 0,
   type: "random",
-  gameId: null,
+  gameId: "",
 };
 
 // Create your store, which includes both state and (optionally) actions

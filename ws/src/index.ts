@@ -55,7 +55,14 @@ wss.on("connection", async function connection(ws, req) {
 connect();
 
 app.get("/", (req, res) => {
-  res.send("Hello World")
+  res.send("Ping")
+})
+
+app.get("/open_games", (req, res) => {
+  const games = gameManager.getAllGames();
+  res.status(200).json({
+    games
+  })
 })
 
 server.listen(PORT, () => {

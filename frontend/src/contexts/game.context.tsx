@@ -53,7 +53,7 @@ const INITIAL_STATE = {
   socket: null,
   opponent: null,
   player: null,
-  stake: 0,
+  stake: 10,
   type: "random",
   gameId: "",
 };

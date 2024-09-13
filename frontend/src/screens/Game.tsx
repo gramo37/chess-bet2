@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Chessboard } from "react-chessboard";
 import { useInitSocket } from "../hooks/useSocket";
 import { Chess, Square } from "chess.js";
@@ -31,8 +32,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { formatTime, isPromotion } from "../utils/game";
 import useTimer from "../hooks/useTimer";
-import { BACKEND_URL } from "../constants/routes";
+import { BACKEND_URL, WS_BACKEND_URL } from "../constants/routes";
 import ChatContainer from "../components/game/chat";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 interface HighlightedSquares {
   [square: string]: React.CSSProperties;
@@ -67,6 +70,14 @@ const ChessOptions: React.FC = () => {
     "setGameId",
     "gameId",
   ]);
+  const [opponents, setOpponents] = useState([]);
+  const { isPending, isError, isSuccess, mutate } = useMutation({
+    mutationFn: async () => {
+      // TODO: Send token and stake
+      const res = await axios.get(`${WS_BACKEND_URL}/open_games`);
+      if (res && res?.data && res?.data?.games) setOpponents(res.data.games);
+    },
+  });
 
   const handleFriendlyOptionChange = (option: FriendlyOption) => {
     setFriendlyOption(option);
@@ -83,6 +94,11 @@ const ChessOptions: React.FC = () => {
         type: INIT_GAME,
       })
     );
+  };
+
+  const getOpponents = () => {
+    // Make an API call to get all players matching current users rating, stake and type should not be friendly
+    mutate();
   };
 
   return (
@@ -121,7 +137,7 @@ const ChessOptions: React.FC = () => {
             type === "lobby" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
-          Choose from Lobby
+          Choose your opponent
         </button>
       </div>
 
@@ -175,16 +191,66 @@ const ChessOptions: React.FC = () => {
           value={stake}
           onChange={(e) => setStake(Number(e.target.value))}
         />
+        {type === "lobby" && (
+          <button
+            className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+              socket === null && "bg-gray-500"
+            }`}
+            onClick={getOpponents}
+          >
+            Find Opponents
+          </button>
+        )}
       </div>
-      <button
-        disabled={socket === null}
-        onClick={startGame}
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
-          socket === null && "bg-gray-500"
-        }`}
-      >
-        Play
-      </button>
+      {type === "lobby" && (
+        <div>
+          {isPending && <p>Fetching Opponents...</p>}
+          {isError && <p>Something went wrong</p>}
+          {opponents.length > 0 && (
+            <div>
+              {opponents.map((opponent: any) => {
+                return (
+                  <div
+                    key={opponent.gameId}
+                    className="text-white border rounded-md p-1 border-white cursor-pointer"
+                    onClick={() => {
+                      setGameId(opponent.gameId);
+                    }}
+                  >
+                    <p>{opponent.player1.name}</p>
+                    <p>Rating: {opponent.player1.rating}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {!isPending && !isError && isSuccess && opponents.length === 0 && (
+            <p className="text-white">No Opponents</p>
+          )}
+        </div>
+      )}
+      {type !== "lobby" && (
+        <button
+          disabled={socket === null}
+          onClick={startGame}
+          className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            socket === null && "bg-gray-500"
+          }`}
+        >
+          Play
+        </button>
+      )}
+      {type === "lobby" && gameId && (
+        <button
+          disabled={socket === null}
+          onClick={startGame}
+          className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            socket === null && "bg-gray-500"
+          }`}
+        >
+          Play
+        </button>
+      )}
       <a
         href={`${BACKEND_URL}/auth/logout`}
         className="w-full bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"
@@ -340,7 +406,7 @@ export default function Game() {
       } else if (message.type === GETFRIENDLYMATCHID) {
         setGameIdLocally(message.payload.gameId);
       } else if (message.type === SEND_MESSAGE) {
-        console.log(message.payload.message,"dsvslkm")
+        console.log(message.payload.message);
         setMessage(message.payload.message);
       }
     };

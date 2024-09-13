@@ -271,7 +271,7 @@ export class GameManager {
             item.getGameStatus() === NOT_YET_STARTED &&
             item.getGameId() === gameId
         );
-        console.log("Game Found -> ",game?.getGameId())
+        console.log("Game Found -> ", game?.getGameId());
         if (game) {
           const player1 = game?.getPlayer1();
           // Avoid creating game between the same player.
@@ -313,14 +313,16 @@ export class GameManager {
           },
         });
       }
-    } else {
+    } else if (["lobby", "random"].includes(type ?? "")) {
       // Check for ratings and match the players
       // Also check for all non friendly matches
       const game = this.games.find((game) => {
         return (
           game.getGameStatus() === NOT_YET_STARTED &&
           !game.isFriendly &&
-          game.matchRating(user.rating) &&
+          // Check nearest rating only if type === "random"
+          (type === "lobby" ||
+            (type === "random" && game.matchRating(user.rating))) &&
           game.stake === stake
         );
       });

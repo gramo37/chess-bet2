@@ -14,7 +14,7 @@ import {
   GET_TIME,
   NOT_YET_STARTED,
   GETFRIENDLYMATCHID,
-  SEND_MESSAGE
+  SEND_MESSAGE,
 } from "./constants";
 import { Game } from "./Game";
 import { Player } from "./Player";
@@ -82,7 +82,7 @@ export class GameManager {
           await self.getTime(socket, token);
           break;
         case SEND_MESSAGE:
-          self.SendMessage(socket,token,message.payload.message)
+          self.SendMessage(socket, token, message.payload.message);
           break;
         default:
           break;
@@ -90,7 +90,7 @@ export class GameManager {
     });
   }
 
-  async SendMessage(socket: WebSocket, token: string,message:string) {
+  async SendMessage(socket: WebSocket, token: string, message: string) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return;
     const game = this.games.find(
@@ -100,24 +100,23 @@ export class GameManager {
         game.getGameStatus() === IN_PROGRESS
     );
     if (game) {
-            const opponent =
+      const opponent =
         game.getPlayer1().getPlayer() === socket
           ? game.getPlayer2()
-                : game.getPlayer1();
-      
-      
-            sendMessage(opponent.getPlayer(), {
-              type: SEND_MESSAGE,
-              payload: {
-              message:message
-              }
+          : game.getPlayer1();
+
+      sendMessage(opponent.getPlayer(), {
+        type: SEND_MESSAGE,
+        payload: {
+          message: message,
+        },
       });
     } else
       sendMessage(socket, {
         type: GAMENOTFOUND,
       });
   }
-  
+
   async abortGame(socket: WebSocket, token: string) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return;

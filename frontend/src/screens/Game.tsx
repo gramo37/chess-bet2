@@ -85,6 +85,11 @@ const ChessOptions: React.FC = () => {
     );
   };
 
+  const getOpponents = () => {
+    // Make an API call to get all players matching current users rating, stake and type should not be friendly
+
+  }
+
   return (
     <div className="flex flex-col items-center space-y-4 p-4">
       <h2 className="text-white text-2xl font-bold mb-4">
@@ -121,7 +126,7 @@ const ChessOptions: React.FC = () => {
             type === "lobby" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
-          Choose from Lobby
+          Choose your opponent
         </button>
       </div>
 
@@ -175,16 +180,26 @@ const ChessOptions: React.FC = () => {
           value={stake}
           onChange={(e) => setStake(Number(e.target.value))}
         />
+        {type === "lobby" && <button
+          className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            socket === null && "bg-gray-500"
+          }`}
+          onClick={getOpponents}
+        >
+          Find Opponents
+        </button>}
       </div>
-      <button
-        disabled={socket === null}
-        onClick={startGame}
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
-          socket === null && "bg-gray-500"
-        }`}
-      >
-        Play
-      </button>
+      {type !== "lobby" && (
+        <button
+          disabled={socket === null}
+          onClick={startGame}
+          className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+            socket === null && "bg-gray-500"
+          }`}
+        >
+          Play
+        </button>
+      )}
       <a
         href={`${BACKEND_URL}/auth/logout`}
         className="w-full bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"

@@ -18,7 +18,7 @@ const allowedHosts = process.env.ALLOWED_HOSTS
   ? process.env.ALLOWED_HOSTS.split(",")
   : [];
 
-console.log(allowedHosts)
+console.log(allowedHosts);
 
 app.use(
   cors({
@@ -43,9 +43,10 @@ wss.on("connection", async function connection(ws, req) {
   if (stake && typeof stake !== "string") stake = null;
   if (token && typeof token !== "string") token = null;
 
-  console.log(token, stake, type, gameId)
+  console.log(token, stake, type, gameId);
 
-  if(token && stake && type) await gameManager.addUser({ socket: ws, token, type, stake, gameId });
+  if (token && stake && type)
+    await gameManager.addUser({ socket: ws, token, type, stake, gameId });
 
   ws.on("close", () => {
     gameManager.removeUser(ws);
@@ -55,15 +56,18 @@ wss.on("connection", async function connection(ws, req) {
 connect();
 
 app.get("/", (req, res) => {
-  res.send("Ping")
-})
+  res.send("Ping");
+});
 
-app.get("/open_games", (req, res) => {
-  const games = gameManager.getAllGames();
+app.get("/open_games", async (req, res) => {
+  let { token, stake } = req.query;
+  if (token && typeof token !== "string") token = "";
+  if (stake && typeof stake !== "string") stake = "";
+  const games = (token && stake) ? await gameManager.getAllGames(token, stake) : [];
   res.status(200).json({
-    games
-  })
-})
+    games,
+  });
+});
 
 server.listen(PORT, () => {
   console.log("Connected to PORT: ", PORT);

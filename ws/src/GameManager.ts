@@ -264,19 +264,30 @@ export class GameManager {
       // In this case don't check for ratings
       console.log("Creating a friendly match", gameId);
       if (Boolean(gameId)) {
-        console.log("Starting the game", gameId, Boolean(gameId));
+        console.log("Starting the game", gameId);
         // Start the game
-        const game = this.games.find((item) => item.getGameId() === gameId);
-        const player1 = game?.getPlayer1();
-        // Avoid creating game between the same player.
-        if (player1?.getPlayerId() !== user.id) {
-          const player2 = game?.getPlayer2();
-          player2?.setPlayerToken(token);
-          player2?.setPlayerSocket(socket);
-          player2?.setPlayerId(user.id);
-          player2?.setPlayerName(user.name);
-          player2?.setPlayerRating(user.rating);
-          await game?.createGame();
+        const game = this.games.find(
+          (item) =>
+            item.getGameStatus() === NOT_YET_STARTED &&
+            item.getGameId() === gameId
+        );
+        console.log("Game Found -> ",game?.getGameId())
+        if (game) {
+          const player1 = game?.getPlayer1();
+          // Avoid creating game between the same player.
+          if (player1?.getPlayerId() !== user.id) {
+            const player2 = game?.getPlayer2();
+            player2?.setPlayerToken(token);
+            player2?.setPlayerSocket(socket);
+            player2?.setPlayerId(user.id);
+            player2?.setPlayerName(user.name);
+            player2?.setPlayerRating(user.rating);
+            await game?.createGame();
+          }
+        } else {
+          sendMessage(socket, {
+            type: GAMEABORTED,
+          });
         }
       } else {
         // Create the game and send this to the frontend
@@ -307,6 +318,7 @@ export class GameManager {
       // Also check for all non friendly matches
       const game = this.games.find((game) => {
         return (
+          game.getGameStatus() === NOT_YET_STARTED &&
           !game.isFriendly &&
           game.matchRating(user.rating) &&
           game.stake === stake
@@ -465,8 +477,9 @@ export class GameManager {
     if (!user || !user.name || !user.id) return [];
     return this.games.filter((game) => {
       return (
+        game.getGameStatus() === NOT_YET_STARTED &&
         !game.isFriendly &&
-        game.matchRating(user?.rating) &&
+        // game.matchRating(user?.rating) &&
         game.stake === stake
       );
     });

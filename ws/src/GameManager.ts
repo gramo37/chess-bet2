@@ -460,9 +460,15 @@ export class GameManager {
       });
   }
 
-  getAllGames() {
+  async getAllGames(token: string, stake: string) {
+    const user = await extractUser(token);
+    if (!user || !user.name || !user.id) return [];
     return this.games.filter((game) => {
-      return !game.isFriendly;
+      return (
+        !game.isFriendly &&
+        game.matchRating(user?.rating) &&
+        game.stake === stake
+      );
     });
   }
 }

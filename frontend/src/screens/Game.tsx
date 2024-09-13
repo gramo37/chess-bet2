@@ -36,6 +36,7 @@ import { BACKEND_URL, WS_BACKEND_URL } from "../constants/routes";
 import ChatContainer from "../components/game/chat";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { usePersonStore } from "../contexts/auth";
 
 interface HighlightedSquares {
   [square: string]: React.CSSProperties;
@@ -70,11 +71,17 @@ const ChessOptions: React.FC = () => {
     "setGameId",
     "gameId",
   ]);
+  const user = usePersonStore((state) => state.user);
   const [opponents, setOpponents] = useState([]);
   const { isPending, isError, isSuccess, mutate } = useMutation({
     mutationFn: async () => {
       // TODO: Send token and stake
-      const res = await axios.get(`${WS_BACKEND_URL}/open_games`);
+      const res = await axios.get(`${WS_BACKEND_URL}/open_games`, {
+        params: {
+          token: user?.token,
+          stake
+        }
+      });
       if (res && res?.data && res?.data?.games) setOpponents(res.data.games);
     },
   });

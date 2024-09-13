@@ -37,7 +37,7 @@ type TAction = {
   setOpponent: (opponent: Player | null) => void;
   setPlayer: (player: Player | null) => void;
   setStake: (stake: number) => void;
-  setType: (type: number) => void;
+  setType: (type: string) => void;
   setGameId: (gameId: string | null) => void;
 };
 
@@ -91,8 +91,8 @@ export const useStore = create<TGame & TAction>((set) => ({
   setStake: (stake: number) => {
     set({ stake });
   },
-  setType: (stake: number) => {
-    set({ stake });
+  setType: (type: string) => {
+    set({ type });
   },
   setGameId: (gameId: string | null) => {
     set({ gameId });

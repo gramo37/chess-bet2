@@ -8,7 +8,7 @@ import {
 import { TMove } from "../types/game";
 import Moves from "../components/game/Moves";
 import { useGameStore } from "../contexts/game.context";
-import NewGame from "../components/game/NewGame";
+// import NewGame from "../components/game/NewGame";
 import {
   ACCEPT_DRAW,
   DRAW,
@@ -19,6 +19,7 @@ import {
   GAMESTARTED,
   GET_TIME,
   GETFRIENDLYMATCHID,
+  INIT_GAME,
   INVALID_MOVE,
   MOVE,
   MOVESUCCESS,
@@ -29,10 +30,168 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { formatTime, isPromotion } from "../utils/game";
 import useTimer from "../hooks/useTimer";
+import { BACKEND_URL } from "../constants/routes";
 
 interface HighlightedSquares {
   [square: string]: React.CSSProperties;
 }
+
+type FriendlyOption = "Create Game" | "Join Game";
+
+const ChessOptions: React.FC = () => {
+  const [friendlyOption, setFriendlyOption] = useState<FriendlyOption | null>(
+    null
+  );
+  const {
+    setIsGameStarted,
+    setResult,
+    socket,
+    setColor,
+    stake,
+    setStake,
+    type,
+    setType,
+    setGameId,
+    gameId,
+  } = useGameStore([
+    "setIsGameStarted",
+    "setResult",
+    "socket",
+    "setColor",
+    "stake",
+    "setStake",
+    "type",
+    "setType",
+    "setGameId",
+    "gameId",
+  ]);
+
+  const handleFriendlyOptionChange = (option: FriendlyOption) => {
+    setFriendlyOption(option);
+    setGameId(""); // Clear game code on changing option
+  };
+
+  const startGame = () => {
+    if (!socket) return;
+    setIsGameStarted(true);
+    setResult(null);
+    setColor(null);
+    socket?.send(
+      JSON.stringify({
+        type: INIT_GAME,
+      })
+    );
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-4 p-4">
+      <h2 className="text-white text-2xl font-bold mb-4">
+        Choose how to play chess:
+      </h2>
+
+      {/* Main options */}
+      <div className="space-y-2">
+        <button
+          onClick={() => setType("friend")}
+          className={`btn m-2 p-2 ${
+            type === "friend" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+        >
+          Friendly Match
+        </button>
+        <button
+          onClick={() => {
+            setType("random");
+            setGameId("");
+          }}
+          className={`btn m-2 p-2 ${
+            type === "random" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+        >
+          Play Random
+        </button>
+        <button
+          onClick={() => {
+            setType("lobby");
+            setGameId("");
+          }}
+          className={`btn m-2 p-2 ${
+            type === "lobby" ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
+        >
+          Choose from Lobby
+        </button>
+      </div>
+
+      {/* Conditional rendering based on selected option */}
+      {type === "friend" && (
+        <div className="flex flex-col items-center space-y-2 mt-4">
+          <h3 className="text-white text-xl font-semibold">
+            Friendly Match Options:
+          </h3>
+          <div>
+            <button
+              onClick={() => handleFriendlyOptionChange("Create Game")}
+              className={`btn p-2 ${
+                friendlyOption === "Create Game"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Create Game
+            </button>
+            <button
+              onClick={() => handleFriendlyOptionChange("Join Game")}
+              className={`btn ml-2 p-2 ${
+                friendlyOption === "Join Game"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Join Game
+            </button>
+          </div>
+
+          {friendlyOption === "Join Game" && (
+            <div className="mt-4">
+              <input
+                type="text"
+                value={gameId ?? ""}
+                onChange={(e) => setGameId(e.target.value)}
+                placeholder="Enter Game Code"
+                className="border p-2 rounded"
+              />
+            </div>
+          )}
+        </div>
+      )}
+      <div className="flex gap-2 justify-center items-center">
+        <label className="text-white">Enter Stake</label>
+        <input
+          type="number"
+          className="p-2"
+          value={stake}
+          onChange={(e) => setStake(Number(e.target.value))}
+        />
+      </div>
+      <button
+        disabled={socket === null}
+        onClick={startGame}
+        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+          socket === null && "bg-gray-500"
+        }`}
+      >
+        Play
+      </button>
+      <a
+        href={`${BACKEND_URL}/auth/logout`}
+        className="w-full bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"
+      >
+        Logout
+      </a>
+    </div>
+  );
+};
 
 export default function Game() {
   const {
@@ -51,8 +210,6 @@ export default function Game() {
     setOpponent,
     player,
     setPlayer,
-    gameId,
-    setGameId
   } = useGameStore([
     "board",
     "setBoard",
@@ -69,13 +226,12 @@ export default function Game() {
     "setOpponent",
     "player",
     "setPlayer",
-    "gameId",
-    "setGameId"
   ]);
   useInitSocket();
   // const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
+  const [localGameId, setGameIdLocally] = useState("");
   const [showPromotionDialog, setShowPromotionDialog] = useState(false);
   const [highlightedSquares, setHighlightedSquares] =
     useState<HighlightedSquares>({});
@@ -87,13 +243,13 @@ export default function Game() {
     timeLeft: player1timeLeft,
     start: startPlayer1Timer,
     stop: stopPlayer1Timer,
-    setTimeLeft: setPlayer1TimeLeft
+    setTimeLeft: setPlayer1TimeLeft,
   } = useTimer();
   const {
     timeLeft: player2timeLeft,
     start: startPlayer2Timer,
     stop: stopPlayer2Timer,
-    setTimeLeft: setPlayer2TimeLeft
+    setTimeLeft: setPlayer2TimeLeft,
   } = useTimer();
 
   const acceptDraw = () => {
@@ -175,11 +331,11 @@ export default function Game() {
         setLoading(false);
       } else if (message.type === GAMEABORTED) {
         setIsGameStarted(false);
-      } else if(message.type === GET_TIME) {
-        setPlayer1TimeLeft(message.payload.player1TimeLeft)
-        setPlayer2TimeLeft(message.payload.player2TimeLeft)
-      } else if(message.type === GETFRIENDLYMATCHID) {
-        setGameId(message.payload.gameId)
+      } else if (message.type === GET_TIME) {
+        setPlayer1TimeLeft(message.payload.player1TimeLeft);
+        setPlayer2TimeLeft(message.payload.player2TimeLeft);
+      } else if (message.type === GETFRIENDLYMATCHID) {
+        setGameIdLocally(message.payload.gameId);
       }
     };
     return () => {
@@ -199,10 +355,12 @@ export default function Game() {
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      if(!socket) return;
-      socket.send(JSON.stringify({
-        type: GET_TIME
-      }))
+      if (!socket) return;
+      socket.send(
+        JSON.stringify({
+          type: GET_TIME,
+        })
+      );
     }, 10000);
 
     return () => {
@@ -308,7 +466,7 @@ export default function Game() {
                 : formatTime(player1timeLeft)}
             </p>
           </div>
-          {gameId && <p className="text-white">Game ID - {gameId}</p>}
+          {localGameId && <p className="text-white">Game ID - {localGameId}</p>}
           <Chessboard
             position={board}
             showPromotionDialog={showPromotionDialog}
@@ -358,7 +516,7 @@ export default function Game() {
             customSquareStyles={highlightedSquares}
           />
           <div className="mt-4 text-center">
-          <h2 className="text-xl font-bold text-gray-300">
+            <h2 className="text-xl font-bold text-gray-300">
               {player?.name ?? ""}
             </h2>
             <p className="text-gray-400">
@@ -381,7 +539,8 @@ export default function Game() {
               </p>
             )}
           <div className="hidden">{loading}</div>
-          {!isGameStarted && <NewGame />}
+          {!isGameStarted && <ChessOptions />}
+          {/* {!isGameStarted && <NewGame />} */}
           {isGameStarted && <Moves />}
         </div>
       </div>

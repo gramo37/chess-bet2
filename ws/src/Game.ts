@@ -283,6 +283,7 @@ export class Game {
           status: IN_PROGRESS,
           stake: this.stake,
           isFriendly: this.isFriendly,
+          id: this.gameId,
           whitePlayer: {
             connect: {
               id: this.player1.getPlayerId(),
@@ -295,8 +296,9 @@ export class Game {
           },
         },
       });
-      this.gameId = db_game.id;
+      // this.gameId = db_game.id;
       this.status = IN_PROGRESS;
+      console.log("Sending message to player1 ->", this.getPlayer1().getPlayerName())
       sendMessage(this.player1.getPlayer(), {
         type: GAMESTARTED,
         payload: {
@@ -312,6 +314,7 @@ export class Game {
         },
       });
 
+      console.log("Sending message to player2 ->", this.getPlayer2().getPlayerName())
       sendMessage(this.player2.getPlayer(), {
         type: GAMESTARTED,
         payload: {
@@ -331,6 +334,7 @@ export class Game {
       return;
     }
     // Recreating a game that is already present in db
+    console.log("Sending message to player1 ->", this.getPlayer1().getPlayerName())
     sendMessage(this.player1.getPlayer(), {
       type: GAMERESTARTED,
       payload: {
@@ -349,6 +353,7 @@ export class Game {
       },
     });
 
+    console.log("Sending message to player1 ->", this.getPlayer2().getPlayerName())
     sendMessage(this.player2.getPlayer(), {
       type: GAMERESTARTED,
       payload: {

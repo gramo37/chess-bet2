@@ -92,13 +92,15 @@ export class GameManager {
     const game = this.games.find((game) => {
       const player1Id = game.getPlayer1().getPlayerId();
       const player2Id = game.getPlayer2().getPlayerId();
-      return player1Id === user.id || player2Id === user.id
-    })
+      return player1Id === user.id || player2Id === user.id;
+    });
     // Before deleting it check if the game is started or not
-    if(!game) return;
-    if(game.getGameStatus() === NOT_YET_STARTED) {
+    if (!game) return;
+    if (game.getGameStatus() === NOT_YET_STARTED) {
       // if not started Delete it
-      this.games = this.games.filter((gm) => gm.getGameId() !== game.getGameId())
+      this.games = this.games.filter(
+        (gm) => gm.getGameId() !== game.getGameId()
+      );
       sendMessage(socket, {
         type: GAMEABORTED,
       });
@@ -197,7 +199,7 @@ export class GameManager {
     token: string,
     stake: string,
     type?: string | null,
-    gameId?: string | null,
+    gameId?: string | null
   ) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return;
@@ -210,11 +212,11 @@ export class GameManager {
       },
     });
     if (db_game) {
-      console.log("Game is present in DB, recreating it")
+      console.log("Game is present in DB, recreating it");
       // Check for the game locally
       const game = this.games.find((item) => item.getGameId() === db_game?.id);
       if (game) {
-        console.log("Game found locally -> ", game.getGameId())
+        console.log("Game found locally -> ", game.getGameId());
         const restartedPlayer =
           game.getPlayer1().getPlayerId() === user.id
             ? game.getPlayer1()
@@ -228,18 +230,22 @@ export class GameManager {
 
     if (type === "friend") {
       // In this case don't check for ratings
-      console.log("Creating a friendly match", gameId)
+      console.log("Creating a friendly match", gameId);
       if (Boolean(gameId)) {
-        console.log("Starting the game", gameId, Boolean(gameId))
+        console.log("Starting the game", gameId, Boolean(gameId));
         // Start the game
         const game = this.games.find((item) => item.getGameId() === gameId);
-        const player2 = game?.getPlayer2();
-        player2?.setPlayerToken(token);
-        player2?.setPlayerSocket(socket);
-        player2?.setPlayerId(user.id);
-        player2?.setPlayerName(user.name);
-        player2?.setPlayerRating(user.rating);
-        game?.createGame();
+        const player1 = game?.getPlayer1();
+        // Avoid creating game between the same player.
+        if (player1?.getPlayerId() !== user.id) {
+          const player2 = game?.getPlayer2();
+          player2?.setPlayerToken(token);
+          player2?.setPlayerSocket(socket);
+          player2?.setPlayerId(user.id);
+          player2?.setPlayerName(user.name);
+          player2?.setPlayerRating(user.rating);
+          await game?.createGame();
+        }
       } else {
         // Create the game and send this to the frontend
         // and wait for the friend
@@ -253,16 +259,16 @@ export class GameManager {
         );
         const player2 = new Player(null, BLACK, null, "", "", 0);
         const game = new Game(player1, player2, true, stake);
-        console.log("Creating a friendly match -> ", game.getGameId())
+        console.log("Creating a friendly match -> ", game.getGameId());
         this.games.push(game);
         // Send this game id to frontend
-        console.log("Sending this to frontend", game.getGameId())
+        console.log("Sending this to frontend", game.getGameId());
         sendMessage(socket, {
           type: GETFRIENDLYMATCHID,
           payload: {
-            gameId: game.getGameId()
-          }
-        })
+            gameId: game.getGameId(),
+          },
+        });
       }
     } else {
       // Check for ratings and match the players
@@ -274,31 +280,36 @@ export class GameManager {
           game.stake === stake
         );
       });
-      console.log("Matched Games -> ", game?.getGameId())
+      console.log("Matched Games -> ", game?.getGameId());
       if (!game) {
         // Push the game in this.games with a null player 2
         const player1 = new Player(
           socket,
-          BLACK,
+          WHITE,
           token,
           user.name,
           user.id,
           user.rating
         );
-        const player2 = new Player(null, WHITE, null, "", "", 0);
+        const player2 = new Player(null, BLACK, null, "", "", 0);
         const game = new Game(player1, player2, false, stake);
-        console.log("Creating new game -> ", game.getGameId())
+        console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
       } else {
         // match the opponent and start the game
-        const player2 = game?.getPlayer2();
-        player2?.setPlayerToken(token);
-        player2?.setPlayerSocket(socket);
-        player2?.setPlayerId(user.id);
-        player2?.setPlayerName(user.name);
-        player2?.setPlayerRating(user.rating);
-        console.log("Adding new player to game -> ", game.getGameId())
-        await game?.createGame();
+
+        const player1 = game.getPlayer1();
+        // Avoid creating game between the same player.
+        if (player1.getPlayerId() !== user.id) {
+          const player2 = game?.getPlayer2();
+          player2?.setPlayerToken(token);
+          player2?.setPlayerSocket(socket);
+          player2?.setPlayerId(user.id);
+          player2?.setPlayerName(user.name);
+          player2?.setPlayerRating(user.rating);
+          console.log("Adding new player to game -> ", game.getGameId());
+          await game?.createGame();
+        }
       }
     }
     // Create a new game if no ongoing game found
@@ -355,7 +366,14 @@ export class GameManager {
       );
       this.users.push(player1);
       this.users.push(player2);
-      const newGame = new Game(player2, player1, game.isFriendly, game.stake, game.id, game.status);
+      const newGame = new Game(
+        player2,
+        player1,
+        game.isFriendly,
+        game.stake,
+        game.id,
+        game.status
+      );
       const chess = seedBoard(
         game.Move.map((move: TMove) => ({
           from: move.from,
@@ -399,7 +417,7 @@ export class GameManager {
           status: true,
           blackPlayer: true,
           whitePlayer: true,
-          isFriendly: true
+          isFriendly: true,
         },
       })
       .then((games: any) => {

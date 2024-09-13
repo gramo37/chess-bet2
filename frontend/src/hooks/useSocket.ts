@@ -8,7 +8,7 @@ export const useInitSocket = () => {
   const { setSocket, stake, type, gameId } = useGameStore(["setSocket", "stake", "type", "gameId"]);
 
   useEffect(() => {
-    const ws = new WebSocket(`${WS_URL}?token=${user?.token}&type=${"random"}&stake=${"10"}`);
+    const ws = new WebSocket(`${WS_URL}?token=${user?.token}&type=${type}&stake=${stake}&gameId=${gameId}`);
     ws.onopen = () => {
       setSocket(ws);
     };
@@ -20,5 +20,5 @@ export const useInitSocket = () => {
     return () => {
       ws.close();
     };
-  }, [setSocket, user?.token]);
+  }, [gameId, setSocket, stake, type, user?.token]);
 };

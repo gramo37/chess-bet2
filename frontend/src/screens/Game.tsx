@@ -26,11 +26,13 @@ import {
   OFFER_DRAW,
   REJECT_DRAW,
   RESIGN,
+  SEND_MESSAGE,
 } from "../constants";
 import { useEffect, useRef, useState } from "react";
 import { formatTime, isPromotion } from "../utils/game";
 import useTimer from "../hooks/useTimer";
 import { BACKEND_URL } from "../constants/routes";
+import ChatContainer from "../components/game/chat";
 
 interface HighlightedSquares {
   [square: string]: React.CSSProperties;
@@ -239,6 +241,7 @@ export default function Game() {
   const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
   const [promotionSquare, setPromotionSquare] = useState<Square | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [message, setMessage] = useState("");
   const {
     timeLeft: player1timeLeft,
     start: startPlayer1Timer,
@@ -336,6 +339,9 @@ export default function Game() {
         setPlayer2TimeLeft(message.payload.player2TimeLeft);
       } else if (message.type === GETFRIENDLYMATCHID) {
         setGameIdLocally(message.payload.gameId);
+      } else if (message.type === SEND_MESSAGE) {
+        console.log(message.payload.message,"dsvslkm")
+        setMessage(message.payload.message);
       }
     };
     return () => {
@@ -540,7 +546,7 @@ export default function Game() {
             )}
           <div className="hidden">{loading}</div>
           {!isGameStarted && <ChessOptions />}
-          {/* {!isGameStarted && <NewGame />} */}
+          {isGameStarted && <ChatContainer message={message} />}
           {isGameStarted && <Moves />}
         </div>
       </div>

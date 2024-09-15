@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useGameStore } from "../contexts/game.context";
+
 import { useState } from "react";
-import { BACKEND_URL, WS_BACKEND_URL } from "../constants/routes";
+import { useGameStore } from "../../contexts/game.context";
+import { usePersonStore } from "../../contexts/auth";
 import { useMutation } from "@tanstack/react-query";
+import { BACKEND_URL, WS_BACKEND_URL } from "../../constants/routes";
 import axios from "axios";
-import { usePersonStore } from "../contexts/auth";
-import { INIT_GAME } from "../constants";
+import { INIT_GAME } from "../../constants";
+
 
 type FriendlyOption = "Create Game" | "Join Game";
 

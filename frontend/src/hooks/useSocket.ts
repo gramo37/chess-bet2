@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { WS_URL } from "../constants/routes";
-import { usePersonStore } from "../contexts/auth";
+import usePersonStore  from "../contexts/auth";
 import { useGameStore } from "../contexts/game.context";
 import {
   ACCEPT_DRAW,

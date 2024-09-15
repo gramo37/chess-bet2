@@ -7,7 +7,7 @@ import { useGameLogic } from "../hooks/useGameLogic";
 import ChessOptions from "../components/game/ChessOptions";
 import Results from "../components/game/Results";
 import TimeLeft from "../components/game/TimeLeft";
-import Board from "../components/Board";
+import Board from "../components/game/Board";
 
 export default function Game() {
   const { color } = useGameStore(["color"]);

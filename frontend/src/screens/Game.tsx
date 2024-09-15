@@ -10,13 +10,7 @@ import TimeLeft from "../components/game/TimeLeft";
 import Board from "../components/Board";
 
 export default function Game() {
-  const { isGameStarted, color } = useGameStore([
-    "board",
-    "isGameStarted",
-    "color",
-    "setBoard",
-    "socket",
-  ]);
+  const { color } = useGameStore(["color"]);
   useInitSocket();
   const {
     loading,
@@ -40,7 +34,7 @@ export default function Game() {
             }
           />
           {localGameId && <p className="text-white">Game ID - {localGameId}</p>}
-          <Board setLoading={setLoading}/>
+          <Board setLoading={setLoading} />
           <TimeLeft
             timeLeft={
               color === "white"
@@ -49,12 +43,12 @@ export default function Game() {
             }
           />
         </div>
-        <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
+        <div className="w-full lg:w-1/2 flex flex-col items-center">
           <Results loading={loading} />
-          <div>
-            {!isGameStarted && <ChessOptions />}
-            {isGameStarted && <ChatContainer message={message} />}
-            {isGameStarted && <Moves />}
+          <div className="w-full">
+            <ChessOptions />
+            <Moves />
+            <ChatContainer message={message} />
           </div>
         </div>
       </div>

@@ -8,7 +8,6 @@ import { BACKEND_URL, WS_BACKEND_URL } from "../../constants/routes";
 import axios from "axios";
 import { INIT_GAME } from "../../constants";
 
-
 type FriendlyOption = "Create Game" | "Join Game";
 
 const ChessOptions: React.FC = () => {
@@ -16,6 +15,7 @@ const ChessOptions: React.FC = () => {
     null
   );
   const {
+    isGameStarted,
     setIsGameStarted,
     setResult,
     socket,
@@ -27,6 +27,7 @@ const ChessOptions: React.FC = () => {
     setGameId,
     gameId,
   } = useGameStore([
+    "isGameStarted",
     "setIsGameStarted",
     "setResult",
     "socket",
@@ -74,6 +75,8 @@ const ChessOptions: React.FC = () => {
     // Make an API call to get all players matching current users rating, stake and type should not be friendly
     mutate();
   };
+
+  if (isGameStarted) return null;
 
   return (
     <div className="flex flex-col items-center space-y-4 p-4">

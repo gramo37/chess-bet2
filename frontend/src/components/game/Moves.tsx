@@ -13,7 +13,7 @@ const processMoves = (moves: string[]) => {
 };
 
 const Moves = () => {
-  const { color, sans, socket, result } = useGameStore([
+  const { color, sans, socket, result, isGameStarted } = useGameStore([
     "color",
     "socket",
     "sans",
@@ -48,6 +48,8 @@ const Moves = () => {
       })
     );
   };
+
+  if (!isGameStarted) return null;
 
   return (
     <>

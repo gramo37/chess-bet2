@@ -7,11 +7,13 @@ interface ChatContainerProps {
 }
 
 export default function ChatContainer({ message }: ChatContainerProps) {
-  const { socket } = useGameStore(['socket']);
-  const [input, setInput] = useState('');
+  const { socket } = useGameStore(["socket"]);
+  const [input, setInput] = useState("");
+
+  const { isGameStarted } = useGameStore(["isGameStarted"]);
 
   const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     if (!socket || !input.trim()) return;
 
     socket.send(
@@ -26,7 +28,7 @@ export default function ChatContainer({ message }: ChatContainerProps) {
       messageContainer.innerHTML += `<div class="bg-white p-1">${input}</div>`;
     }
 
-    setInput('');
+    setInput("");
   };
 
   useEffect(() => {
@@ -38,9 +40,14 @@ export default function ChatContainer({ message }: ChatContainerProps) {
     }
   }, [message]);
 
+  if (!isGameStarted) return null;
+
   return (
     <div className="relative min-h-80 w-full mt-4 bg-gray-400">
-      <div id="message-container" className="h-[85%] max-w-[1200px] overflow-y-auto">
+      <div
+        id="message-container"
+        className="h-[85%] max-w-[1200px] overflow-y-auto"
+      >
         <div className="bg-gray-300 p-1">Sample message 1</div>
         <div className="bg-white p-1">Sample message 2</div>
       </div>

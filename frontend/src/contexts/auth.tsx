@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import create from 'zustand';
 
 type TUser = {
   id: string;
@@ -7,14 +7,19 @@ type TUser = {
 
 type State = {
   user: TUser | null;
+  isLoading: boolean;
 };
 
 type Action = {
   updateUser: (user: State["user"]) => void;
+  setIsLoading: (isLoading: boolean) => void;
 };
 
-// Create your store, which includes both state and (optionally) actions
-export const usePersonStore = create<State & Action>((set) => ({
+const usePersonStore = create<State & Action>((set) => ({
   user: null,
+  isLoading: false, // Initialize isLoading state
   updateUser: (user) => set(() => ({ user })),
+  setIsLoading: (isLoading) => set(() => ({ isLoading })), // Action to update isLoading
 }));
+
+export default usePersonStore;

@@ -1,15 +1,8 @@
-// import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Landing() {
-  // const navigate = useNavigate();
-
-  // const startGame = () => {
-  //   navigate("/game");
-  // };
-
   const signup = () => {
     window.open(`${BACKEND_URL}/auth/register`, "_self");
   };
@@ -59,12 +52,6 @@ export default function Landing() {
             Join the exciting world of online chess.
           </p>
           <div className="mt-8">
-            {/* <button
-              onClick={startGame}
-              className="w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-            >
-              Play
-            </button> */}
             <button
               onClick={signup}
               className="w-full bg-green-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-green-600 focus:outline-none focus:bg-green-600"
@@ -79,8 +66,12 @@ export default function Landing() {
             </button>
           </div>
           <div className="mt-8">
-            <h3 className="text-sm font-light italic text-gray-300">Active Users: {(data?.games ?? 0) * 2}</h3>
-            <h3 className="text-sm font-light italic text-gray-300">Users: {(users?.users ?? 0)}</h3>
+            <h3 className="text-sm font-light italic text-gray-300">
+              Active Users: {(data?.games ?? 0) * 2}
+            </h3>
+            <h3 className="text-sm font-light italic text-gray-300">
+              Users: {users?.users ?? 0}
+            </h3>
           </div>
         </div>
       </div>

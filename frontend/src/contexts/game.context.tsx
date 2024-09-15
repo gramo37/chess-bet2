@@ -59,7 +59,7 @@ const INITIAL_STATE = {
 };
 
 // Create your store, which includes both state and (optionally) actions
-export const useStore = create<TGame & TAction>((set) => ({
+export const useStore = create<TGameState>((set) => ({
   ...INITIAL_STATE,
   setBoard: (board: string) => {
     set({ board });

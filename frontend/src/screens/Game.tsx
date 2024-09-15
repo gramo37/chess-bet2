@@ -1,5 +1,5 @@
 import { Chessboard } from "react-chessboard";
-import { useInitSocket } from "../hooks/useSocket";
+import { useInitSocket, useSocketHandler } from "../hooks/useSocket";
 import { Chess, Square } from "chess.js";
 import {
   Piece,
@@ -8,27 +8,9 @@ import {
 import { TMove } from "../types/game";
 import Moves from "../components/game/Moves";
 import { useGameStore } from "../contexts/game.context";
-import {
-  ACCEPT_DRAW,
-  DRAW,
-  ENDGAME,
-  GAMEABORTED,
-  GAMEOVER,
-  GAMERESTARTED,
-  GAMESTARTED,
-  GET_TIME,
-  GETFRIENDLYMATCHID,
-  INVALID_MOVE,
-  MOVE,
-  MOVESUCCESS,
-  OFFER_DRAW,
-  REJECT_DRAW,
-  RESIGN,
-  SEND_MESSAGE,
-} from "../constants";
+import { ACCEPT_DRAW, DRAW, GET_TIME, MOVE, RESIGN } from "../constants";
 import { useEffect, useRef, useState } from "react";
 import { formatTime, isPromotion } from "../utils/game";
-import useTimer from "../hooks/useTimer";
 import ChatContainer from "../components/game/chat";
 import ChessOptions from "../components/ChessOptions";
 
@@ -43,38 +25,29 @@ export default function Game() {
     color,
     result,
     setBoard,
-    setMoves,
-    setSans,
-    setColor,
-    setResult,
-    setIsGameStarted,
     socket,
     opponent,
-    setOpponent,
     player,
-    setPlayer,
   } = useGameStore([
     "board",
-    "setBoard",
     "isGameStarted",
-    "setIsGameStarted",
-    "setMoves",
-    "setSans",
     "color",
-    "setColor",
     "result",
-    "setResult",
+    "setBoard",
     "socket",
     "opponent",
-    "setOpponent",
     "player",
-    "setPlayer",
   ]);
   useInitSocket();
-  // const queryClient = useQueryClient();
+  const {
+    loading,
+    setLoading,
+    message,
+    localGameId,
+    player1timeLeft,
+    player2timeLeft,
+  } = useSocketHandler();
 
-  const [loading, setLoading] = useState(false);
-  const [localGameId, setGameIdLocally] = useState("");
   const [showPromotionDialog, setShowPromotionDialog] = useState(false);
   const [highlightedSquares, setHighlightedSquares] =
     useState<HighlightedSquares>({});
@@ -82,114 +55,6 @@ export default function Game() {
   const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
   const [promotionSquare, setPromotionSquare] = useState<Square | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [message, setMessage] = useState("");
-  const {
-    timeLeft: player1timeLeft,
-    start: startPlayer1Timer,
-    stop: stopPlayer1Timer,
-    setTimeLeft: setPlayer1TimeLeft,
-  } = useTimer();
-  const {
-    timeLeft: player2timeLeft,
-    start: startPlayer2Timer,
-    stop: stopPlayer2Timer,
-    setTimeLeft: setPlayer2TimeLeft,
-  } = useTimer();
-
-  const acceptDraw = () => {
-    socket?.send(
-      JSON.stringify({
-        type: ENDGAME,
-        payload: {
-          status: ACCEPT_DRAW,
-        },
-      })
-    );
-  };
-
-  const rejectDraw = () => {
-    socket?.send(
-      JSON.stringify({
-        type: REJECT_DRAW,
-      })
-    );
-  };
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === MOVESUCCESS) {
-        setBoard(message.payload.board);
-        setMoves(message.payload.moves);
-        setSans(message.payload.sans);
-        setLoading(false);
-        const chess = new Chess(message.payload.board);
-        if (chess.turn() === "w") {
-          startPlayer1Timer(message.payload.player1TimeLeft);
-          stopPlayer2Timer();
-        } else {
-          startPlayer2Timer(message.payload.player2TimeLeft);
-          stopPlayer1Timer();
-        }
-      } else if (message.type === GAMESTARTED) {
-        setColor(message.payload.color);
-        setBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        setOpponent(message.payload.opponent);
-        setPlayer(message.payload.player);
-        startPlayer1Timer(message.payload.player1TimeLeft);
-      } else if (message.type === GAMEOVER) {
-        setMoves([]);
-        setResult({
-          winner: message.payload.winner?.color,
-          loser: message.payload.loser?.color,
-          gameResult: message.payload?.result,
-        });
-        setIsGameStarted(false);
-        setLoading(false);
-        stopPlayer1Timer();
-        stopPlayer2Timer();
-        // queryClient.invalidateQueries({ queryKey: ["myGames"] });
-      } else if (message.type === GAMERESTARTED) {
-        setBoard(message.payload.board);
-        setMoves(message.payload.moves);
-        setSans(message.payload.sans);
-        setColor(message.payload.color);
-        setOpponent(message.payload.opponent);
-        setPlayer(message.payload.player);
-        const chess = new Chess(message.payload.board);
-        if (chess.turn() === "w") {
-          startPlayer1Timer(message.payload.player1TimeLeft);
-        } else {
-          startPlayer2Timer(message.payload.player2TimeLeft);
-        }
-      } else if (message.type === OFFER_DRAW) {
-        if (confirm("Opponents was a draw. Do you want to draw ?")) {
-          acceptDraw();
-        } else {
-          rejectDraw();
-        }
-      } else if (message.type === REJECT_DRAW) {
-        alert("Opponent rejected the offer of draw");
-      } else if (message.type === INVALID_MOVE) {
-        setLoading(false);
-      } else if (message.type === GAMEABORTED) {
-        setIsGameStarted(false);
-      } else if (message.type === GET_TIME) {
-        setPlayer1TimeLeft(message.payload.player1TimeLeft);
-        setPlayer2TimeLeft(message.payload.player2TimeLeft);
-      } else if (message.type === GETFRIENDLYMATCHID) {
-        setGameIdLocally(message.payload.gameId);
-      } else if (message.type === SEND_MESSAGE) {
-        console.log(message.payload.message);
-        setMessage(message.payload.message);
-      }
-    };
-    return () => {
-      socket.onmessage = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setBoard, setColor, setIsGameStarted, setMoves, setResult, socket]);
 
   useEffect(() => {
     if (result?.gameResult === RESIGN && result.winner === color) {

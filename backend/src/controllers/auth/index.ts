@@ -32,7 +32,7 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     const token = generateToken({ id: newUser.id, email: newUser.email });
-
+    EmailVerification(username);
     res
       .status(200)
       .json({ message: "User created successfully", token });

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useGameStore } from "../../contexts/game.context";
-import { usePersonStore } from "../../contexts/auth";
+import usePersonStore  from "../../contexts/auth";
 import { useMutation } from "@tanstack/react-query";
 import { BACKEND_URL, WS_BACKEND_URL } from "../../constants/routes";
 import axios from "axios";

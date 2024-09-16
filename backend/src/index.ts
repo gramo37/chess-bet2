@@ -9,7 +9,6 @@ import router from "./routes";
 import { db } from "./db";
 import cron from "node-cron";
 import { connect as connectToRedis, sendMovesToDB } from "./db/redis";
-
 const expressSession = require("express-session");
 // var SQLiteStore = require('connect-sqlite3')(expressSession);
 
@@ -17,7 +16,7 @@ dotenv.config();
 
 const app = express();
 const ejs = require("ejs");
-const PORT = process.env.BACKEND_PORT ?? 3000;
+const PORT = process.env.BACKEND_PORT ?? 5000;
 const BACKEND_ROUTE = "api"
 
 initPassport(passport);
@@ -94,8 +93,8 @@ app.get(`/${BACKEND_ROUTE}/all_users`, async (req, res) => {
 
 app.use(`/${BACKEND_ROUTE}/me`, router);
 
-app.use(`/${BACKEND_ROUTE}/auth`, auth);
-
+app.use(`/${BACKEND_ROUTE}/auth/`, auth);
+// app.use(`/${BACKEND_ROUTE}/`, verifyRouter);
 cron.schedule('*/10 * * * * *', async function () {
   await sendMovesToDB()
 });

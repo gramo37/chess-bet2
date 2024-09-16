@@ -26,14 +26,16 @@ export default function SignUP() {
         });
         
         const data = await response.json();
-        
+
+        localStorage.setItem('token', data.token);
         
         setEmail("");
         setName("");
         setPassword("");
         
         console.log(data, response);
-        alert(data.message)
+        alert(data.message);
+        window.location.href = "/game";
     } catch (error) {
         console.error('Error:', error);
         alert('Registration failed. Please try again.');

@@ -3,7 +3,6 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Landing() {
-
   const { data } = useQuery({
     queryKey: ["myGames"],
     queryFn: async () => {
@@ -47,20 +46,20 @@ export default function Landing() {
           <div className="mt-8">
             <a
               href="/signup"
-              className="w-full block bg-green-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-green-600 focus:outline-none focus:bg-green-600"
+              className="w-full block text-center bg-green-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-green-600 focus:outline-none focus:bg-green-600"
             >
               Signup
             </a>
             <a
-href="/login"
-              className="w-full block bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
+              href="/login"
+              className="w-full block text-center bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600"
             >
               Login
             </a>
           </div>
           <div className="mt-8">
             <h3 className="text-sm font-light italic text-gray-300">
-              Active Users: {(data?.games ?? 0) * 2}
+              Active Users: {(data?.users ?? 0)}
             </h3>
             <h3 className="text-sm font-light italic text-gray-300">
               Users: {users?.users ?? 0}

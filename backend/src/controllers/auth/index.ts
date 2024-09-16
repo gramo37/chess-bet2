@@ -23,7 +23,7 @@ export const signup = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
 
-    await db.user.create({
+    const newUser = await db.user.create({
       data: {
         email: username,
         password: hashPassword,
@@ -31,11 +31,11 @@ export const signup = async (req: Request, res: Response) => {
       },
     });
 
-    EmailVerification(username);
+    const token = generateToken({ id: newUser.id, email: newUser.email });
 
     res
       .status(200)
-      .json({ message: "User created successfully", status: "ok" });
+      .json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
@@ -135,13 +135,10 @@ export const verifyToken = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  req.logout((err) => {
-    if (err) {
-      console.error("Error logging out:", err);
-      res.status(500).json({ error: "Failed to log out" });
-    } else {
-      res.clearCookie("jwt");
-      res.redirect(`${FRONTEND_URL}`);
-    }
-  });
+  try {
+    res.clearCookie("jwt");
+    res.redirect(FRONTEND_URL)
+  } catch (error) {
+    res.status(500).json({ error: "Failed to log out" });
+  }
 };

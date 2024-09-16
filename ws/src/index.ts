@@ -5,6 +5,7 @@ import { connect } from "./db/redis";
 import express from "express";
 import cors from "cors";
 import http from "http";
+import { extractUser } from "./auth";
 
 const PORT = process.env.WEBSOCKET_PORT ?? 8080;
 
@@ -34,7 +35,6 @@ gameManager.initServer();
 
 wss.on("connection", async function connection(ws, req) {
   let token = req?.url ? url.parse(req.url, true).query.token : null;
-  // TODO: Check if the given token is valid
   let gameId = req?.url ? url.parse(req.url, true).query.gameId : null;
   let type = req?.url ? url.parse(req.url, true).query.type : null;
   let stake = req?.url ? url.parse(req.url, true).query.stake : null;
@@ -43,6 +43,10 @@ wss.on("connection", async function connection(ws, req) {
   if (stake && typeof stake !== "string") stake = null;
   if (token && typeof token !== "string") token = null;
 
+  let isAuthorizedUser = await extractUser(token)
+  if (!isAuthorizedUser) return ws.send(JSON.stringify({ "message": "Unauthorized user!" }))
+
+  console.log("isAuthorizedUser", isAuthorizedUser)
   console.log(token, stake, type, gameId);
 
   if (token && stake && type)

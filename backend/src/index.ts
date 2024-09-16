@@ -3,14 +3,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cron from "node-cron";
 import { connect as connectToRedis, sendMovesToDB } from "./db/redis";
-import user from "./routes/users"
-import auth from "./auth"
+import user from "./routes/users";
+import auth from "./routes/auth";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.BACKEND_PORT ?? 5000;
-const BACKEND_ROUTE = "api"
+const BACKEND_ROUTE = "api";
 
 connectToRedis();
 
@@ -21,7 +21,7 @@ const allowedHosts = process.env.ALLOWED_HOSTS
   ? process.env.ALLOWED_HOSTS.split(",")
   : [];
 
-console.log(allowedHosts)
+console.log(allowedHosts);
 
 app.use(
   cors({
@@ -33,10 +33,9 @@ app.use(
 
 app.use(BACKEND_ROUTE, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
-// app.use(BACKEND_ROUTE, auth);
 
-cron.schedule('*/10 * * * * *', async function () {
-  await sendMovesToDB()
+cron.schedule("*/10 * * * * *", async function () {
+  await sendMovesToDB();
 });
 
 app.listen(PORT, () => {

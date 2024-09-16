@@ -18,9 +18,8 @@ export const useGetUser = () => {
             "Authorization": `Bearer ${token}` // Attach token in the Authorization header
           }
         });
-        if (response.data.user) {
-          console.log(response.data.user);
-          updateUser(response.data.user); // Update user state with the response data
+        if (response?.data?.user?.user) {
+          updateUser(response.data.user.user); // Update user state with the response data
         }
       } catch (error) {
         console.error("Error fetching user:", error);

@@ -8,9 +8,15 @@ import ChessOptions from "../components/game/ChessOptions";
 import Results from "../components/game/Results";
 import TimeLeft from "../components/game/TimeLeft";
 import Board from "../components/game/Board";
+import { CiSettings } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
 
 export default function Game() {
-  const { color, opponent, player } = useGameStore(["color", "opponent", "player"]);
+  const { color, opponent, player } = useGameStore([
+    "color",
+    "opponent",
+    "player",
+  ]);
   useInitSocket();
   const {
     loading,
@@ -21,10 +27,16 @@ export default function Game() {
     player2timeLeft,
   } = useSocketHandler();
   useGameLogic();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full sm:w-[70%] lg:w-[85%] max-w-7xl">
+        <div className="text-white absolute top-2 left-2 w-10 h-10 cursor-pointer" onClick={() => {
+          navigate("/settings")
+        }}>
+          <CiSettings size={25}/>
+        </div>
         <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
           <h2 className="text-xl font-bold text-gray-300">
             {opponent?.name ?? ""}

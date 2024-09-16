@@ -1,6 +1,5 @@
 import { db } from "../db";
-import jwt from "jsonwebtoken";
-import { verifyToken } from "../utils";
+import { bigIntReplacer, verifyToken } from "../utils";
 
 // JWT Authentication Middleware
 export const authenticateJWT = async (req: any, res: any, next: any) => {
@@ -14,13 +13,21 @@ export const authenticateJWT = async (req: any, res: any, next: any) => {
 
   try {
     const decoded: any = verifyToken(token);
-    const user = await db.user.findFirst({
+    let user = await db.user.findFirst({
       where: {
         email: decoded.email,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        rating: true,
+        balance: true
+      }
     });
     if (!user) return res.status(404).json({ message: "User not found" });
-    req.user = { user: decoded, token };
+    user = {...user, balance: bigIntReplacer(user.balance)}
+    req.user = { user, token };
     next();
   } catch (error) {
     return res.status(403).json({ message: "Forbidden: Invalid token" });

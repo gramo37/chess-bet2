@@ -1,8 +1,12 @@
-import create from 'zustand';
+import create from "zustand";
 
 type TUser = {
   id: string;
   token: string;
+  balance: string;
+  rating: number;
+  name: string;
+  email: string;
 };
 
 type State = {

@@ -31,7 +31,7 @@ app.use(
   })
 );
 
-app.use(BACKEND_ROUTE, user);
+app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
 
 cron.schedule("*/10 * * * * *", async function () {

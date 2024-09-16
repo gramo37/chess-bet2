@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
 import { generateToken } from "../../utils";
 
 export async function EmailVerification(email: string) {

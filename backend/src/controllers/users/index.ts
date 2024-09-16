@@ -9,7 +9,7 @@ export async function getActiveUsers(req: Request, res: Response) {
       },
     });
     res.status(200).json({
-      games,
+      users: games * 2,
     });
   } catch (error) {
     console.log(error);

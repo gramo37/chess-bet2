@@ -10,7 +10,7 @@ import TimeLeft from "../components/game/TimeLeft";
 import Board from "../components/game/Board";
 
 export default function Game() {
-  const { color } = useGameStore(["color"]);
+  const { color, opponent, player } = useGameStore(["color", "opponent", "player"]);
   useInitSocket();
   const {
     loading,
@@ -26,6 +26,9 @@ export default function Game() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full sm:w-[70%] lg:w-[85%] max-w-7xl">
         <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
+          <h2 className="text-xl font-bold text-gray-300">
+            {opponent?.name ?? ""}
+          </h2>
           <TimeLeft
             timeLeft={
               color === "white"
@@ -35,6 +38,9 @@ export default function Game() {
           />
           {localGameId && <p className="text-white">Game ID - {localGameId}</p>}
           <Board setLoading={setLoading} />
+          <h2 className="text-xl font-bold text-gray-300">
+            {player?.name ?? ""}
+          </h2>
           <TimeLeft
             timeLeft={
               color === "white"

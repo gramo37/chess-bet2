@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useGameStore } from "../../contexts/game.context";
-import usePersonStore  from "../../contexts/auth";
+import usePersonStore from "../../contexts/auth";
 import { useMutation } from "@tanstack/react-query";
-import { BACKEND_URL, WS_BACKEND_URL } from "../../constants/routes";
+import { WS_BACKEND_URL } from "../../constants/routes";
 import axios from "axios";
 import { INIT_GAME } from "../../constants";
 
@@ -229,7 +229,10 @@ const ChessOptions: React.FC = () => {
         </button>
       )}
       <a
-        href={`${BACKEND_URL}/auth/logout`}
+        onClick={() => {
+          localStorage.setItem("token", "");
+          window.location.href = "/game";
+        }}
         className="w-full bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"
       >
         Logout

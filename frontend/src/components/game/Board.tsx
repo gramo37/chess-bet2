@@ -1,14 +1,14 @@
 import { Chessboard } from "react-chessboard";
-import { IHighlightedSquares, useBoardStore } from "../contexts/board.context";
-import { useGameStore } from "../contexts/game.context";
-import { isPromotion } from "../utils/game";
+import { IHighlightedSquares, useBoardStore } from "../../contexts/board.context";
+import { useGameStore } from "../../contexts/game.context";
+import { isPromotion } from "../../utils/game";
 import {
   Piece,
   PromotionPieceOption,
 } from "react-chessboard/dist/chessboard/types";
-import { MOVE } from "../constants";
+import { MOVE } from "../../constants";
 import { Chess, Square } from "chess.js";
-import { TMove } from "../types/game";
+import { TMove } from "../../types/game";
 
 export default function Board(props: {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;

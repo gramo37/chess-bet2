@@ -386,6 +386,7 @@ export class Game {
     );
     if (payload.status === ACCEPT_DRAW) result = DRAW;
     if (result) {
+      await this.updateBalances(winner, loser)
       await db.game.update({
         data: {
           status: COMPLETED,
@@ -429,4 +430,11 @@ export class Game {
     const playerRating = this.getPlayer1().getPlayerRating() 
     return isCloseTo(playerRating, rating);
   }
+
+  async updateBalances(winner: Player, loser: Player) {
+    // Reduce stake amount (this.stake) from loser's account
+    // Send 85% stake amount to winner's account using backend microservice
+    // Use route /api/payments/deposit-money
+  }
+
 }

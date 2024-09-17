@@ -33,7 +33,7 @@ export default function Game() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full sm:w-[70%] lg:w-[85%] max-w-7xl">
         <div className="text-white absolute top-2 left-2 w-10 h-10 cursor-pointer" onClick={() => {
-          navigate("/settings")
+          navigate("/account")
         }}>
           <CiSettings size={25}/>
         </div>

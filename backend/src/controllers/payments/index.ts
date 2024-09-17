@@ -52,7 +52,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
             message: "In-sufficient funds"
         })
 
-        // Send the amount to the company's account
+        // Send the amount to the user's account
         if (!(await withdrawMoneyToUser(amount, user))) {
             return res.status(404).json({
                 message: "Something went wrong when sending money to user's account"

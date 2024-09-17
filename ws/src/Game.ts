@@ -18,7 +18,6 @@ import {
   ACCEPT_DRAW,
   INITIAL_TIME,
   GET_TIME,
-  VITE_BACKEND_URL,
 } from "./constants";
 import { db } from "./db";
 import { randomUUID } from "crypto";
@@ -449,7 +448,7 @@ export class Game {
 
   async updateBalances(winner: Player, loser: Player) {
     try {
-      // Reduce stake amount (this.stake) from loser's account -> Simple DB call
+      // Reduce stake amount (this.stake) from loser's account
       await db.user.update({
         where: {
           id: loser.getPlayerId(),
@@ -460,23 +459,17 @@ export class Game {
           },
         },
       });
-      // Send 85% stake amount to winner's account using backend microservice
-      // Use route /api/payments/deposit-money
-      const depositAmount = 0.85 * Number(this.stake);
-      console.log(VITE_BACKEND_URL, "Lavda ka code")
-      const res = await axios.post(
-        `${VITE_BACKEND_URL}/api/payments/deposit-money`,
-        {
-          amount: depositAmount,
+      // Increase 85 % of the stake amount (this.stake) from winner's account
+      await db.user.update({
+        where: {
+          id: winner.getPlayerId(),
         },
-        {
-          headers: {
-            Authorization: `Bearer ${winner.getPlayerToken()}`,
-            "Content-Type": "application/json",
+        data: {
+          balance: {
+            increment: BigInt(Math.floor(0.85 * Number(this.stake))),
           },
-        }
-      );
-      console.log(res);
+        },
+      });
       return true;
     } catch (error) {
       console.log("Error updating balance", error);

@@ -18,6 +18,7 @@ import {
   ACCEPT_DRAW,
   INITIAL_TIME,
   GET_TIME,
+  VITE_BACKEND_URL,
 } from "./constants";
 import { db } from "./db";
 import { randomUUID } from "crypto";
@@ -25,6 +26,7 @@ import { TGameStatus, TMove } from "./types/game.types";
 import { TEndGamePayload } from "./types";
 import { sendGameOverMessage } from "./utils/game";
 import { addMoveToRedis } from "./utils/redis";
+import axios from "axios";
 
 export class Game {
   private player1: Player;
@@ -112,7 +114,8 @@ export class Game {
     this.timer1 = setInterval(() => {
       this.player1TimeLeft -= 1;
       if (this.player1TimeLeft <= 0) {
-        if(this.status !== COMPLETED) this.endGame(this.player1.getPlayer(), { status: "TIMER_EXPIRED" });
+        if (this.status !== COMPLETED)
+          this.endGame(this.player1.getPlayer(), { status: "TIMER_EXPIRED" });
         clearInterval(this.timer1);
       }
     }, 1000);
@@ -123,7 +126,8 @@ export class Game {
     this.timer2 = setInterval(() => {
       this.player2TimeLeft -= 1;
       if (this.player2TimeLeft <= 0) {
-        if(this.status !== COMPLETED) this.endGame(this.player2.getPlayer(), { status: "TIMER_EXPIRED" });
+        if (this.status !== COMPLETED)
+          this.endGame(this.player2.getPlayer(), { status: "TIMER_EXPIRED" });
         clearInterval(this.timer2);
       }
     }, 1000);
@@ -208,7 +212,7 @@ export class Game {
       console.log(error);
     }
 
-    if(chess.turn() === "w") {
+    if (chess.turn() === "w") {
       // Black has made a move, stop player2Timer and start player1Timer
       this.startPlayer1Timer();
       this.stopPlayer2Timer();
@@ -224,7 +228,7 @@ export class Game {
         moves: this.moves,
         sans: this.sans,
         player1TimeLeft: this.player1TimeLeft,
-        player2TimeLeft: this.player2TimeLeft
+        player2TimeLeft: this.player2TimeLeft,
       },
     });
 
@@ -263,7 +267,7 @@ export class Game {
           result,
           gameOutCome: result === DRAW ? DRAW : CHECKMATE,
           board: this.board,
-          endTime: new Date(Date.now())
+          endTime: new Date(Date.now()),
         },
         where: {
           id: this.gameId,
@@ -298,7 +302,10 @@ export class Game {
       });
       // this.gameId = db_game.id;
       this.status = IN_PROGRESS;
-      console.log("Sending message to player1 ->", this.getPlayer1().getPlayerName())
+      console.log(
+        "Sending message to player1 ->",
+        this.getPlayer1().getPlayerName()
+      );
       sendMessage(this.player1.getPlayer(), {
         type: GAMESTARTED,
         payload: {
@@ -307,14 +314,17 @@ export class Game {
             name: this.getPlayer2().getPlayerName(),
           },
           player: {
-            name: this.getPlayer1().getPlayerName()
+            name: this.getPlayer1().getPlayerName(),
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
         },
       });
 
-      console.log("Sending message to player2 ->", this.getPlayer2().getPlayerName())
+      console.log(
+        "Sending message to player2 ->",
+        this.getPlayer2().getPlayerName()
+      );
       sendMessage(this.player2.getPlayer(), {
         type: GAMESTARTED,
         payload: {
@@ -323,7 +333,7 @@ export class Game {
             name: this.getPlayer1().getPlayerName(),
           },
           player: {
-            name: this.getPlayer2().getPlayerName()
+            name: this.getPlayer2().getPlayerName(),
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
@@ -334,7 +344,10 @@ export class Game {
       return;
     }
     // Recreating a game that is already present in db
-    console.log("Sending message to player1 ->", this.getPlayer1().getPlayerName())
+    console.log(
+      "Sending message to player1 ->",
+      this.getPlayer1().getPlayerName()
+    );
     sendMessage(this.player1.getPlayer(), {
       type: GAMERESTARTED,
       payload: {
@@ -346,14 +359,17 @@ export class Game {
           name: this.getPlayer2().getPlayerName(),
         },
         player: {
-          name: this.getPlayer1().getPlayerName()
+          name: this.getPlayer1().getPlayerName(),
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,
       },
     });
 
-    console.log("Sending message to player1 ->", this.getPlayer2().getPlayerName())
+    console.log(
+      "Sending message to player1 ->",
+      this.getPlayer2().getPlayerName()
+    );
     sendMessage(this.player2.getPlayer(), {
       type: GAMERESTARTED,
       payload: {
@@ -365,7 +381,7 @@ export class Game {
           name: this.getPlayer1().getPlayerName(),
         },
         player: {
-          name: this.getPlayer2().getPlayerName()
+          name: this.getPlayer2().getPlayerName(),
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,
@@ -386,7 +402,7 @@ export class Game {
     );
     if (payload.status === ACCEPT_DRAW) result = DRAW;
     if (result) {
-      await this.updateBalances(winner, loser)
+      await this.updateBalances(winner, loser);
       await db.game.update({
         data: {
           status: COMPLETED,
@@ -427,14 +443,44 @@ export class Game {
   }
 
   matchRating(rating: number) {
-    const playerRating = this.getPlayer1().getPlayerRating() 
+    const playerRating = this.getPlayer1().getPlayerRating();
     return isCloseTo(playerRating, rating);
   }
 
   async updateBalances(winner: Player, loser: Player) {
-    // Reduce stake amount (this.stake) from loser's account
-    // Send 85% stake amount to winner's account using backend microservice
-    // Use route /api/payments/deposit-money
+    try {
+      // Reduce stake amount (this.stake) from loser's account -> Simple DB call
+      await db.user.update({
+        where: {
+          id: loser.getPlayerId(),
+        },
+        data: {
+          balance: {
+            decrement: BigInt(this.stake),
+          },
+        },
+      });
+      // Send 85% stake amount to winner's account using backend microservice
+      // Use route /api/payments/deposit-money
+      const depositAmount = 0.85 * Number(this.stake);
+      console.log(VITE_BACKEND_URL, "Lavda ka code")
+      const res = await axios.post(
+        `${VITE_BACKEND_URL}/api/payments/deposit-money`,
+        {
+          amount: depositAmount,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${winner.getPlayerToken()}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(res);
+      return true;
+    } catch (error) {
+      console.log("Error updating balance", error);
+      return false;
+    }
   }
-
 }

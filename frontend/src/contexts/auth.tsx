@@ -23,7 +23,7 @@ const usePersonStore = create<State & Action>((set) => ({
   user: null,
   isLoading: false, // Initialize isLoading state
   updateUser: (user) => {
-    set({ user: { ...user, balance: user?.balance.replace("n", "") ?? "" } });
+    set({ user: { ...user, balance: user?.balance?.replace("n", "") ?? "" } });
   },
   setIsLoading: (isLoading) => set(() => ({ isLoading })), // Action to update isLoading
 }));

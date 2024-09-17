@@ -260,6 +260,13 @@ export class GameManager {
       return;
     }
 
+    // Check for balance and stake here
+    // Don't proceed if balance is less than stake
+    if (BigInt(stake) > user.balance)
+      return sendMessage(socket, {
+        type: GAMEABORTED,
+      });
+
     if (type === "friend") {
       // In this case don't check for ratings
       console.log("Creating a friendly match", gameId);

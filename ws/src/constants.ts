@@ -26,3 +26,4 @@ export const GAMEABORTED = "GAMEABORTED";
 export const GET_TIME = "GET_TIME";
 export const GETFRIENDLYMATCHID = "GETFRIENDLYMATCHID";
 export const SEND_MESSAGE = "SEND_MESSAGE";
+export const VITE_BACKEND_URL = process.env.VITE_BACKEND_URL ?? "http://localhost:5000"

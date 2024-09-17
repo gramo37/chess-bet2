@@ -7,7 +7,7 @@ type TUser = {
 } | null
 
 // Function to send money from user -> company account
-export const depositMoney = async (amount: number, user: TUser) => {
+export const depositMoneyToCompany = async (amount: number, user: TUser) => {
     try {
         console.log("Deposit Money to company", amount, "Received from", user)
         return true;
@@ -18,7 +18,7 @@ export const depositMoney = async (amount: number, user: TUser) => {
 }
 
 // Function to send money from company -> user
-export const withdrawMoney = async (amount: number, user: TUser) => {
+export const withdrawMoneyToUser = async (amount: number, user: TUser) => {
     try {
         console.log("Deposit Money to user", amount, "Received from", user)
         return true;

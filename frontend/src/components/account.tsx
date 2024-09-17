@@ -1,18 +1,37 @@
 import { useState } from "react";
-import usePersonStore from "../contexts/auth"; // Import your store
+import usePersonStore from "../contexts/auth"; 
+import { BACKEND_URL } from "../constants/routes";
+import axios from "axios";
 
 export default function Account() {
     const user = usePersonStore((state) => state.user);
-    const [choose, setChoose] = useState("choose");
+    const [transactionType, setTransactionType] = useState("choose");
+    const [paymentMethod, setPaymentMethod] = useState("choose");
     const [amount, setAmount] = useState("");
+console.log(user)
+    const handleTransaction = async (action: string) => {
+        const url = action === "Deposit"
+            ? `${BACKEND_URL}/payments/deposit-money`
+            : `${BACKEND_URL}/payments/withdraw-money`;
+  
+        try {
+ const response = await axios.post(url, 
+      { amount }, // Body of the request
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`, // Token for authorization
+        }
+      }
+    );
 
-    const handleSubmit = (action:string) => {
-        if (action === "Deposit") {
-            console.log(`Depositing ${amount}$`);
-            // Handle deposit logic here
-        } else if (action === "Withdrawal") {
-            console.log(`Withdrawing ${amount}$`);
-            // Handle withdrawal logic here
+    // Axios automatically parses JSON for you
+    const data = response.data; 
+
+            alert(data.message);
+        } catch (error) {
+            console.error(`Error during ${action}:`, error);
+            alert("Something went wrong. Please try again.");
         }
     };
 
@@ -26,21 +45,19 @@ export default function Account() {
             <div className="flex justify-between items-center my-4">
                 <p>Balance: {user?.balance ? `${user.balance}$` : "0$"}</p>
 
-                <div className="flex gap-2 items-center">
-                    <select
-                        name="paymentMethod"
-                        value={choose}
-                        onChange={(e) => setChoose(e.target.value)}
-                        className="px-2 py-1 rounded bg-gray-700 text-white"
-                    >
-                        <option value="choose">Choose Transaction</option>
-                        <option value="Deposit">Deposit</option>
-                        <option value="Withdrawal">Withdrawal</option>
-                    </select>
-                </div>
+                <select
+                    name="transactionType"
+                    value={transactionType}
+                    onChange={(e) => setTransactionType(e.target.value)}
+                    className="px-4 py-2 rounded bg-gray-700 text-white"
+                >
+                    <option value="choose">Choose Transaction</option>
+                    <option value="Deposit">Deposit</option>
+                    <option value="Withdrawal">Withdrawal</option>
+                </select>
             </div>
 
-            {choose !== "choose" && (
+            {transactionType !== "choose" && (
                 <div className="my-4">
                     <label className="block mb-2 text-left">Amount:</label>
                     <input
@@ -51,20 +68,37 @@ export default function Account() {
                         placeholder="Enter amount"
                     />
 
-                    {choose === "Deposit" ? (
-                        <button
-                            onClick={() => handleSubmit("Deposit")}
-                            className="px-4 py-2 bg-green-600 text-white rounded"
-                        >
-                            Deposit
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => handleSubmit("Withdrawal")}
-                            className="px-4 py-2 bg-red-600 text-white rounded"
-                        >
-                            Withdrawal
-                        </button>
+                    {transactionType === "Deposit" && (
+                        <div className="flex gap-2 justify-between">
+                            <select
+                                name="paymentMethod"
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="px-4 py-2 rounded bg-gray-700 text-white"
+                            >
+                                <option value="choose">Deposit Options</option>
+                                <option value="Instasend">Instasend</option>
+                                <option value="Paypal">Paypal</option>
+                            </select>
+                            <button
+                                onClick={() => handleTransaction("Deposit")}
+                                className="px-4 py-2 bg-green-600 text-white rounded"
+                            >
+                                Deposit
+                            </button>
+                        </div>
+                    )}
+
+                    {transactionType === "Withdrawal" && (
+                        <>
+                            <button
+                                onClick={() => handleTransaction("Withdrawal")}
+                                className="px-4 py-2 bg-red-600 text-white rounded"
+                            >
+                                Withdrawal
+                            </button>
+                            <p className="mt-4">Minimum amount: 5$</p>
+                        </>
                     )}
                 </div>
             )}

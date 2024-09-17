@@ -13,10 +13,10 @@ const app = express();
 const PORT = process.env.BACKEND_PORT ?? 5000;
 const BACKEND_ROUTE = "api";
 
-connectToRedis();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+connectToRedis();
 
 const allowedHosts = process.env.ALLOWED_HOSTS
   ? process.env.ALLOWED_HOSTS.split(",")

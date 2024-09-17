@@ -30,6 +30,7 @@ export const authenticateJWT = async (req: any, res: any, next: any) => {
     req.user = { user, token };
     next();
   } catch (error) {
+    console.log(error)
     return res.status(403).json({ message: "Forbidden: Invalid token" });
   }
 };

@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
 import { bigIntReviver } from "../../utils";
+import { depositMoneyToCompany,withdrawMoneyToUser } from "../../utils/payment";
 
 export const depositMoney = async (req: Request, res: Response) => {
     try {
+        console.log("Deposit Money: ", req.body);
         const { amount } = req.body;
-
         if (!amount) return res.status(400).json({
             message: "Please Provide amount to be deposited"
         })
@@ -13,7 +14,7 @@ export const depositMoney = async (req: Request, res: Response) => {
         const user: any = ((req?.user) as any)?.user;
         const currentBalance = bigIntReviver(user?.balance);
         // Send the amount to the company's account
-        if (!(await depositMoney(amount, user))) {
+        if (!(await depositMoneyToCompany(amount.tonumber(), user))) {
             return res.status(404).json({
                 message: "Something went wrong when sending money to companies account"
             })
@@ -51,7 +52,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
         })
 
         // Send the amount to the company's account
-        if (!(await withdrawMoney(amount, user))) {
+        if (!(await withdrawMoneyToUser(amount, user))) {
             return res.status(404).json({
                 message: "Something went wrong when sending money to user's account"
             })

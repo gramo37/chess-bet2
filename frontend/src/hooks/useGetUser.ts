@@ -6,27 +6,42 @@ import axios from "axios";
 export const useGetUser = () => {
   const updateUser = usePersonStore((state) => state.updateUser);
   const setIsLoading = usePersonStore((state) => state.setIsLoading);
+
   useEffect(() => {
-    (async () => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token'); // Retrieve token from localStorage
+
+      if (!token) {
+        return; // Exit early if no token is found
+      }
+
+      setIsLoading(true);
+
       try {
-        const token = localStorage.getItem('token'); // Get token from localStorage
-        if (!token) { return }
-        setIsLoading(true)
-        const response = await axios.get(`${BACKEND_URL}/auth/refresh`, {
+        const { data } = await axios.get(`${BACKEND_URL}/auth/refresh`, {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` // Attach token in the Authorization header
+            "Authorization": `Bearer ${token}` // Send token in Authorization header
           }
         });
-        if (response?.data?.user?.user) {
-          updateUser(response.data.user.user); // Update user state with the response data
+
+        const user = data?.user?.user;
+
+        if (user) {
+          updateUser({ ...user, token }); // Update user state with token and user data
+        } else {
+          updateUser(null); // Clear user if no valid data is returned
+localStorage.removeItem('token');
         }
       } catch (error) {
         console.error("Error fetching user:", error);
-        updateUser(null); // Set user as null if there was an error
+        updateUser(null); // Handle error by resetting user state
+localStorage.removeItem('token');
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Stop loading state in all cases
       }
-    })();
-  }, [setIsLoading, updateUser]);
+    };
+
+    fetchUser(); // Call the async function immediately after defining it
+  }, [setIsLoading, updateUser]); // Dependency array to prevent unnecessary re-renders
 };

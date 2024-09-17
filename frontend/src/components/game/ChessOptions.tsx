@@ -84,7 +84,7 @@ const ChessOptions: React.FC = () => {
         Choose how to play chess:
       </h2>
       <h2 className="text-white text-xl font-bold">
-        Balance: {user?.balance.replace("n", "") ?? 0} $
+        Balance: {user?.balance ?? 0} $
       </h2>
       <h2 className="text-white text-lg font-bold mb-4">
         Your Rating: {user?.rating ?? 0}

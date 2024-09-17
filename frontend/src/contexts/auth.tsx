@@ -1,12 +1,12 @@
 import create from "zustand";
 
 type TUser = {
-  id: string;
-  token: string;
   balance: string;
-  rating: number;
-  name: string;
-  email: string;
+  id?: string | undefined;
+  token?: string | undefined;
+  rating?: number | undefined;
+  name?: string | undefined;
+  email?: string | undefined;
 };
 
 type State = {
@@ -22,7 +22,9 @@ type Action = {
 const usePersonStore = create<State & Action>((set) => ({
   user: null,
   isLoading: false, // Initialize isLoading state
-  updateUser: (user) => set(() => ({ user })),
+  updateUser: (user) => {
+    set({ user: { ...user, balance: user?.balance.replace("n", "") ?? "" } });
+  },
   setIsLoading: (isLoading) => set(() => ({ isLoading })), // Action to update isLoading
 }));
 

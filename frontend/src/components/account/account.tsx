@@ -1,6 +1,6 @@
 import { useState } from "react";
-import usePersonStore from "../contexts/auth"; 
-import { BACKEND_URL } from "../constants/routes";
+import usePersonStore from "../../contexts/auth"; 
+import { BACKEND_URL } from "../../constants/routes";
 import axios from "axios";
 
 export default function Account() {
@@ -8,7 +8,8 @@ export default function Account() {
     const [transactionType, setTransactionType] = useState("choose");
     const [paymentMethod, setPaymentMethod] = useState("choose");
     const [amount, setAmount] = useState("");
-console.log(user)
+    const [activeTab, setActiveTab] = useState('transactions');
+
     const handleTransaction = async (action: string) => {
         const url = action === "Deposit"
             ? `${BACKEND_URL}/payments/deposit-money`
@@ -102,6 +103,27 @@ console.log(user)
                     )}
                 </div>
             )}
+<div className="flex space-x-3 w-full">
+
+    <div className={`py-2 border-b-4 transition-colors w-[48%] duration-300 ${
+                'transactions' === activeTab 
+                  ? 'border-teal-500'
+                  : 'border-transparent hover:border-gray-200'
+              }`} onClick={()=>setActiveTab('transactions')}>Transactions</div>
+              
+    <div className={`py-2 border-b-4 transition-colors w-[48%] duration-300 ${
+                'gamesplayed' === activeTab 
+                  ? 'border-teal-500'
+                  : 'border-transparent hover:border-gray-200'
+              }`} onClick={()=>setActiveTab('gamesplayed')} >Games Played</div>
+</div>
+
+<div className="mt-4">
+
+{'gamesplayed' === activeTab?"Games Played by You":"Transactions Done By You" }
+</div>
         </div>
+
+          
     );
 }

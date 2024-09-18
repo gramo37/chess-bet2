@@ -4,7 +4,7 @@ import Game from "./screens/Game";
 import Login from "./components/login";
 import Signup from "./components/signup";
 import Spinner from "./components/spinner";
-import Account from "./components/account";
+import Account from "./components/account/account";
 import { PrivateRoute, PublicRoute } from "./components/routeComponent";
 import usePersonStore from "./contexts/auth";
 import { useGetUser } from "./hooks/useGetUser";

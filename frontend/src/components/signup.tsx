@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { BACKEND_URL } from "../constants/routes";
-
+import axios from "axios";
 export default function SignUP() {
     const [email, setEmail] = useState('');
     const [name, setName] = useState("");
@@ -13,20 +13,21 @@ export default function SignUP() {
     }
     const url = `${BACKEND_URL}/auth/register`;
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json', // Add Content-Type header
-            },
-            body: JSON.stringify({
+        const response = await axios.post(
+            url,
+            {
                 username: email,
                 name: name,
                 password: password,
-            })
-        });
-        
-        const data = await response.json();
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
+        const data = response.data;
         localStorage.setItem('token', data.token);
         
         setEmail("");
@@ -35,7 +36,6 @@ export default function SignUP() {
         
         console.log(data, response);
         alert(data.message);
-        window.location.href = "/game";
     } catch (error) {
         console.error('Error:', error);
         alert('Registration failed. Please try again.');

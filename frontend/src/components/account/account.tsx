@@ -1,6 +1,7 @@
 import { useState } from "react";
 import usePersonStore from "../../contexts/auth"; 
 import { BACKEND_URL } from "../../constants/routes";
+import TransactionHistory from "./transactions";
 import axios from "axios";
 
 export default function Account() {
@@ -9,24 +10,23 @@ export default function Account() {
     const [paymentMethod, setPaymentMethod] = useState("choose");
     const [amount, setAmount] = useState("");
     const [activeTab, setActiveTab] = useState('transactions');
-
-    const handleTransaction = async (action: string) => {
+    
+   const handleTransaction = async (action: string) => {
         const url = action === "Deposit"
             ? `${BACKEND_URL}/payments/deposit-money`
             : `${BACKEND_URL}/payments/withdraw-money`;
   
         try {
  const response = await axios.post(url, 
-      { amount }, // Body of the request
+      { amount }, 
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.token}`, // Token for authorization
+          'Authorization': `Bearer ${user?.token}`,
         }
       }
     );
 
-    // Axios automatically parses JSON for you
     const data = response.data; 
 
             alert(data.message);
@@ -35,6 +35,7 @@ export default function Account() {
             alert("Something went wrong. Please try again.");
         }
     };
+
 
     return (
         <div className="text-white text-center max-w-full w-[700px] m-auto">
@@ -105,13 +106,13 @@ export default function Account() {
             )}
 <div className="flex space-x-3 w-full">
 
-    <div className={`py-2 border-b-4 transition-colors w-[48%] duration-300 ${
+    <div className={`py-2 border-b-4 transition-colors cursor-pointer w-[48%] duration-300 ${
                 'transactions' === activeTab 
                   ? 'border-teal-500'
                   : 'border-transparent hover:border-gray-200'
               }`} onClick={()=>setActiveTab('transactions')}>Transactions</div>
               
-    <div className={`py-2 border-b-4 transition-colors w-[48%] duration-300 ${
+    <div className={`py-2 border-b-4 transition-colors cursor-pointer w-[48%] duration-300 ${
                 'gamesplayed' === activeTab 
                   ? 'border-teal-500'
                   : 'border-transparent hover:border-gray-200'
@@ -120,8 +121,10 @@ export default function Account() {
 
 <div className="mt-4">
 
-{'gamesplayed' === activeTab?"Games Played by You":"Transactions Done By You" }
+{'gamesplayed' === activeTab?"Games Played by You":<TransactionHistory token={user?.token || ""} /> }
 </div>
+
+
         </div>
 
           

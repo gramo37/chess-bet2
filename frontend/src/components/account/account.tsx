@@ -3,6 +3,9 @@ import usePersonStore from "../../contexts/auth";
 import { BACKEND_URL } from "../../constants/routes";
 import TransactionHistory from "./transactions";
 import axios from "axios";
+import GameHistory from "./gamehistory";
+import { IoMdArrowBack } from "react-icons/io";
+import { TbMessageReportFilled } from "react-icons/tb";
 
 export default function Account() {
     const user = usePersonStore((state) => state.user);
@@ -38,7 +41,9 @@ export default function Account() {
 
 
     return (
-        <div className="text-white text-center max-w-full w-[700px] m-auto">
+        <div className="text-white text-center max-w-full w-[900px] m-auto">
+<a className="absolute top-10 left-10" href="/"><IoMdArrowBack /></a>
+<div className="absolute top-10 cursor-pointer right-10"><TbMessageReportFilled /></div>
             <h1 className="text-3xl mb-4">Account</h1>
 
             <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
@@ -121,7 +126,7 @@ export default function Account() {
 
 <div className="mt-4">
 
-{'gamesplayed' === activeTab?"Games Played by You":<TransactionHistory token={user?.token || ""} /> }
+{'gamesplayed' === activeTab?<GameHistory/> :<TransactionHistory /> }
 </div>
 
 

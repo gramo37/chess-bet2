@@ -9,23 +9,57 @@ type TUser = {
   email?: string | undefined;
 };
 
+type Transaction = {
+  id: string;
+  amount: number;
+  type: string;
+  status: string;
+  createdAt: string;
+};
+
+type Game = {
+  id: string;
+  whitePlayerId: string;
+  blackPlayerId: string;
+  whitePlayer:{id:string,name:string};
+  blackPlayer:{id:string,name:string};
+  status: string;
+  result: string;
+  startTime: string;
+  endTime?: string;
+  stake: string;
+  isFriendly: boolean;
+};
+
 type State = {
   user: TUser | null;
   isLoading: boolean;
+  transactions: Transaction[] | null;
+  games: Game[] | null;
 };
 
 type Action = {
   updateUser: (user: State["user"]) => void;
   setIsLoading: (isLoading: boolean) => void;
+  setTransactions: (transactions: Transaction[]) => void;
+  setGames: (games: Game[]) => void;
 };
 
 const usePersonStore = create<State & Action>((set) => ({
   user: null,
-  isLoading: false, // Initialize isLoading state
+  isLoading: false, 
+  transactions: null,
+  games: null,
+  
   updateUser: (user) => {
     set({ user: { ...user, balance: user?.balance?.replace("n", "") ?? "" } });
   },
-  setIsLoading: (isLoading) => set(() => ({ isLoading })), // Action to update isLoading
+  
+  setIsLoading: (isLoading) => set(() => ({ isLoading })), 
+  
+  setTransactions: (transactions) => set(() => ({ transactions })),
+  
+  setGames: (games) => set(() => ({ games })), 
 }));
 
 export default usePersonStore;

@@ -23,7 +23,6 @@ model User {
   rating             Int                 @default(800)
   balance            BigInt              @default(0)
   transactions       Transaction[]
-  withdrawalRequests WithdrawalRequest[]
 }
 
 model Transaction {
@@ -34,18 +33,6 @@ model Transaction {
   type      TransactionType
   status    TransactionStatus
   createdAt DateTime      @default(now())
-
-  @@index([userId])
-}
-
-model WithdrawalRequest {
-  id        String                @id @default(cuid())
-  user      User                  @relation(fields: [userId], references: [id])
-  userId    String
-  amount    Float
-  status    WithdrawalStatus
-  createdAt DateTime              @default(now())
-  updatedAt DateTime              @updatedAt
 
   @@index([userId])
 }
@@ -110,12 +97,6 @@ enum TransactionType {
 }
 
 enum TransactionStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
-}
-
-enum WithdrawalStatus {
   PENDING
   COMPLETED
   CANCELLED

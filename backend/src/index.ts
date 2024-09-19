@@ -5,6 +5,7 @@ import cron from "node-cron";
 import { connect as connectToRedis, sendMovesToDB } from "./db/redis";
 import user from "./routes/users";
 import auth from "./routes/auth";
+import game from "./routes/game";
 import payment from "./routes/payments";
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use(cors());
 app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
 app.use(`/${BACKEND_ROUTE}/payments`, payment)
+app.use(`/${BACKEND_ROUTE}/game/`, game);
 
 cron.schedule("*/10 * * * * *", async function () {
   await sendMovesToDB();

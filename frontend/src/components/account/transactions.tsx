@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState} from "react";
 import { BACKEND_URL } from "../../constants/routes";
+import usePersonStore from "../../contexts/auth";
 import React from "react";
 
 interface Transaction {
@@ -11,18 +12,15 @@ interface Transaction {
   createdAt: string;
 }
 
-interface TransactionHistoryProps {
-  token: string;
-}
 
-const TransactionHistory: React.FC<TransactionHistoryProps> = ({ token }) => {
-  const [transactions, setTransactions] = useState<Transaction[] | null>(null);
+const TransactionHistory: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { user, transactions, setTransactions, setIsLoading, isLoading } = usePersonStore();
 
   const fetchTransactions = async () => {
     try {
-        if(!token)return;
+        if (!user || !user.token) return;
+
       setIsLoading(true);
       const url = `${BACKEND_URL}/payments/transaction-history`;
       const response = await axios.get(
@@ -30,12 +28,12 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ token }) => {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${user.token}`,
           },
         }
       );
       setTransactions(response.data.transactions);
-      setError(null); // Clear any previous errors
+      setError(null); 
     } catch (err) {
       console.error(err);
       setError("Error loading transaction history.");
@@ -52,11 +50,12 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ token }) => {
     return <div className="text-center py-6 text-red-500">{error}</div>;
   }
 
+  
   return (
     <div className="container mx-auto px-4 py-8">
-      {transactions && transactions.length > 0 ? (
+      { (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+          {(transactions&&transactions.length>0)?<table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
             <thead className="bg-gray-100">
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">ID</th>
@@ -92,12 +91,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ token }) => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table>:((transactions&&transactions.length===0)?<div className="text-center text-gray-500">No Transactions</div>:'')}
         </div>
-      ) : (
-        transactions && transactions.length === 0 ?<div className="text-center mb-4 text-gray-500">No transaction history found.</div>:""
       )}
-      <button className="px-4 py-2 mt-4 bg-teal-500 text-white" onClick={fetchTransactions}>Get Transactions</button>
+  <button className="px-4 py-2 mt-4 bg-teal-500 text-white" onClick={fetchTransactions}>Get Transactions</button>
     </div>
   );
 };

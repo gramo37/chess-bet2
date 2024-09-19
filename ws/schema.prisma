@@ -1,79 +1,122 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-// Copying this from packages/db/schema.prisma (as we are not using prisma client from packages)
 
 datasource db {
-    provider             = "postgres"
-    url                  = env("DATABASE_URL")
-    referentialIntegrity = "prisma"
+  provider             = "postgres"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String    @unique @default("demo@gmail.com")
-    emailVerified DateTime?
-    password      String    @default("test")
-    gamesAsWhite  Game[]    @relation("GamesAsWhite")
-    gamesAsBlack  Game[]    @relation("GamesAsBlack")
-    rating        Int       @default(800)
-    balance       BigInt    @default(0)
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String              @unique
+  emailVerified      DateTime?
+  password           String
+  gamesAsWhite       Game[]              @relation("GamesAsWhite")
+  gamesAsBlack       Game[]              @relation("GamesAsBlack")
+  rating             Int                 @default(800)
+  balance            BigInt              @default(0)
+  transactions       Transaction[]
+  withdrawalRequests WithdrawalRequest[]
+}
+
+model Transaction {
+  id        String       @id @default(cuid())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Float
+  type      TransactionType
+  status    TransactionStatus
+  createdAt DateTime      @default(now())
+
+  @@index([userId])
+}
+
+model WithdrawalRequest {
+  id        String                @id @default(cuid())
+  user      User                  @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Float
+  status    WithdrawalStatus
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  @@index([userId])
 }
 
 model Game {
-    id            String       @id @default(cuid())
-    Move          Move[]
-    blackPlayerId String
-    whitePlayerId String
-    whitePlayer   User         @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-    blackPlayer   User         @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
-    board         String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    status        GameStatus?
-    result        GameResult?
-    gameOutCome   GameOutCome?
-    startTime     DateTime     @default(now())
-    endTime       DateTime?
-    stake         String       @default("")
-    isFriendly    Boolean      @default(false)
+  id            String       @id @default(cuid())
+  Move          Move[]
+  blackPlayerId String
+  whitePlayerId String
+  whitePlayer   User         @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer   User         @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  board         String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  status        GameStatus?
+  result        GameResult?
+  gameOutCome   GameOutCome?
+  startTime     DateTime     @default(now())
+  endTime       DateTime?
+  stake         String       @default("")
+  isFriendly    Boolean      @default(false)
 
-    @@index([blackPlayerId])
-    @@index([whitePlayerId])
+  @@index([blackPlayerId])
+  @@index([whitePlayerId])
 }
 
 model Move {
-    id         String  @id @default(cuid())
-    gameId     String
-    Game       Game    @relation(fields: [gameId], references: [id])
-    moveNumber Int
-    from       String
-    to         String
-    san        String
-    promotion  String?
+  id         String  @id @default(cuid())
+  gameId     String
+  Game       Game    @relation(fields: [gameId], references: [id])
+  moveNumber Int
+  from       String
+  to         String
+  san        String
+  promotion  String?
 
-    @@index([gameId])
+  @@index([gameId])
 }
 
 enum GameStatus {
-    IN_PROGRESS
-    COMPLETED
-    ABANDONED
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
 }
 
 enum GameResult {
-    WHITE_WINS
-    BLACK_WINS
-    DRAW
+  WHITE_WINS
+  BLACK_WINS
+  DRAW
 }
 
 enum GameOutCome {
-    ACCEPT_DRAW
-    RESIGN
-    CHECKMATE
-    DRAW
-    TIMER_EXPIRED
+  ACCEPT_DRAW
+  RESIGN
+  CHECKMATE
+  DRAW
+  TIMER_EXPIRED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  REFERRAL_COMMISSION
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }

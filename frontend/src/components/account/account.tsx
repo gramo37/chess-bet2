@@ -5,8 +5,7 @@ import TransactionHistory from "./transactions";
 import axios from "axios";
 import GameHistory from "./gamehistory";
 import { IoMdArrowBack } from "react-icons/io";
-import { TbMessageReportFilled } from "react-icons/tb";
-
+import { Report } from "./report";
 export default function Account() {
     const user = usePersonStore((state) => state.user);
     const [transactionType, setTransactionType] = useState("choose");
@@ -43,7 +42,7 @@ export default function Account() {
     return (
         <div className="text-white text-center max-w-full w-[900px] m-auto">
 <a className="absolute top-10 left-10" href="/"><IoMdArrowBack /></a>
-<div className="absolute top-10 cursor-pointer right-10"><TbMessageReportFilled /></div>
+<Report/>
             <h1 className="text-3xl mb-4">Account</h1>
 
             <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>

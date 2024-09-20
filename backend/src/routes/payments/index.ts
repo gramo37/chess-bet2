@@ -1,4 +1,5 @@
 import express from "express";
+import { depositMoney,withdrawMoney } from "../../controllers/payments";
 import { CURRENCY, HOST, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY, REDIRECT_URL } from "../../constants";
 import { transactionHistory } from "../../controllers/payments";
 import { authenticateJWT } from "../../middlewares/auth";
@@ -6,8 +7,8 @@ import { db } from "../../db";
 
 const router = express.Router();
 
-// router.post("/deposit-money", authenticateJWT, depositMoney);
-// router.post("/withdraw-money", authenticateJWT, withdrawMoney);
+router.post("/deposit-money", authenticateJWT, depositMoney);
+router.post("/withdraw-money", authenticateJWT, withdrawMoney);
 
 router.post("/get-payment-url", authenticateJWT, (req, res) => {
     try {

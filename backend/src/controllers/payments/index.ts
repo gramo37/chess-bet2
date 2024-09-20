@@ -32,8 +32,8 @@ export const depositMoney = async (req: Request, res: Response) => {
         });
 
         // Attempt to send the amount to the company's account
-        const depositSuccess = await depositMoneyToCompany(amount, user);
-
+        const depositSuccess =true;
+//  await depositMoneyToCompany(amount, user)
         if (!depositSuccess) {
             // If sending to the company failed, update transaction status to 'CANCELLED'
             await db.transaction.update({
@@ -164,7 +164,7 @@ export const transactionHistory = async (req: Request, res: Response) => {
                 createdAt: 'desc',  
             },
         });
-console.log('working1');
+console.log(transactions);
 
         res.status(200).json({
             message: "Transaction history retrieved successfully!",

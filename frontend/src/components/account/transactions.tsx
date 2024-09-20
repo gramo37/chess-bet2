@@ -4,13 +4,13 @@ import { BACKEND_URL } from "../../constants/routes";
 import usePersonStore from "../../contexts/auth";
 import React from "react";
 
-interface Transaction {
-  id: string;
-  amount: number;
-  type: string;
-  status: string;
-  createdAt: string;
-}
+// interface Transaction {
+//   id: string;
+//   amount: number;
+//   type: string;
+//   status: string;
+//   createdAt: string;
+// }
 
 
 const TransactionHistory: React.FC = () => {

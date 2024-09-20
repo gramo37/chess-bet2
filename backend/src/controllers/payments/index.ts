@@ -62,7 +62,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
                         message: "Payment request successful",
                         paymentDetails: resp.url
                     })
-                }).catch((err) => {
+                }).catch((err: any) => {
                     console.error(`Charge error:`, err);
                     res.status(500).json({ message: "Something went wrong in adding data to transaction table", status: "error" });
                 })

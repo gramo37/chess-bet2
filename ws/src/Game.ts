@@ -401,6 +401,8 @@ export class Game {
     );
     if (payload.status === ACCEPT_DRAW) result = DRAW;
     if (result) {
+
+      console.log("Game is ended. Updating balances...")
       await this.updateBalances(winner, loser);
       await db.game.update({
         data: {
@@ -449,7 +451,8 @@ export class Game {
   async updateBalances(winner: Player, loser: Player) {
     try {
       // Reduce stake amount (this.stake) from loser's account
-      if(!this.stake || !Number.isNaN(Number(this.stake))) return false;
+      // if(!this.stake || !Number.isNaN(Number(this.stake))) return false;
+      console.log("Updating balances")
       await db.user.update({
         where: {
           id: loser.getPlayerId(),
@@ -467,7 +470,7 @@ export class Game {
         },
         data: {
           balance: {
-            increment: Math.floor(0.85 * Number(this.stake)),
+            increment: 0.85 * Number(this.stake),
           },
         },
       });

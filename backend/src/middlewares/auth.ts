@@ -1,8 +1,9 @@
+import { Request,Response,NextFunction } from "express";
 import { db } from "../db";
 import { bigIntReplacer, verifyToken } from "../utils";
 
 // JWT Authentication Middleware
-export const authenticateJWT = async (req: any, res: any, next: any) => {
+export const authenticateJWT = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
@@ -32,5 +33,27 @@ export const authenticateJWT = async (req: any, res: any, next: any) => {
   } catch (error) {
     console.log(error)
     return res.status(403).json({ message: "Forbidden: Invalid token" });
+  }
+};
+
+
+// Middleware to check if the authenticated user is an admin
+export const authorizeAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user: any = (req?.user as any)?.user; 
+
+    const dbUser = await db.user.findUnique({
+      where: { id: user.id },
+    });
+
+    if (!dbUser || dbUser.role !== "ADMIN") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    // If the user is an admin, proceed to the next middleware or route handler
+    next();
+  } catch (error) {
+    console.error("Authorization error:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };

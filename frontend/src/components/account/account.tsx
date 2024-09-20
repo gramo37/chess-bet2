@@ -45,13 +45,12 @@ export default function Account() {
     }
   };
 
-  return (
-    <div className="text-white text-center max-w-full w-[900px] m-auto">
-      <a className="absolute top-10 left-10" href="/">
-        <IoMdArrowBack />
-      </a>
-      <Report />
-      <h1 className="text-3xl mb-4">Account</h1>
+    return (
+        <div className="text-white text-center max-w-full w-[900px] m-auto">
+<a className="absolute top-10 left-10" href="/"><IoMdArrowBack /></a>
+<Report token={user?.token || ""} />
+
+            <h1 className="text-3xl mb-4">Account</h1>
 
       <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>

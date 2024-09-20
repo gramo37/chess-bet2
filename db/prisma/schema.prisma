@@ -23,6 +23,8 @@ model User {
   rating             Int                 @default(800)
   balance            BigInt              @default(0)
   transactions       Transaction[]
+  reports            UserReport[]    
+  role                Roles              @default(USER)
 }
 
 model Transaction {
@@ -72,6 +74,25 @@ model Move {
   @@index([gameId])
 }
 
+model UserReport {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  title       String
+  description String
+  status      ReportStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+}
+
 enum GameStatus {
   IN_PROGRESS
   COMPLETED
@@ -102,4 +123,10 @@ enum TransactionStatus {
   PENDING
   COMPLETED
   CANCELLED
+}
+
+enum Roles {
+  USER
+  ADMIN
+  MODRATOR
 }

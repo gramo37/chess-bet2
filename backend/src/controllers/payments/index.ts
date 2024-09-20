@@ -20,6 +20,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         const IntaSend = require('intasend-node');
         const user: any = ((req?.user) as any)?.user;
 
+
         let intasend = new IntaSend(
             INTASEND_PUBLISHABLE_KEY,
             INTASEND_SECRET_KEY,
@@ -222,7 +223,6 @@ export const transactionHistory = async (req: Request, res: Response) => {
                 createdAt: 'desc',
             },
         });
-        console.log('working1');
 
         res.status(200).json({
             message: "Transaction history retrieved successfully!",

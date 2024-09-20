@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { bigIntReviver } from "../../utils";
 import { withdrawMoneyToUser } from "../../utils/payment";
-import { CURRENCY, HOST, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY, REDIRECT_URL } from "../../constants";
+import { CURRENCY, HOST, INSTASEND_PLATFORM_PERCENT, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY, REDIRECT_URL } from "../../constants";
 
 export const getPaymentURL = async (req: Request, res: Response) => {
     try {
@@ -105,7 +104,7 @@ export const successTransaction = async (req: Request, res: Response) => {
                 },
                 data: {
                     balance: {
-                        increment: BigInt(transaction.amount)
+                        increment: transaction.amount * (1 - INSTASEND_PLATFORM_PERCENT)
                     }
                 },
             }),
@@ -145,9 +144,9 @@ export const withdrawMoney = async (req: Request, res: Response) => {
         }
 
         const user: any = ((req?.user) as any)?.user;
-        const currentBalance = bigIntReviver(user?.balance);
+        const currentBalance = user?.balance;
 
-        if (BigInt(amount) > currentBalance) {
+        if (amount > currentBalance) {
             return res.status(400).json({
                 message: "Insufficient funds",
             });
@@ -189,7 +188,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
                     email: user.email,
                 },
                 data: {
-                    balance: currentBalance - BigInt(amount),
+                    balance: currentBalance - amount,
                 },
             }),
             db.transaction.update({

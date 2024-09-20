@@ -262,7 +262,7 @@ export class GameManager {
 
     // Check for balance and stake here
     // Don't proceed if balance is less than stake
-    if (BigInt(stake) > user.balance)
+    if (Number(stake) > user.balance)
       return sendMessage(socket, {
         type: GAMEABORTED,
       });

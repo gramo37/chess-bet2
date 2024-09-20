@@ -52,7 +52,7 @@ const usePersonStore = create<State & Action>((set) => ({
   games: null,
   
   updateUser: (user) => {
-    set({ user: { ...user, balance: user?.balance?.replace("n", "") ?? "" } });
+    set({ user: { ...user, balance: user?.balance ?? "" } });
   },
   
   setIsLoading: (isLoading) => set(() => ({ isLoading })), 

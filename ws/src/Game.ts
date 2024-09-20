@@ -449,13 +449,14 @@ export class Game {
   async updateBalances(winner: Player, loser: Player) {
     try {
       // Reduce stake amount (this.stake) from loser's account
+      if(!this.stake || !Number.isNaN(Number(this.stake))) return false;
       await db.user.update({
         where: {
           id: loser.getPlayerId(),
         },
         data: {
           balance: {
-            decrement: BigInt(this.stake),
+            decrement: Number(this.stake),
           },
         },
       });
@@ -466,7 +467,7 @@ export class Game {
         },
         data: {
           balance: {
-            increment: BigInt(Math.floor(0.85 * Number(this.stake))),
+            increment: Math.floor(0.85 * Number(this.stake)),
           },
         },
       });

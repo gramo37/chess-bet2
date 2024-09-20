@@ -25,6 +25,9 @@ export const depositMoney = async (req: Request, res: Response) => {
                 amount: amount,
                 type: 'DEPOSIT',  
                 status: 'PENDING', 
+                // TODO: Temporary change
+                signature: "",
+                checkout_id: ""
             }
         });
 
@@ -98,6 +101,9 @@ export const withdrawMoney = async (req: Request, res: Response) => {
                 amount: amount,
                 type: 'WITHDRAWAL',
                 status: 'PENDING',
+                // TODO: Temporary change
+                signature: "",
+                checkout_id: ""
             },
         });
 

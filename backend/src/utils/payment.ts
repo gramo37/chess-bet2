@@ -22,6 +22,9 @@ export const depositMoneyToCompany = async (amount: number, user: TUser) => {
                 amount,
                 type: "DEPOSIT",
                 status: status ? "COMPLETED" : "CANCELLED",
+                // TODO: Temporary change
+                signature: "",
+                checkout_id: ""
             }
         })
         return true;
@@ -45,6 +48,9 @@ export const withdrawMoneyToUser = async (amount: number, user: TUser) => {
                 amount,
                 type: "WITHDRAWAL",
                 status: status ? "COMPLETED" : "CANCELLED",
+                // TODO: Temporary change
+                signature: "",
+                checkout_id: ""
             }
         })
         return true;

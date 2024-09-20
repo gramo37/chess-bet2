@@ -26,13 +26,15 @@ model User {
 }
 
 model Transaction {
-  id        String       @id @default(cuid())
-  user      User         @relation(fields: [userId], references: [id])
-  userId    String
-  amount    Float
-  type      TransactionType
-  status    TransactionStatus
-  createdAt DateTime      @default(now())
+  id          String       @id @default(cuid())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus
+  createdAt   DateTime      @default(now())
+  signature   String
+  checkout_id String
 
   @@index([userId])
 }

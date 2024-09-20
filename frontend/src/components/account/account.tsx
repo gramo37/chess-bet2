@@ -23,7 +23,7 @@ export default function Account() {
     try {
       const response = await axios.post(
         url,
-        { amount },
+        { amount, account: action !== "Deposit" ?? "254708374149" },
         {
           headers: {
             "Content-Type": "application/json",
@@ -36,9 +36,9 @@ export default function Account() {
 
       console.log(data, data.url)
 
-      window.location.href = data.paymentDetails;
+      if(action === "Deposit") window.location.href = data.paymentDetails;
 
-    //   alert(data.message);
+      else alert(data.message);
     } catch (error) {
       console.error(`Error during ${action}:`, error);
       alert("Something went wrong. Please try again.");

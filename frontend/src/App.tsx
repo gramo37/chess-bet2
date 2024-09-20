@@ -8,6 +8,7 @@ import Account from "./components/account/account";
 import { PrivateRoute, PublicRoute } from "./components/routeComponent";
 import usePersonStore from "./contexts/auth";
 import { useGetUser } from "./hooks/useGetUser";
+import Payment from "./screens/Payment";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
@@ -47,6 +48,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Account />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <PrivateRoute>
+                  <Payment />
                 </PrivateRoute>
               }
             />

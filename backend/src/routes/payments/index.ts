@@ -1,12 +1,16 @@
 import express from "express";
+import { getPaymentURL, successTransaction, transactionHistory, withdrawMoney } from "../../controllers/payments";
 import { depositMoney,withdrawMoney } from "../../controllers/payments";
 import { CURRENCY, HOST, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY, REDIRECT_URL } from "../../constants";
 import { transactionHistory } from "../../controllers/payments";
 import { authenticateJWT } from "../../middlewares/auth";
-import { db } from "../../db";
 
 const router = express.Router();
 
+
+router.post("/withdraw-money", authenticateJWT, withdrawMoney);
+router.post("/get-payment-url", authenticateJWT, getPaymentURL);
+router.post("/success-transaction", authenticateJWT, successTransaction);
 router.post("/deposit-money", authenticateJWT, depositMoney);
 router.post("/withdraw-money", authenticateJWT, withdrawMoney);
 

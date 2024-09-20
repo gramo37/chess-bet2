@@ -38,6 +38,8 @@ cron.schedule("*/10 * * * * *", async function () {
   await sendMovesToDB();
 });
 
+// TODO: Create a cron job to update all old pending transactions (older than 5 mins) as Cancelled every 5mins
+
 app.listen(PORT, () => {
   console.log("Connected to PORT: ", PORT);
 });

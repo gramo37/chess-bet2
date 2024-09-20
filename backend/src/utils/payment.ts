@@ -1,4 +1,3 @@
-import { db } from "../db";
 import { CURRENCY, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY } from "../constants";
 
 
@@ -7,7 +6,7 @@ type TUser = {
     name: string | null;
     email: string;
     rating: number;
-    balance: bigint;
+    balance: number;
 } | null
 
 // Function to send money from company -> user

@@ -3,7 +3,7 @@ import { TbMessageReportFilled } from "react-icons/tb";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
-import {ReportHistory} from "../account/reporthistory";
+// import {ReportHistory} from "../account/reporthistory";
 type ReportProps = {
   token: string;
 };
@@ -42,6 +42,7 @@ return;
       });
   
       alert(response.data.message);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error:any) {
       if (error.response) {
         // Server responded with a status other than 2xx
@@ -101,7 +102,7 @@ return;
             </button>
           </div>
   
-          <ReportHistory token={token} openModal={openModal} />
+          {/* <ReportHistory token={token} openModal={openModal} /> */}
         </div>
   
       </div>

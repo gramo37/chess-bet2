@@ -10,9 +10,8 @@ export default function Account() {
   const user = usePersonStore((state) => state.user);
   const [transactionType, setTransactionType] = useState("choose");
   const [paymentMethod, setPaymentMethod] = useState("choose");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
   const [activeTab, setActiveTab] = useState("transactions");
-  
 
   const handleTransaction = async (action: string) => {
     const url =
@@ -23,7 +22,7 @@ export default function Account() {
     try {
       const response = await axios.post(
         url,
-        { amount, account: action !== "Deposit" ?? "254708374149" },
+        { amount: amount, account: action !== "Deposit" ? "254708374149" : undefined },
         {
           headers: {
             "Content-Type": "application/json",
@@ -34,10 +33,9 @@ export default function Account() {
 
       const data = response.data;
 
-      console.log(data, data.url)
+      console.log(data, data.url);
 
-      if(action === "Deposit") window.location.href = data.paymentDetails;
-
+      if (action === "Deposit") window.location.href = data.paymentDetails;
       else alert(data.message);
     } catch (error) {
       console.error(`Error during ${action}:`, error);
@@ -45,12 +43,14 @@ export default function Account() {
     }
   };
 
-    return (
-        <div className="text-white text-center max-w-full w-[900px] m-auto">
-<a className="absolute top-10 left-10" href="/"><IoMdArrowBack /></a>
-<Report token={user?.token || ""} />
+  return (
+    <div className="text-white text-center max-w-full w-[900px] m-auto">
+      <a className="absolute top-10 left-10" href="/">
+        <IoMdArrowBack />
+      </a>
+      <Report token={user?.token || ""} />
 
-            <h1 className="text-3xl mb-4">Account</h1>
+      <h1 className="text-3xl mb-4">Account</h1>
 
       <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
@@ -76,7 +76,7 @@ export default function Account() {
           <input
             type="number"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(Number(e.target.value))}
             className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
             placeholder="Enter amount"
           />
@@ -93,12 +93,17 @@ export default function Account() {
                 <option value="Instasend">Instasend</option>
                 <option value="Paypal">Paypal</option>
               </select>
-              <button
-                onClick={() => handleTransaction("Deposit")}
-                className="px-4 py-2 bg-green-600 text-white rounded"
-              >
-                Deposit
-              </button>
+              <div className="flex gap-3 items-center">
+                {amount && !Number.isNaN(Number(amount)) && (
+                  <p>Deposit Charges (3.5%) - {(0.035 * Number(amount)).toFixed(2)}</p>
+                )}
+                <button
+                  onClick={() => handleTransaction("Deposit")}
+                  className="px-4 py-2 bg-green-600 text-white rounded"
+                >
+                  Deposit
+                </button>
+              </div>
             </div>
           )}
 

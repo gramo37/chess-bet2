@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 import { db } from "../db";
-import { bigIntReplacer, verifyToken } from "../utils";
+import { verifyToken } from "../utils";
 
 // JWT Authentication Middleware
 export const authenticateJWT = async (req: Request, res: Response, next: NextFunction) => {
@@ -27,7 +27,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
       }
     });
     if (!user) return res.status(404).json({ message: "User not found" });
-    user = {...user, balance: bigIntReplacer(user.balance)}
+    user = {...user, balance: user.balance}
     req.user = { user, token };
     next();
   } catch (error) {

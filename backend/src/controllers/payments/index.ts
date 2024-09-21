@@ -56,13 +56,13 @@ export const getPaymentURL = async (req: Request, res: Response) => {
                         signature: resp.signature,
                         checkout_id: resp.id
                     }
-                }).then((data) => {
+                }).then(() => {
                     // Redirect user to URL to complete payment
                     res.status(200).json({
                         message: "Payment request successful",
                         paymentDetails: resp.url
                     })
-                }).catch((err) => {
+                }).catch((err: any) => {
                     console.error(`Charge error:`, err);
                     res.status(500).json({ message: "Something went wrong in adding data to transaction table", status: "error" });
                 })

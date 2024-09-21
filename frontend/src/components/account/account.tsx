@@ -13,6 +13,7 @@ export default function Account() {
   const [amount, setAmount] = useState(0);
   const [activeTab, setActiveTab] = useState("transactions");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [currency, setCurrency] = useState("USD");
 
   const handleTransaction = async (action: string) => {
     const url =
@@ -26,6 +27,7 @@ export default function Account() {
         {
           amount: amount,
           account: action !== "Deposit" ? phoneNumber : undefined,
+          currency: action === "Deposit" ? currency : undefined,
         },
         {
           headers: {
@@ -97,6 +99,17 @@ export default function Account() {
                 <option value="Instasend">Instasend</option>
                 <option value="Paypal">Paypal</option>
               </select>
+              <select
+                name="transactionType"
+                value={currency}
+                onChange={(e) => {
+                  setCurrency(e.target.value)
+                }}
+                className="px-4 py-2 rounded bg-gray-700 text-white"
+              >
+                <option value="USD">USD</option>
+                <option value="KES">KES</option>
+              </select>
               <div className="flex gap-3 items-center">
                 {amount && !Number.isNaN(Number(amount)) && (
                   <p>
@@ -131,7 +144,7 @@ export default function Account() {
                 Withdrawal
               </button>
               <p className="mt-4">Minimum amount: 5$</p>
-              <p className="">Withdrawal Charges - 10</p>
+              <p className="">Withdrawal Charges - 10$</p>
             </>
           )}
         </div>

@@ -12,6 +12,8 @@ type TUser = {
 type Transaction = {
   id: string;
   amount: number;
+  currency: number;
+  finalamountInUSD: number;
   type: string;
   status: string;
   createdAt: string;

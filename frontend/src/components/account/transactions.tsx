@@ -60,6 +60,8 @@ const TransactionHistory: React.FC = () => {
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">ID</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Amount</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Currency</th>
+                <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Final Amount ($)</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Type</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Status</th>
                 <th className="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase">Date</th>
@@ -70,6 +72,8 @@ const TransactionHistory: React.FC = () => {
                 <tr key={transaction.id} className="border-t">
                   <td className="py-3 px-4 text-sm text-gray-600">{transaction.id}</td>
                   <td className="py-3 px-4 text-sm text-gray-600">{transaction.amount.toFixed(2)}</td>
+                  <td className="py-3 px-4 text-sm text-gray-600">{transaction.currency}</td>
+                  <td className="py-3 px-4 text-sm text-gray-600">{transaction.finalamountInUSD.toFixed(2)} $</td>
                   <td className="py-3 px-4 text-sm text-gray-600">{transaction.type}</td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     <span

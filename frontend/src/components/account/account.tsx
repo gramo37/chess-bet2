@@ -12,6 +12,7 @@ export default function Account() {
   const [paymentMethod, setPaymentMethod] = useState("choose");
   const [amount, setAmount] = useState(0);
   const [activeTab, setActiveTab] = useState("transactions");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleTransaction = async (action: string) => {
     const url =
@@ -22,7 +23,10 @@ export default function Account() {
     try {
       const response = await axios.post(
         url,
-        { amount: amount, account: action !== "Deposit" ? "254708374149" : undefined },
+        {
+          amount: amount,
+          account: action !== "Deposit" ? phoneNumber : undefined,
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -95,7 +99,10 @@ export default function Account() {
               </select>
               <div className="flex gap-3 items-center">
                 {amount && !Number.isNaN(Number(amount)) && (
-                  <p>Deposit Charges (3.5%) - {(0.035 * Number(amount)).toFixed(2)}</p>
+                  <p>
+                    Deposit Charges (3.5%) -{" "}
+                    {(0.035 * Number(amount)).toFixed(2)}
+                  </p>
                 )}
                 <button
                   onClick={() => handleTransaction("Deposit")}
@@ -109,13 +116,22 @@ export default function Account() {
 
           {transactionType === "Withdrawal" && (
             <>
+              <input
+                type="number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
+                placeholder="Enter phone number"
+              />
               <button
                 onClick={() => handleTransaction("Withdrawal")}
-                className="px-4 py-2 bg-red-600 text-white rounded"
+                className="px-4 py-2 bg-red-600 text-white rounded disabled:bg-red-800"
+                disabled={phoneNumber.length !== 12}
               >
                 Withdrawal
               </button>
               <p className="mt-4">Minimum amount: 5$</p>
+              <p className="">Withdrawal Charges - 10</p>
             </>
           )}
         </div>

@@ -59,11 +59,11 @@ wss.on("connection", async function connection(ws, req) {
 
 connect();
 
-app.get("/", (req, res) => {
+app.get("/ws", (req, res) => {
   res.send("Ping");
 });
 
-app.get("/open_games", async (req, res) => {
+app.get("/ws/open_games", async (req, res) => {
   let { token, stake } = req.query;
   if (token && typeof token !== "string") token = "";
   if (stake && typeof stake !== "string") stake = "";

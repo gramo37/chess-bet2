@@ -56,7 +56,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
                         signature: resp.signature,
                         checkout_id: resp.id
                     }
-                }).then((data) => {
+                }).then(() => {
                     // Redirect user to URL to complete payment
                     res.status(200).json({
                         message: "Payment request successful",

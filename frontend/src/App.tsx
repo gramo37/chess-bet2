@@ -52,7 +52,7 @@ function App() {
               }
             />
             <Route
-              path="/payment"
+              path="/payment/:secret_token"
               element={
                 <PrivateRoute>
                   <Payment />

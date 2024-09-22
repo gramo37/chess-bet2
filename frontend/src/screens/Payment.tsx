@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import usePersonStore from "../contexts/auth";
@@ -7,6 +7,7 @@ import Spinner from "../components/spinner";
 
 export default function Payment() {
   const [searchParams] = useSearchParams();
+  const { secret_token } = useParams();
   const user = usePersonStore((state) => state.user);
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ export default function Payment() {
       try {
         const response = await axios.post(
           url,
-          { signature, checkout_id },
+          { checkout_id, secret_token },
           {
             headers: {
               "Content-Type": "application/json",
@@ -39,6 +40,7 @@ export default function Payment() {
       } catch (error) {
         console.error(`Error during fetching:`, error);
         alert("Something went wrong. Please try again.");
+        navigate("/account");
       }
     }
 

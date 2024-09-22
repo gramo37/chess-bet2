@@ -41,6 +41,7 @@ model Transaction {
   checkout_id      String
   api_ref          String            @default("")
   currency         String            @default("USD")
+  secret_token     String            @default("")
 
   @@index([userId])
 }

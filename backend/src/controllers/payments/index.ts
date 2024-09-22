@@ -69,6 +69,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         ? user?.name?.split(" ")?.[1]
         : " ";
     const email = user?.email && isValidEmail(user?.email) ? user?.email : " ";
+    const secret_token = generateUniqueId();
     console.log("User Details", first_name, last_name, email);
     collection
       .charge({
@@ -79,7 +80,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         amount,
         currency,
         api_ref,
-        redirect_url: REDIRECT_URL,
+        redirect_url: `${REDIRECT_URL}/${secret_token}`, // Add some secret key here which will be stored in the transaction table and it will checked again in the success-transaction route
       })
       .then((resp: any) => {
         // Create a transaction entry as PENDING in db
@@ -120,6 +121,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
               currency,
               finalamountInUSD: finalamountInUSD - platform_charges,
               platform_charges,
+              secret_token
             },
           })
           .then(() => {
@@ -151,13 +153,18 @@ export const getPaymentURL = async (req: Request, res: Response) => {
 export const successTransaction = async (req: Request, res: Response) => {
   try {
     const user: any = (req?.user as any)?.user;
-    const { signature, checkout_id } = req.body;
-    console.log(signature, checkout_id);
+    const { secret_token, checkout_id } = req.body;
+    console.log(secret_token, checkout_id);
+    if(!secret_token || !checkout_id) {
+      return res.status(401).json({
+        message: "Unauthorized Payment"
+      })
+    }
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
       where: {
         checkout_id,
-        signature,
+        secret_token,
       },
       select: {
         id: true,

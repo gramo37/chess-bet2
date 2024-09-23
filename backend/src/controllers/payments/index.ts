@@ -211,6 +211,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
   try {
     let { amount, account } = req.body;
     amount = Math.floor(amount);
+console.log('comming here');
 
     if (!amount || amount <= 0) {
       return res.status(400).json({

@@ -1,7 +1,11 @@
 import { useState } from "react"
 import { BACKEND_URL } from "../constants/routes";
 
-export default function Login() {
+type props = {
+admin:boolean
+}
+
+export default function Login({admin}:props) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState("");
     
@@ -11,7 +15,7 @@ export default function Login() {
         return;
     }
 
-    const url = `${BACKEND_URL}/auth/login`;
+    const url = !admin?`${BACKEND_URL}/auth/login`:`${BACKEND_URL}/admin/login-admin`;
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -36,7 +40,7 @@ export default function Login() {
         localStorage.setItem('token', data.token);
         
         alert('Login successful');
-        window.location.href = "/game";
+        window.location.href = admin?"/dashboard":"/game";
     } catch (error) {
         console.error('Error:', error);
        } 
@@ -50,7 +54,7 @@ return <section className="bg-gray-50 dark:bg-gray-900">
       <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                  Sign up to your account
+                  {admin?"Admin Login":"Login in to your account"}
               </h1>
               <div className="space-y-4 md:space-y-6">
                   <div>
@@ -68,7 +72,7 @@ return <section className="bg-gray-50 dark:bg-gray-900">
                     onClick={onclick}
                     >Log In</button>
                   <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                      Already have an account ? <a href="/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign Up</a>
+                      Already have an account ? <a href={admin?"/adminsignup":"signup"} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign Up</a>
                   </p>
               </div>
           </div>

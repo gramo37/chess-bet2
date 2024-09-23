@@ -8,6 +8,7 @@ import auth from "./routes/auth";
 import game from "./routes/game";
 import payment from "./routes/payments";
 import report from "./routes/report";
+import admin from "./routes/admin";
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use(`/${BACKEND_ROUTE}/auth`, auth);
 app.use(`/${BACKEND_ROUTE}/payments`, payment);
 app.use(`/${BACKEND_ROUTE}/game/`, game);
 app.use(`/${BACKEND_ROUTE}/report/`, report);
+app.use(`/${BACKEND_ROUTE}/admin/`, admin);
 
 cron.schedule("*/10 * * * * *", async function () {
   await sendMovesToDB();

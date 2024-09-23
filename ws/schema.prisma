@@ -61,7 +61,7 @@ model Game {
   endTime            DateTime?
   stake              String       @default("")
   isFriendly         Boolean      @default(false)
-  areBalancesUpdated Boolean      @default(true)
+  areBalancesUpdated Boolean      @default(false)
 
   @@index([blackPlayerId])
   @@index([whitePlayerId])

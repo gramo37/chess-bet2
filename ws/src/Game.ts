@@ -233,11 +233,11 @@ export class Game {
 
     // Check for draw or checkmate
     let result: "WHITE_WINS" | "BLACK_WINS" | "DRAW" | null = null;
-    if (chess.isGameOver()) {
-      const winner =
+    const winner =
         this.player1.getPlayer() === socket ? this.player1 : this.player2;
       const loser =
         this.player1.getPlayer() === socket ? this.player2 : this.player1;
+    if (chess.isGameOver()) {
       result = sendGameOverMessage(winner, loser, CHECKMATE);
       this.stopPlayer1Timer();
       this.stopPlayer2Timer();
@@ -260,6 +260,7 @@ export class Game {
 
     // Update the result of game in DB
     if (result) {
+      const areBalancesUpdated = await this.updateBalances(winner, loser);
       await db.game.update({
         data: {
           status: COMPLETED,
@@ -267,6 +268,7 @@ export class Game {
           gameOutCome: result === DRAW ? DRAW : CHECKMATE,
           board: this.board,
           endTime: new Date(Date.now()),
+          areBalancesUpdated
         },
         where: {
           id: this.gameId,
@@ -456,12 +458,16 @@ export class Game {
       console.log(
         `Decrementing for Player ->`,
         loser.getPlayerName(),
-        loser.getPlayerId()
+        loser.getPlayerId(),
+        "Rating -> ",
+        loser.getPlayerRating()
       );
       console.log(
         `Incrementing for Player ->`,
         winner.getPlayerName(),
-        winner.getPlayerId()
+        winner.getPlayerId(),
+        "Rating -> ",
+        loser.getPlayerRating()
       );
       await db.$transaction([
         db.user.update({

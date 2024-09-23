@@ -17,6 +17,14 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
 
         const IntaSend = require('intasend-node');
 
+        console.log(
+            "INSTASEND Details",
+            INTASEND_PUBLISHABLE_KEY,
+            INTASEND_SECRET_KEY,
+            INTASEND_IS_TEST,
+            typeof INTASEND_IS_TEST
+          );
+
         let intasend = new IntaSend(
             INTASEND_PUBLISHABLE_KEY,
             INTASEND_SECRET_KEY,
@@ -24,6 +32,8 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
         );
 
         let payouts = intasend.payouts();
+
+        console.log("User Details", user?.name, account, amount)
 
         await payouts
             .mpesa({

@@ -11,14 +11,20 @@ import {
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
   REDIRECT_URL,
-  INSTASEND_WITHDRAWAL_LIMIT
+  INSTASEND_WITHDRAWAL_LIMIT,
 } from "../../constants";
 import { generateUniqueId, isValidEmail } from "../../utils";
 import axios from "axios";
 
 export const getPaymentURL = async (req: Request, res: Response) => {
   try {
-    console.log(INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY);
+    console.log(
+      "INSTA SEND Details",
+      INTASEND_PUBLISHABLE_KEY,
+      INTASEND_SECRET_KEY,
+      INTASEND_IS_TEST,
+      typeof INTASEND_IS_TEST
+    );
     console.log("Deposit Money: ", req.body);
     let { amount, currency } = req.body;
     amount = Math.floor(amount);
@@ -70,7 +76,17 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         : " ";
     const email = user?.email && isValidEmail(user?.email) ? user?.email : " ";
     const secret_token = generateUniqueId();
-    console.log("User Details", first_name, last_name, email);
+    console.log(
+      "User Details",
+      first_name,
+      last_name,
+      email,
+      HOST,
+      amount,
+      currency,
+      api_ref,
+      `${REDIRECT_URL}/${secret_token}`
+    );
     collection
       .charge({
         first_name,
@@ -102,7 +118,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
           "Payment Details ->",
           amount,
           rates.rates[currency],
-          INSTASEND_DEPOSIT_PERCENT,
+          INSTASEND_DEPOSIT_PERCENT
         );
         db.transaction
           .create({
@@ -121,7 +137,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
               currency,
               finalamountInUSD: finalamountInUSD - platform_charges,
               platform_charges,
-              secret_token
+              secret_token,
             },
           })
           .then(() => {
@@ -132,7 +148,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
             });
           })
           .catch((err: any) => {
-            console.error(`Charge error:`, err);
+            console.error(`Charge error 1:`, "" + err, JSON.parse("" + err));
             res.status(500).json({
               message:
                 "Something went wrong in adding data to transaction table",
@@ -141,7 +157,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
           });
       })
       .catch((err: any) => {
-        console.error(`Charge error:`, err);
+        console.error(`Charge error 2:`, "" + err, JSON.parse("" + err));
         res.status(500).json({ message: "Invalid Request", status: "error" });
       });
   } catch (error) {
@@ -155,10 +171,10 @@ export const successTransaction = async (req: Request, res: Response) => {
     const user: any = (req?.user as any)?.user;
     const { secret_token, checkout_id } = req.body;
     console.log(secret_token, checkout_id);
-    if(!secret_token || !checkout_id) {
+    if (!secret_token || !checkout_id) {
       return res.status(401).json({
-        message: "Unauthorized Payment"
-      })
+        message: "Unauthorized Payment",
+      });
     }
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
@@ -234,11 +250,11 @@ console.log('comming here');
       });
     }
 
-    if(amount <= INSTASEND_WITHDRAWAL_LIMIT) {
+    if (amount <= INSTASEND_WITHDRAWAL_LIMIT) {
       return res.status(400).json({
         message: "Amount less than minimum withdrawal amount",
       });
-    } 
+    }
 
     // Initiate the transaction and set its status to 'PENDING'
     const platform_charges = INSTASEND_WITHDRAWAL_CHARGE;

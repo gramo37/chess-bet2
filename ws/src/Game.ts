@@ -260,7 +260,9 @@ export class Game {
 
     // Update the result of game in DB
     if (result) {
-      const areBalancesUpdated = await this.updateBalances(winner, loser);
+      let areBalancesUpdated = false;
+      if(result !== "DRAW") areBalancesUpdated = await this.updateBalances(winner, loser);
+      else areBalancesUpdated = true;
       await db.game.update({
         data: {
           status: COMPLETED,

@@ -33,6 +33,7 @@ const TransactionHistory: React.FC = () => {
         }
       );
       setTransactions(response.data.transactions);
+      console.log(response.data.transactions)
       setError(null); 
     } catch (err) {
       console.error(err);

@@ -1,7 +1,13 @@
 import { useState } from "react"
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
-export default function SignUP() {
+
+
+type props = {
+    admin:boolean
+    }    
+
+export default function SignUP({admin}:props) {
     const [email, setEmail] = useState('');
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
@@ -11,7 +17,7 @@ export default function SignUP() {
         alert("Enter All details");
         return;
     }
-    const url = `${BACKEND_URL}/auth/register`;
+    const url = !admin?`${BACKEND_URL}/auth/register`:`${BACKEND_URL}/admin/create-admin`;
     try {
         const response = await axios.post(
             url,
@@ -36,6 +42,7 @@ export default function SignUP() {
         
         console.log(data, response);
         alert(data.message);
+        window.location.href = admin?"/dashboard":"/game";
     } catch (error) {
         console.error('Error:', error);
         alert('Registration failed. Please try again.');
@@ -48,7 +55,7 @@ return <section className="bg-gray-50 dark:bg-gray-900">
       <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                  Sign up to your account
+                  {admin?"Admin Signup":"Sign up to your account"}
               </h1>
               <div className="space-y-4 md:space-y-6">
                   <div>
@@ -69,7 +76,7 @@ return <section className="bg-gray-50 dark:bg-gray-900">
                     onClick={onclick}
                     >Sign Up</button>
                   <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                      Already have an account ? <a href="/login" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Log In</a>
+                      Already have an account ? <a href={admin?"/adminlogin":"/login"} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Log In</a>
                   </p>
               </div>
           </div>

@@ -7,6 +7,7 @@ type TUser = {
   rating?: number | undefined;
   name?: string | undefined;
   email?: string | undefined;
+  role?:string | undefined;
 };
 
 type Transaction = {

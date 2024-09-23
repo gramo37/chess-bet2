@@ -119,7 +119,10 @@ export class GameManager {
 
   async abortGame(socket: WebSocket, token: string) {
     const user = await extractUser(token);
-    if (!user || !user.name || !user.id) return;
+    if (!user || !user.name || !user.id)
+      return sendMessage(socket, {
+        type: GAMEABORTED,
+      });
     // Find the user's game from this.games
     const game = this.games.find((game) => {
       const player1Id = game.getPlayer1().getPlayerId();
@@ -218,6 +221,7 @@ export class GameManager {
           game.getPlayer2().getPlayer() === socket) &&
         game.getGameStatus() === IN_PROGRESS
     );
+    console.log("Ending Game -> ", game?.getGameId())
     if (game) {
       await game.endGame(socket, payload);
     } else
@@ -328,9 +332,11 @@ export class GameManager {
           game.getGameStatus() === NOT_YET_STARTED &&
           !game.isFriendly &&
           // Check nearest rating only if type === "random"
-          (type === "lobby" ||
-            (type === "random" && game.matchRating(user.rating))) &&
-          game.stake === stake
+          game.matchRating(user.rating) &&
+          (type === "lobby" || (type === "random" && game.stake === stake))
+          // (type === "lobby" ||
+          //   (type === "random" && game.matchRating(user.rating))) &&
+          // game.stake === stake
         );
       });
       console.log("Matched Games -> ", game?.getGameId());
@@ -488,8 +494,8 @@ export class GameManager {
       return (
         game.getGameStatus() === NOT_YET_STARTED &&
         !game.isFriendly &&
-        // game.matchRating(user?.rating) &&
-        game.stake === stake
+        game.matchRating(user?.rating)
+        // game.stake === stake
       );
     });
   }

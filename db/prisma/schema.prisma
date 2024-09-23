@@ -47,20 +47,21 @@ model Transaction {
 }
 
 model Game {
-  id            String       @id @default(cuid())
-  Move          Move[]
-  blackPlayerId String
-  whitePlayerId String
-  whitePlayer   User         @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer   User         @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
-  board         String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-  status        GameStatus?
-  result        GameResult?
-  gameOutCome   GameOutCome?
-  startTime     DateTime     @default(now())
-  endTime       DateTime?
-  stake         String       @default("")
-  isFriendly    Boolean      @default(false)
+  id                 String       @id @default(cuid())
+  Move               Move[]
+  blackPlayerId      String
+  whitePlayerId      String
+  whitePlayer        User         @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
+  blackPlayer        User         @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  board              String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  status             GameStatus?
+  result             GameResult?
+  gameOutCome        GameOutCome?
+  startTime          DateTime     @default(now())
+  endTime            DateTime?
+  stake              String       @default("")
+  isFriendly         Boolean      @default(false)
+  areBalancesUpdated Boolean      @default(false)
 
   @@index([blackPlayerId])
   @@index([whitePlayerId])

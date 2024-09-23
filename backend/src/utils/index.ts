@@ -6,7 +6,7 @@ dotenv.config();
 
 const JWT_SECRET = process.env.SECRET_KEY ?? "SECRET_KEY";
 
-export const generateToken = (obj: Object, expiresIn: string = "1h") => {
+export const generateToken = (obj: Object, expiresIn: string = "24h") => {
   const token = jwt.sign(obj, JWT_SECRET, {
     expiresIn,
   });

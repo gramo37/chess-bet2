@@ -233,11 +233,11 @@ export class Game {
 
     // Check for draw or checkmate
     let result: "WHITE_WINS" | "BLACK_WINS" | "DRAW" | null = null;
-    if (chess.isGameOver()) {
-      const winner =
+    const winner =
         this.player1.getPlayer() === socket ? this.player1 : this.player2;
       const loser =
         this.player1.getPlayer() === socket ? this.player2 : this.player1;
+    if (chess.isGameOver()) {
       result = sendGameOverMessage(winner, loser, CHECKMATE);
       this.stopPlayer1Timer();
       this.stopPlayer2Timer();
@@ -260,6 +260,9 @@ export class Game {
 
     // Update the result of game in DB
     if (result) {
+      let areBalancesUpdated = false;
+      if(result !== "DRAW") areBalancesUpdated = await this.updateBalances(winner, loser);
+      else areBalancesUpdated = true;
       await db.game.update({
         data: {
           status: COMPLETED,
@@ -267,6 +270,7 @@ export class Game {
           gameOutCome: result === DRAW ? DRAW : CHECKMATE,
           board: this.board,
           endTime: new Date(Date.now()),
+          areBalancesUpdated
         },
         where: {
           id: this.gameId,
@@ -401,9 +405,8 @@ export class Game {
     );
     if (payload.status === ACCEPT_DRAW) result = DRAW;
     if (result) {
-
-      console.log("Game is ended. Updating balances...")
-      await this.updateBalances(winner, loser);
+      console.log(`Game is ended. Result: ${result}.`);
+      const areBalancesUpdated = await this.updateBalances(winner, loser);
       await db.game.update({
         data: {
           status: COMPLETED,
@@ -411,6 +414,7 @@ export class Game {
           gameOutCome: payload.status,
           board: this.board,
           endTime: new Date(Date.now()),
+          areBalancesUpdated
         },
         where: {
           id: this.gameId,
@@ -452,37 +456,53 @@ export class Game {
     try {
       // Reduce stake amount (this.stake) from loser's account
       // if(!this.stake || !Number.isNaN(Number(this.stake))) return false;
-      console.log("Updating balances")
-      await db.user.update({
-        where: {
-          id: loser.getPlayerId(),
-        },
-        data: {
-          balance: {
-            decrement: Number(this.stake),
+      console.log("Updating balances");
+      console.log(
+        `Decrementing for Player ->`,
+        loser.getPlayerName(),
+        loser.getPlayerId(),
+        "Rating -> ",
+        loser.getPlayerRating()
+      );
+      console.log(
+        `Incrementing for Player ->`,
+        winner.getPlayerName(),
+        winner.getPlayerId(),
+        "Rating -> ",
+        loser.getPlayerRating()
+      );
+      await db.$transaction([
+        db.user.update({
+          where: {
+            id: loser.getPlayerId(),
           },
-          rating: {
-            decrement: 10
-          }
-        },
-      });
-      // Increase 85 % of the stake amount (this.stake) from winner's account
-      await db.user.update({
-        where: {
-          id: winner.getPlayerId(),
-        },
-        data: {
-          balance: {
-            increment: 0.85 * Number(this.stake),
+          data: {
+            balance: {
+              decrement: Number(this.stake),
+            },
+            rating: {
+              decrement: 10,
+            },
           },
-          rating: {
-            increment: 10
-          }
-        },
-      });
+        }),
+        // Increase 85 % of the stake amount (this.stake) from winner's account
+        db.user.update({
+          where: {
+            id: winner.getPlayerId(),
+          },
+          data: {
+            balance: {
+              increment: 0.85 * Number(this.stake),
+            },
+            rating: {
+              increment: 10,
+            },
+          },
+        }),
+      ]);
       return true;
     } catch (error) {
-      console.log("Error updating balance", error);
+      console.log("Error updating balance for ", this.gameId, error);
       return false;
     }
   }

@@ -11,6 +11,7 @@ interface RouteProps {
 // PrivateRoute: Redirect to /login if user is not logged in
 export const PrivateRoute = ({ children }: RouteProps) => {
   const user = usePersonStore((state) => state.user);
+  
   return user ? <>{children}</> : <Landing/>;
 };
 

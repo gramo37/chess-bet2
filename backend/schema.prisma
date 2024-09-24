@@ -25,6 +25,7 @@ model User {
   transactions  Transaction[]
   reports       UserReport[]
   role          Roles         @default(USER)
+  status        UserStatus    @default(ACTIVE)
 }
 
 model Transaction {
@@ -135,4 +136,10 @@ enum Roles {
   USER
   ADMIN
   MODRATOR
+}
+
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
 }

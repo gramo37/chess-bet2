@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import usePersonStore from "../contexts/auth"; // Your auth store
 import Landing from "../screens/Landing";
+import Login from "./login";
 
 interface RouteProps {
   children: ReactNode;
@@ -26,6 +27,6 @@ if(user && user.role==='USER'){
 }else if (user){
 return <>{children}</>
 }
-return <Navigate to="/adminlogin"/>
+return <Login admin={true}/>
 }
 

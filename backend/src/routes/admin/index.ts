@@ -20,4 +20,5 @@ router.get("/game/:id", authenticateJWT,authorizeAdmin, getGame);
 
 //report Routes
 router.get("/reports",authenticateJWT,authorizeAdmin,getAllReports);
+
 export default router;

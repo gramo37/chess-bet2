@@ -9,7 +9,6 @@ type TUser = {
     balance: number;
 } | null
 
-// Function to send money from company -> user
 export const withdrawMoneyToUser = async (amount: number, account: string, user: TUser) => {
     try {
         if (!user || !user?.id) return false;

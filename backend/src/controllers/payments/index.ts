@@ -224,6 +224,8 @@ export const successTransaction = async (req: Request, res: Response) => {
 };
 
 export const withdrawMoney = async (req: Request, res: Response) => {
+console.log('comming here1vsdv');
+  
   try {
     let { amount, account } = req.body;
     amount = Math.floor(amount);

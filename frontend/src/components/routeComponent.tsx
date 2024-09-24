@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import usePersonStore from "../contexts/auth"; // Your auth store
 import Landing from "../screens/Landing";
-import Login from "./login";
+import Login from "../screens/login";
 
 interface RouteProps {
   children: ReactNode;

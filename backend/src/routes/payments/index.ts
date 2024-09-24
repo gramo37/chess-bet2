@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.post("/get-payment-url", authenticateJWT, getPaymentURL);
-router.post("/success-transaction", authenticateJWT, successTransaction);
+router.post("/success-transaction", successTransaction);
 router.post("/withdraw-money", authenticateJWT, withdrawMoney);
 
 router.get("/transaction-history",authenticateJWT,transactionHistory);

@@ -1,16 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Game from "./screens/Game";
-import Login from "./components/login";
-import Signup from "./components/signup";
+import Login from "./screens/login";
+import Signup from "./screens/signup";
 import Spinner from "./components/spinner";
-import Account from "./components/account/account";
-import { PrivateRoute, PublicRoute,AdminPrivateRoute } from "./components/routeComponent";
+import {
+  PrivateRoute,
+  PublicRoute,
+  AdminPrivateRoute,
+} from "./components/routeComponent";
 import usePersonStore from "./contexts/auth";
 import { useGetUser } from "./hooks/useGetUser";
 import Payment from "./screens/Payment";
-import Dashboard from "./components/admin";
 import PlayerProfile from "./components/admin/playerprofile";
+import Dashboard from "./screens/dashboard";
+import AccountPage from "./screens/account";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
@@ -49,16 +53,16 @@ function App() {
               path="/account"
               element={
                 <PrivateRoute>
-                  <Account />
+                  <AccountPage />
                 </PrivateRoute>
               }
             />
             <Route
               path="/payment/:secret_token"
               element={
-                <PrivateRoute>
+                <PublicRoute>
                   <Payment />
-                </PrivateRoute>
+                </PublicRoute>
               }
             />
 
@@ -67,7 +71,7 @@ function App() {
               path="/login"
               element={
                 <PublicRoute>
-                  <Login admin={false}/>
+                  <Login admin={false} />
                 </PublicRoute>
               }
             />
@@ -75,38 +79,36 @@ function App() {
               path="/signup"
               element={
                 <PublicRoute>
-                  <Signup admin={false}/>
+                  <Signup admin={false} />
                 </PublicRoute>
               }
             />
-            <Route 
-            path="/adminsignup"
-            element={
-              <PublicRoute>
-              <Signup admin={true}/>
-              </PublicRoute>
-
-            }
+            <Route
+              path="/adminsignup"
+              element={
+                <PublicRoute>
+                  <Signup admin={true} />
+                </PublicRoute>
+              }
             />
-            <Route 
-            path="/adminlogin"
-            element={
-              <PublicRoute>
-              <Login admin={true}/>
-              </PublicRoute>
-            }
+            <Route
+              path="/adminlogin"
+              element={
+                <PublicRoute>
+                  <Login admin={true} />
+                </PublicRoute>
+              }
             />
-            <Route path="/dashboard" element={
-              <AdminPrivateRoute>
-              <Dashboard/>
-              </AdminPrivateRoute>
-          }/>
-          <Route
-          path="/player/:id"
-          element={<PlayerProfile/>}
-          />
+            <Route
+              path="/dashboard"
+              element={
+                <AdminPrivateRoute>
+                  <Dashboard />
+                </AdminPrivateRoute>
+              }
+            />
+            <Route path="/player/:id" element={<PlayerProfile />} />
           </Routes>
-
         </BrowserRouter>
       </div>
     </QueryClientProvider>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
-import React from "react";
 import Spinner from "../spinner";
 
 type UserReport = {

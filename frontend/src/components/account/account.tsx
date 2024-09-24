@@ -6,6 +6,7 @@ import axios from "axios";
 import GameHistory from "./gamehistory";
 import { IoMdArrowBack } from "react-icons/io";
 import { Report } from "./report";
+
 export default function Account() {
   const user = usePersonStore((state) => state.user);
   const [transactionType, setTransactionType] = useState("choose");

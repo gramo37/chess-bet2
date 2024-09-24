@@ -168,10 +168,9 @@ export const getPaymentURL = async (req: Request, res: Response) => {
 
 export const successTransaction = async (req: Request, res: Response) => {
   try {
-    const user: any = (req?.user as any)?.user;
-    const { secret_token, checkout_id } = req.body;
-    console.log(secret_token, checkout_id);
-    if (!secret_token || !checkout_id) {
+    const { secret_token } = req.body;
+    console.log(secret_token);
+    if (!secret_token) {
       return res.status(401).json({
         message: "Unauthorized Payment",
       });
@@ -179,11 +178,11 @@ export const successTransaction = async (req: Request, res: Response) => {
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
       where: {
-        checkout_id,
         secret_token,
       },
       select: {
         id: true,
+        userId: true,
         finalamountInUSD: true,
       },
     });
@@ -194,11 +193,13 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
+
     // Update transaction it as successful
     await db.$transaction([
       db.user.update({
         where: {
-          email: user.email,
+          // email: user.email,
+          id: transaction.userId,
         },
         data: {
           balance: {
@@ -224,12 +225,12 @@ export const successTransaction = async (req: Request, res: Response) => {
 };
 
 export const withdrawMoney = async (req: Request, res: Response) => {
-console.log('comming here1vsdv');
-  
+  console.log("comming here1vsdv");
+
   try {
     let { amount, account } = req.body;
     amount = Math.floor(amount);
-console.log('comming here');
+    console.log("comming here");
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -255,6 +256,20 @@ console.log('comming here');
     if (amount <= INSTASEND_WITHDRAWAL_LIMIT) {
       return res.status(400).json({
         message: "Amount less than minimum withdrawal amount",
+      });
+    }
+
+    const games = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+      },
+    });
+
+    console.log('Games played by user ->', games)
+    if(games < 3) {
+      console.log("Less number of games played by user -> ", games)
+      return res.status(401).json({
+        message: "Please play atleast 3 games before withdrawing money.",
       });
     }
 
@@ -310,7 +325,7 @@ console.log('comming here');
     ]);
 
     res.status(200).json({
-      message: "Money withdrawn successfully!",
+      message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object
     });
   } catch (error) {

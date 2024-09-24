@@ -10,6 +10,7 @@ import usePersonStore from "./contexts/auth";
 import { useGetUser } from "./hooks/useGetUser";
 import Payment from "./screens/Payment";
 import Dashboard from "./components/admin";
+import PlayerProfile from "./components/admin/playerprofile";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
@@ -81,18 +82,18 @@ function App() {
             <Route 
             path="/adminsignup"
             element={
-              <AdminPrivateRoute>
+              <PublicRoute>
               <Signup admin={true}/>
-              </AdminPrivateRoute>
+              </PublicRoute>
 
             }
             />
             <Route 
             path="/adminlogin"
             element={
-              <AdminPrivateRoute>
+              <PublicRoute>
               <Login admin={true}/>
-              </AdminPrivateRoute>
+              </PublicRoute>
             }
             />
             <Route path="/dashboard" element={
@@ -100,7 +101,12 @@ function App() {
               <Dashboard/>
               </AdminPrivateRoute>
           }/>
+          <Route
+          path="/player/:id"
+          element={<PlayerProfile/>}
+          />
           </Routes>
+
         </BrowserRouter>
       </div>
     </QueryClientProvider>

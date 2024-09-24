@@ -20,6 +20,8 @@ export default function Account() {
       action === "Deposit"
         ? `${BACKEND_URL}/payments/get-payment-url`
         : `${BACKEND_URL}/payments/withdraw-money`;
+        console.log(url);
+        
 
     try {
       const response = await axios.post(

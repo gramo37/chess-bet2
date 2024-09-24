@@ -13,7 +13,6 @@ import { GamesList, ReportsList, TransactionsList } from "./admincomponent";
         const fetchedReports = await fetchReports();
         const fetchedTransactions = await fetchTransactions();
         const fetchedGames = await fetchGames();
-  console.log(fetchGames,fetchReports,fetchTransactions);
   
         setReports(fetchedReports);
         setTransactions(fetchedTransactions);
@@ -27,7 +26,7 @@ import { GamesList, ReportsList, TransactionsList } from "./admincomponent";
     return (
       <div className="container mx-auto py-8">
 <div className="w-[90%] h-[300px] rounded-lg p-3 mb-2 m-auto  bg-amber-50">
-<h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+<h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
 <div className="inline-flex items-center gap-3"><h1 className="text-3xl">Profit: </h1> <div className="rounded-full w-[70px] h-[70px] grid place-content-center text-center bg-black text-white text-xl"> 100$</div></div>
 </div>
 <div className="w-[90%] m-auto">

@@ -184,6 +184,7 @@ export const successTransaction = async (req: Request, res: Response) => {
         id: true,
         userId: true,
         finalamountInUSD: true,
+        status: true
       },
     });
 
@@ -193,6 +194,13 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
+    
+    // Check for if the transaction is pending
+    if(transaction.status !== "PENDING") {
+      return res
+        .status(401)
+        .json({ message: "Transaction already completed or cancelled", status: "error" });
+    }
 
     // Update transaction it as successful
     await db.$transaction([

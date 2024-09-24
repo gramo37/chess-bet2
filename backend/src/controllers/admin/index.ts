@@ -130,7 +130,8 @@ export const GetTransaction = async (req: Request, res: Response) => {
   export const getUsers = async (req: Request, res: Response) => {
     try {
       const users = await db.user.findMany({
-        select: { id: true, name: true, email: true, role: true }, // Minimal fields
+        where: { role: 'USER' }, // Only select users with the role of 'USER'
+        select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
       });
       res.status(200).json(users);
     } catch (error) {
@@ -151,6 +152,7 @@ export const GetTransaction = async (req: Request, res: Response) => {
           email: true,
           balance:true,
           rating:true,
+          status:true,
           gamesAsWhite: { select: { id: true, status: true ,result:true} },
           gamesAsBlack: { select: { id: true, status: true ,result:true} },
           transactions: { select: { id: true, amount: true, status: true } },

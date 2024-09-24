@@ -24,7 +24,8 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
         email: true,
         rating: true,
         balance: true,
-        role:true
+        role:true,
+        status:true
       }
     });
 

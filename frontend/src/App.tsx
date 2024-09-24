@@ -12,7 +12,7 @@ import {
 import usePersonStore from "./contexts/auth";
 import { useGetUser } from "./hooks/useGetUser";
 import Payment from "./screens/Payment";
-import PlayerProfile from "./components/admin/playerprofile";
+import PlayerProfile from "./components/admin/component/playerprofile";
 import Dashboard from "./screens/dashboard";
 import AccountPage from "./screens/account";
 

@@ -1,24 +1,30 @@
 import { useEffect, useState } from "react";
-import { fetchGames, fetchReports, fetchTransactions } from "./fetch";
-import { GamesList, ReportsList, TransactionsList } from "./admincomponent";
+import { fetchData } from "./fetch";
+import { GamesList } from "./component/game";
+import { ReportsList } from "./component/report";
+import { TransactionsList} from "./component/transaction"
+import { Users } from "./component/users";
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [games, setGames] = useState([]);
+  const [users,setUsers]=useState([])
   const [activeTab, setActiveTab] = useState<string>("reports");
-  useEffect(() => {
-    async function fetchData() {
-      const fetchedReports = await fetchReports();
-      const fetchedTransactions = await fetchTransactions();
-      const fetchedGames = await fetchGames();
 
+  useEffect(() => {
+    async function getdata() {
+      const fetchedReports = await fetchData('reports');
+      const fetchedTransactions = await fetchData('transactions');
+      const fetchedGames = await fetchData('games');
+      const fetchedUsers = await fetchData('users');
       setReports(fetchedReports);
       setTransactions(fetchedTransactions);
       setGames(fetchedGames);
+      setUsers(fetchedUsers)
     }
 
-    fetchData();
+    getdata();
   }, []);
 
   return (
@@ -66,6 +72,16 @@ const Dashboard = () => {
           >
             Games
           </button>
+          <button
+            className={`text-xl font-bold pb-2 ${
+              activeTab === "users"
+                ? "text-blue-500 border-b-2 border-blue-500"
+                : "text-white"
+            }`}
+            onClick={() => setActiveTab("users")}
+          >
+            Users
+          </button>
         </div>
 
         {/* Tabs Content */}
@@ -75,6 +91,7 @@ const Dashboard = () => {
             <TransactionsList transactions={transactions} />
           )}
           {activeTab === "games" && <GamesList games={games} />}
+          {activeTab === "users" && <Users users={users}/>}
         </div>
       </div>
     </div>

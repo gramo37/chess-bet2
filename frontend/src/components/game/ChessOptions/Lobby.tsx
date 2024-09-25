@@ -83,7 +83,8 @@ const Lobby = () => {
                   }}
                 >
                   <p>Name: {opponent.player1.name}</p>
-                  <p>Stake: {opponent.stake}</p>
+                  <p>Stake: ${opponent.stake}</p>
+                  <p>Rating: {opponent.player1.rating}</p>
                 </div>
               );
             })}

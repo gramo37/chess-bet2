@@ -102,10 +102,10 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         // Create a transaction entry as PENDING in db
         console.log(`Charge Resp:`, resp);
         // TODO: GET the deducted amount and add that in the transaction table
-        if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
-          console.error(`Charge details Not Found!!`, resp);
-          res.status(500).json({ message: "URL Not Found", status: "error" });
-        }
+        // if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
+        //   console.error(`Charge details Not Found!!`, resp);
+        //   res.status(500).json({ message: "URL Not Found", status: "error" });
+        // }
         // Store the currency in the transaction table
         // Store the amount as well in the transaction table
         const finalamountInUSD = parseFloat(

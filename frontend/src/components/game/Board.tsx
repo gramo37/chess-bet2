@@ -1,7 +1,7 @@
 import { Chessboard } from "react-chessboard";
 import { IHighlightedSquares, useBoardStore } from "../../contexts/board.context";
 import { useGameStore } from "../../contexts/game.context";
-import { isPromotion } from "../../utils/game";
+import { isPromotion } from "../../types/utils/game";
 import {
   Piece,
   PromotionPieceOption,

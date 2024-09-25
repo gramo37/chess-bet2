@@ -2,6 +2,7 @@ import express from "express";
 import { authenticateJWT,authorizeAdmin } from "../../middlewares/auth";
 import { createAdmin, getGames,getGame, GetTransaction, GetTransactions, getUser, getUsers, adminLogin, getAllReports } from "../../controllers/admin";
 import { DeleteUserAccount, MarkIssueCompleted, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount } from "../../controllers/admin/updateuser";
+import { BussinesProfits, DailyGames, UserProfits, UsersWinLoss } from "../../controllers/admin/stats";
 
 const router = express.Router();
 
@@ -30,5 +31,11 @@ router.put("/users/:id/suspend", authenticateJWT, authorizeAdmin, SuspendUserAcc
 router.put("/users/:id/active", authenticateJWT, authorizeAdmin, ActiveUserAccount);
 router.delete("/users/:id", authenticateJWT, authorizeAdmin, DeleteUserAccount);
 router.put("/reports/:id/complete", authenticateJWT, authorizeAdmin, MarkIssueCompleted);
+
+//stats
+router.get("/stats/daily-games", authenticateJWT, authorizeAdmin, DailyGames);
+router.get("/users/:userId/profits", authenticateJWT, authorizeAdmin, UserProfits);
+router.get("/stats/business-profits", authenticateJWT, authorizeAdmin, BussinesProfits);
+router.get("/stats/users-won-lost", authenticateJWT, authorizeAdmin, UsersWinLoss);
 
 export default router;

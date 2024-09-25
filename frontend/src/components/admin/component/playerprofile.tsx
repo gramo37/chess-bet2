@@ -91,9 +91,7 @@ const url = `${BACKEND_URL}/admin/users/${id}`
       updateUser(type,id);
       return;
     }
-    
     const a = Number(prompt(`Enter the amount you want to change ${type}:`));
-
     if (isNaN(a) || a < 0) {
       alert("Please enter a valid amount that is zero or greater.");
     } else {

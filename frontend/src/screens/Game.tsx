@@ -32,10 +32,13 @@ export default function Game() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full sm:w-[70%] lg:w-[85%] max-w-7xl">
-        <div className="text-white absolute top-2 left-2 w-10 h-10 cursor-pointer" onClick={() => {
-          navigate("/account")
-        }}>
-          <CiSettings size={25}/>
+        <div
+          className="text-white absolute top-2 left-2 w-10 h-10 cursor-pointer"
+          onClick={() => {
+            navigate("/account");
+          }}
+        >
+          <CiSettings size={25} />
         </div>
         <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
           <h2 className="text-xl font-bold text-gray-300">
@@ -69,6 +72,15 @@ export default function Game() {
             <ChatContainer message={message} />
           </div>
         </div>
+        <a
+          onClick={() => {
+            localStorage.setItem("token", "");
+            window.location.href = "/game";
+          }}
+          className="m-4 bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"
+        >
+          Logout
+        </a>
       </div>
     </div>
   );

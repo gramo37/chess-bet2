@@ -43,7 +43,8 @@ export default function Login({ admin }: props) {
 
       alert("Login successful");
       window.location.href = admin ? "/dashboard" : "/game";
-    } catch (error) {
+    } catch (error:any) {
+      alert(error.message)
       console.error("Error:", error);
     }
 

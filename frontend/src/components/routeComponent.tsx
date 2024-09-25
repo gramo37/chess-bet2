@@ -11,8 +11,8 @@ interface RouteProps {
 // PrivateRoute: Redirect to /login if user is not logged in
 export const PrivateRoute = ({ children }: RouteProps) => {
   const user = usePersonStore((state) => state.user);
-  
-  return user ? <>{children}</> : <Landing/>;
+  if(user&&user.role==='ADMIN')return <Navigate to="/dashboard"/>
+  return user ? <>{children}</> : <Navigate to="/login"/>;
 };
 
 // PublicRoute: Redirect to /game if user is logged in
@@ -23,8 +23,9 @@ export const PublicRoute = ({ children }: RouteProps) => {
 
 export const AdminPrivateRoute = ({children}:RouteProps)=>{
   const user = usePersonStore((state) => state.user);
+  if(!user)return <Navigate to="/login"/>
 if(user && user.role==='USER'){
-  return <Navigate to="/dashboard"/>
+  return <Navigate to="/game"/>
 }else if (user){
 return <>{children}</>
 }

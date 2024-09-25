@@ -1,7 +1,7 @@
 import { useInitSocket, useSocketHandler } from "../hooks/useSocket";
 import Moves from "../components/game/Moves";
 import { useGameStore } from "../contexts/game.context";
-import { formatTime } from "../utils/game";
+import { formatTime } from "../types/utils/game";
 import ChatContainer from "../components/game/chat";
 import { useGameLogic } from "../hooks/useGameLogic";
 import ChessOptions from "../components/game/ChessOptions";

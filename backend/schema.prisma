@@ -21,7 +21,7 @@ model User {
   gamesAsWhite  Game[]        @relation("GamesAsWhite")
   gamesAsBlack  Game[]        @relation("GamesAsBlack")
   rating        Int           @default(800)
-  balance       Float         @default(0)
+  balance       Float         @default(3)
   transactions  Transaction[]
   reports       UserReport[]
   role          Roles         @default(USER)

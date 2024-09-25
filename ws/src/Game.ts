@@ -164,6 +164,7 @@ export class Game {
       });
       return;
     }
+    
     if (this.moveCount % 2 === 1 && socket === player1) {
       sendMessage(socket, {
         type: INVALID_MOVE,

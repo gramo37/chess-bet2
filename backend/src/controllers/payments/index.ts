@@ -29,7 +29,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
     let { amount, currency } = req.body;
     amount = Math.floor(amount);
 
-    if (!amount || amount <= 0 || !currency) {
+    if (!amount || amount <= 5 || !currency) {
       return res.status(400).json({
         message: "Please provide a valid amount to be deposited and currency",
       });
@@ -240,7 +240,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     amount = Math.floor(amount);
     console.log("comming here");
 
-    if (!amount || amount <= 0) {
+    if (!amount || amount <= 5) {
       return res.status(400).json({
         message: "Please provide a valid amount to be withdrawn",
       });

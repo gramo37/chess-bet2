@@ -137,7 +137,7 @@ export class GameManager {
     });
     // Before deleting it check if the game is started or not
     if (game) {
-      console.log("User has the game to aborted -> ", game.getGameId())
+      console.log("User has the game to aborted -> ", game.getGameId());
       this.games = this.games.filter(
         (gm) => gm.getGameId() !== game.getGameId()
       );
@@ -309,13 +309,21 @@ export class GameManager {
           const player1 = game?.getPlayer1();
           // Avoid creating game between the same player.
           if (player1?.getPlayerId() !== user.id) {
-            const player2 = game?.getPlayer2();
-            player2?.setPlayerToken(token);
-            player2?.setPlayerSocket(socket);
-            player2?.setPlayerId(user.id);
-            player2?.setPlayerName(user.name);
-            player2?.setPlayerRating(user.rating);
-            await game?.createGame();
+            // Check if the balance of the player 2 is greater than stake
+            console.log("User balance and game stake comparison", user.balance, Number(game.stake))
+            if (user.balance > Number(game.stake)) {
+              const player2 = game?.getPlayer2();
+              player2?.setPlayerToken(token);
+              player2?.setPlayerSocket(socket);
+              player2?.setPlayerId(user.id);
+              player2?.setPlayerName(user.name);
+              player2?.setPlayerRating(user.rating);
+              await game?.createGame();
+            } else {
+              sendMessage(socket, {
+                type: GAMEABORTED,
+              });
+            }
           }
         } else {
           sendMessage(socket, {

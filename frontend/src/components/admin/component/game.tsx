@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { BACKEND_URL } from "../../../constants/routes";
+import React from "react";
 // Define types for Game, Transaction, and Report
 interface Player {
   id: string;

@@ -5,7 +5,7 @@ import TransactionHistory from "./transactions";
 import GameHistory from "./gamehistory";
 import { Report } from "./report";
 import DepositMoney from "./DepositMoney";
-import WithdrawMoney from "./withdrawMoney";
+import WithdrawMoney from "./WithdrawMoney";
 import { useNavigate } from "react-router-dom";
 
 export default function Account() {

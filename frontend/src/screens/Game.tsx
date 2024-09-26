@@ -10,6 +10,7 @@ import TimeLeft from "../components/game/TimeLeft";
 import Board from "../components/game/Board";
 import { CiSettings } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
+import { IoIosLogOut } from "react-icons/io";
 
 export default function Game() {
   const { color, opponent, player } = useGameStore([
@@ -40,6 +41,15 @@ export default function Game() {
         >
           <CiSettings size={25} />
         </div>
+        <a
+          onClick={() => {
+            localStorage.setItem("token", "");
+            window.location.href = "/game";
+          }}
+          className="absolute top-10 left-2 w-10 h-10 cursor-pointer text-white"
+        >
+          <IoIosLogOut size={25} />
+        </a>
         <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
           <h2 className="text-xl font-bold text-gray-300">
             {opponent?.name ?? ""}
@@ -72,15 +82,6 @@ export default function Game() {
             <ChatContainer message={message} />
           </div>
         </div>
-        <a
-          onClick={() => {
-            localStorage.setItem("token", "");
-            window.location.href = "/game";
-          }}
-          className="m-4 bg-gray-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-gray-600 focus:outline-none focus:bg-gray-600 text-center"
-        >
-          Logout
-        </a>
       </div>
     </div>
   );

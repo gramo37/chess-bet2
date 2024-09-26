@@ -35,7 +35,7 @@ export const GamesList: React.FC<GamesListProps> = ({ games }) => {
   function onViewProfile(id:string): void {
     console.log(id);
     
-  window.location.href = `/player/${id}`    
+  window.location.href = `/game/${id}`    
   }
 
   return (
@@ -47,8 +47,7 @@ export const GamesList: React.FC<GamesListProps> = ({ games }) => {
               <p className="text-lg font-bold">Game ID: {game.id}</p>
               <p>Status: {game.status}</p>
               <p>Outcome: {game.gameOutCome}</p>
-              <p>Result: {game.result}</p>
-              <p>Stake: ${game.stake}</p>
+              <p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">
@@ -57,26 +56,9 @@ export const GamesList: React.FC<GamesListProps> = ({ games }) => {
               <p className="text-sm text-gray-500">
                 End Time: {new Date(game.endTime).toLocaleString()}
               </p>
-
-              <div className="mt-4 space-y-2">
-                <div>
-                  <p
-                    className="font-semibold cursor-pointer text-blue-500 hover:underline"
-                    onClick={() => onViewProfile(game.whitePlayer.id)}
-                  >
-                    White Player: {game.whitePlayer.name}
-                  </p>
-                </div>
-
-                <div>
-                  <p
-                    className="font-semibold text-blue-500 cursor-pointer hover:underline"
-                    onClick={() => onViewProfile(game.blackPlayer.id)}
-                  >
-                    Black Player: {game.blackPlayer.name}
-                  </p>
-                </div>
-              </div>
+              <p>Result: {game.result}</p>
+              <p>Stake: ${game.stake}</p>
+              
             </div>
           </div>
         </div>

@@ -26,6 +26,8 @@ model User {
   reports       UserReport[]
   role          Roles         @default(USER)
   status        UserStatus    @default(ACTIVE)
+  otp           String?  
+  otpExpiresAt  DateTime?
 }
 
 model Transaction {

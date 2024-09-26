@@ -1,16 +1,29 @@
 import { useEffect, useState } from "react"
 import { fetchedStatsData } from "../fetch";
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+};
 
+type StatsProps = {
+  users: User[];
+};
 
-export  function Stats() {
+export  function Stats({users}:StatsProps) {
     const [statsProfits, setStatsProfits] = useState(0);
     const [statsGamePlayed, setStatsGamePlayed] = useState([]);
     const [StatsWin, setStatsWin] = useState([]);
     const [timeRange, setTimeRange] = useState<string>("allTime");
-    
+    const [activeuser,setActiveUser]=useState(0)
+    const [suspendeduser,setSuspendedUser]=useState(0);
     useEffect(()=>{
+
 getStats();
-},[])
+
+},[users])
 
 async function getStats(){
     const date = calculateStartDate()
@@ -20,7 +33,13 @@ async function getStats(){
 
     setStatsGamePlayed(fetchedStatsGames.totalGamesPlayed);
     setStatsProfits(fetchedStatsProfits.businessProfit);
-    setStatsWin(fetchedStatsUserWin.totalWinners)
+    setStatsWin(fetchedStatsUserWin.totalWinners);
+    const activeCount = users.filter(user => user.status === 'ACTIVE').length;
+    const suspendedCount = users.filter(user => user.status === 'SUSPENDED').length;
+
+    setActiveUser(activeCount);
+    setSuspendedUser(suspendedCount);
+
 }
 
 
@@ -86,6 +105,13 @@ async function getStats(){
           <div className="bg-white p-3 rounded shadow">
             <h3 className="font-semibold">Games Played</h3>
             <p className="text-lg">{statsGamePlayed}</p>
+          </div>
+          <div className="bg-white p-3 rounded shadow">
+            <h3 className="font-semibold">Active User</h3>
+            <p className="text-lg">{activeuser}</p>
+          </div><div className="bg-white p-3 rounded shadow">
+            <h3 className="font-semibold">Suspended User</h3>
+            <p className="text-lg">{suspendeduser}</p>
           </div>
         </div>
     </div>

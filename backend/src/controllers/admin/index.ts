@@ -101,45 +101,65 @@ export const GetTransactions = async (req: Request, res: Response) => {
 
 
 export const GetTransaction = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const transaction = await db.transaction.findUnique({
-        where: { id },
-      });
-      
-      if (!transaction) {
-        return res.status(404).json({ message: "Transaction not found" });
-      }
-  
-      res.status(200).json(transaction);
-    } catch (error) {
-      console.error("Error fetching transaction:", error);
-      res.status(500).json({ message: "Internal server error" });
+  try {
+    const { id } = req.params;
+    const transaction = await db.transaction.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        createdAt: true,
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
     }
-  };
+
+    res.status(200).json(transaction);
+  } catch (error) {
+    console.error("Error fetching transaction:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
   export const getUsers = async (req: Request, res: Response) => {
     try {
-      const users = await db.user.findMany();
+      const users = await db.user.findMany({
+        where: { role: 'USER' }, // Only select users with the role of 'USER'
+        select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
+      });
       res.status(200).json(users);
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
-
+  
   export const getUser = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      
       const user = await db.user.findUnique({
         where: { id },
-        include: {
-          transactions: true, // Optionally include transaction data
-          gamesAsWhite: true, // Include games where user is white player
-          gamesAsBlack: true, // Include games where user is black player
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          balance:true,
+          rating:true,
+          status:true,
+          gamesAsWhite: { select: { id: true, status: true ,result:true} },
+          gamesAsBlack: { select: { id: true, status: true ,result:true} },
+          transactions: { select: { id: true, amount: true, status: true } },
         },
       });
-  
+     console.log(user);
+     
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -150,13 +170,20 @@ export const GetTransaction = async (req: Request, res: Response) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
-
+  
   export const getGames = async (req: Request, res: Response) => {
     try {
       const games = await db.game.findMany({
-        include: {
-          whitePlayer: true, // Include white player data
-          blackPlayer: true, // Include black player data
+        select: {
+          id: true,
+          status: true,
+          stake: true,
+          gameOutCome:true,
+          result:true,
+          startTime:true,
+          endTime:true,
+          whitePlayer: { select: { id: true, name: true } },
+          blackPlayer: { select: { id: true, name: true } },
         },
       });
       res.status(200).json(games);
@@ -165,53 +192,56 @@ export const GetTransaction = async (req: Request, res: Response) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
-
-export const getGame = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const game = await db.game.findUnique({
-      where: { id },
-      include: {
-        whitePlayer: true,
-        blackPlayer: true,
-        Move: true, 
-      },
-    });
-
-    if (!game) {
-      return res.status(404).json({ message: "Game not found" });
-    }
-
-    res.status(200).json(game);
-  } catch (error) {
-    console.error("Error fetching game:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-export const getAllReports = async (req: Request, res: Response) => {
+  
+  export const getGame = async (req: Request, res: Response) => {
     try {
-      // Fetch all reports, selecting only the title, description, and user details
-      const reports = await db.userReport.findMany({
+      const { id } = req.params;
+      const game = await db.game.findUnique({
+        where: { id },
         select: {
-          title: true,
-          description: true,
-          user: {
-            select: {
-              id: true,
-              email: true,
-              name: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc", 
+          id: true,
+          status: true,
+          result: true,
+          whitePlayer: { select: { id: true, name: true } },
+          blackPlayer: { select: { id: true, name: true } },
+          Move: { select: { id: true, from: true, to: true, san: true } },
         },
       });
   
-      res.status(200).json(reports);
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+  
+      res.status(200).json(game);
     } catch (error) {
-      console.error("Error fetching reports:", error);
+      console.error("Error fetching game:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
+  
+export const getAllReports = async (req: Request, res: Response) => {
+  try {
+    // Fetch all reports with user details, allowing for the possibility that user may be null
+    const reports = await db.userReport.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc', // Order by created date, latest first
+      },
+    });
+
+    
+
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

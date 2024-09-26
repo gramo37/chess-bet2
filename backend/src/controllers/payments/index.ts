@@ -29,7 +29,7 @@ export const getPaymentURL = async (req: Request, res: Response) => {
     let { amount, currency } = req.body;
     amount = Math.floor(amount);
 
-    if (!amount || amount <= 0 || !currency) {
+    if (!amount || amount <= 5 || !currency) {
       return res.status(400).json({
         message: "Please provide a valid amount to be deposited and currency",
       });
@@ -102,10 +102,10 @@ export const getPaymentURL = async (req: Request, res: Response) => {
         // Create a transaction entry as PENDING in db
         console.log(`Charge Resp:`, resp);
         // TODO: GET the deducted amount and add that in the transaction table
-        if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
-          console.error(`Charge details Not Found!!`, resp);
-          res.status(500).json({ message: "URL Not Found", status: "error" });
-        }
+        // if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
+        //   console.error(`Charge details Not Found!!`, resp);
+        //   res.status(500).json({ message: "URL Not Found", status: "error" });
+        // }
         // Store the currency in the transaction table
         // Store the amount as well in the transaction table
         const finalamountInUSD = parseFloat(
@@ -168,10 +168,9 @@ export const getPaymentURL = async (req: Request, res: Response) => {
 
 export const successTransaction = async (req: Request, res: Response) => {
   try {
-    const user: any = (req?.user as any)?.user;
-    const { secret_token, checkout_id } = req.body;
-    console.log(secret_token, checkout_id);
-    if (!secret_token || !checkout_id) {
+    const { secret_token } = req.body;
+    console.log(secret_token);
+    if (!secret_token) {
       return res.status(401).json({
         message: "Unauthorized Payment",
       });
@@ -179,12 +178,13 @@ export const successTransaction = async (req: Request, res: Response) => {
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
       where: {
-        checkout_id,
         secret_token,
       },
       select: {
         id: true,
+        userId: true,
         finalamountInUSD: true,
+        status: true
       },
     });
 
@@ -194,11 +194,20 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
+    
+    // Check for if the transaction is pending
+    if(transaction.status !== "PENDING") {
+      return res
+        .status(401)
+        .json({ message: "Transaction already completed or cancelled", status: "error" });
+    }
+
     // Update transaction it as successful
     await db.$transaction([
       db.user.update({
         where: {
-          email: user.email,
+          // email: user.email,
+          id: transaction.userId,
         },
         data: {
           balance: {
@@ -224,12 +233,14 @@ export const successTransaction = async (req: Request, res: Response) => {
 };
 
 export const withdrawMoney = async (req: Request, res: Response) => {
+  console.log("comming here1vsdv");
+
   try {
     let { amount, account } = req.body;
     amount = Math.floor(amount);
-console.log('comming here');
+    console.log("comming here");
 
-    if (!amount || amount <= 0) {
+    if (!amount || amount <= 5) {
       return res.status(400).json({
         message: "Please provide a valid amount to be withdrawn",
       });
@@ -253,6 +264,20 @@ console.log('comming here');
     if (amount <= INSTASEND_WITHDRAWAL_LIMIT) {
       return res.status(400).json({
         message: "Amount less than minimum withdrawal amount",
+      });
+    }
+
+    const games = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+      },
+    });
+
+    console.log('Games played by user ->', games)
+    if(games < 3) {
+      console.log("Less number of games played by user -> ", games)
+      return res.status(401).json({
+        message: "Please play atleast 3 games before withdrawing money.",
       });
     }
 
@@ -308,7 +333,7 @@ console.log('comming here');
     ]);
 
     res.status(200).json({
-      message: "Money withdrawn successfully!",
+      message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object
     });
   } catch (error) {

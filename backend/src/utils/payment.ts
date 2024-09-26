@@ -9,7 +9,6 @@ type TUser = {
     balance: number;
 } | null
 
-// Function to send money from company -> user
 export const withdrawMoneyToUser = async (amount: number, account: string, user: TUser) => {
     try {
         if (!user || !user?.id) return false;
@@ -33,7 +32,7 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
 
         let payouts = intasend.payouts();
 
-        console.log("User Details", user?.name, account, amount)
+        console.log("User Details", user?.name, account, amount, CURRENCY)
 
         await payouts
             .mpesa({
@@ -47,7 +46,7 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
             })
         return true;
     } catch (error) {
-        console.log("Error in payment to user", error);
+        console.log("Error in payment to user", error, "" + error);
         return false;
     }
 }

@@ -24,9 +24,11 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
         email: true,
         rating: true,
         balance: true,
-        role:true
+        role:true,
+        status:true
       }
     });
+
     if (!user) return res.status(404).json({ message: "User not found" });
     user = {...user, balance: user.balance}
     req.user = { user, token };
@@ -50,10 +52,11 @@ export const authorizeAdmin = async (req: Request, res: Response, next: NextFunc
     if (!dbUser || dbUser.role !== "ADMIN") {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
-
+    
     // If the user is an admin, proceed to the next middleware or route handler
     next();
   } catch (error) {
+
     console.error("Authorization error:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }

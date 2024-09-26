@@ -119,27 +119,32 @@ export class GameManager {
 
   async abortGame(socket: WebSocket, token: string) {
     const user = await extractUser(token);
-    if (!user || !user.name || !user.id)
+    if (!user || !user.name || !user.id) {
+      console.log("User not found for abort.");
       return sendMessage(socket, {
         type: GAMEABORTED,
       });
+    }
+    console.log("Aborting the game for user ->", user.id);
     // Find the user's game from this.games
     const game = this.games.find((game) => {
       const player1Id = game.getPlayer1().getPlayerId();
       const player2Id = game.getPlayer2().getPlayerId();
-      return player1Id === user.id || player2Id === user.id;
+      return (
+        (player1Id === user.id || player2Id === user.id) &&
+        game.getGameStatus() === NOT_YET_STARTED
+      );
     });
     // Before deleting it check if the game is started or not
-    if (!game) return;
-    if (game.getGameStatus() === NOT_YET_STARTED) {
-      // if not started Delete it
+    if (game) {
+      console.log("User has the game to aborted -> ", game.getGameId());
       this.games = this.games.filter(
         (gm) => gm.getGameId() !== game.getGameId()
       );
-      sendMessage(socket, {
-        type: GAMEABORTED,
-      });
     }
+    return sendMessage(socket, {
+      type: GAMEABORTED,
+    });
     // if (this.pendingUser === null) return;
     // // If the pending user is the player who wants to abort the game
     // if (this.pendingUser.getPlayerId() === user.id) {
@@ -221,7 +226,7 @@ export class GameManager {
           game.getPlayer2().getPlayer() === socket) &&
         game.getGameStatus() === IN_PROGRESS
     );
-    console.log("Ending Game -> ", game?.getGameId())
+    console.log("Ending Game -> ", game?.getGameId());
     if (game) {
       await game.endGame(socket, payload);
     } else
@@ -266,10 +271,27 @@ export class GameManager {
 
     // Check for balance and stake here
     // Don't proceed if balance is less than stake
-    if (Number(stake) > user.balance)
+    if (Number(stake) > user.balance || Number(stake) <= 0)
       return sendMessage(socket, {
         type: GAMEABORTED,
       });
+
+    // Avoid single user to create multiple games
+    const game = this.games.find((game) => {
+      const player1Id = game.getPlayer1().getPlayerId();
+      const player2Id = game.getPlayer2().getPlayerId();
+      return (
+        (player1Id === user.id || player2Id === user.id) &&
+        game.getGameStatus() !== "COMPLETED"
+      );
+    });
+    if (game) {
+      console.log("User is trying to create one more game");
+      console.log("Therefore deleting the old game");
+      this.games = this.games.filter(
+        (gm) => gm.getGameId() !== game.getGameId()
+      );
+    }
 
     if (type === "friend") {
       // In this case don't check for ratings
@@ -287,13 +309,21 @@ export class GameManager {
           const player1 = game?.getPlayer1();
           // Avoid creating game between the same player.
           if (player1?.getPlayerId() !== user.id) {
-            const player2 = game?.getPlayer2();
-            player2?.setPlayerToken(token);
-            player2?.setPlayerSocket(socket);
-            player2?.setPlayerId(user.id);
-            player2?.setPlayerName(user.name);
-            player2?.setPlayerRating(user.rating);
-            await game?.createGame();
+            // Check if the balance of the player 2 is greater than stake
+            console.log("User balance and game stake comparison", user.balance, Number(game.stake))
+            if (user.balance > Number(game.stake)) {
+              const player2 = game?.getPlayer2();
+              player2?.setPlayerToken(token);
+              player2?.setPlayerSocket(socket);
+              player2?.setPlayerId(user.id);
+              player2?.setPlayerName(user.name);
+              player2?.setPlayerRating(user.rating);
+              await game?.createGame();
+            } else {
+              sendMessage(socket, {
+                type: GAMEABORTED,
+              });
+            }
           }
         } else {
           sendMessage(socket, {

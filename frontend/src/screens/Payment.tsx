@@ -1,32 +1,30 @@
 import { useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
-import usePersonStore from "../contexts/auth";
 import Spinner from "../components/spinner";
 
 export default function Payment() {
-  const [searchParams] = useSearchParams();
   const { secret_token } = useParams();
-  const user = usePersonStore((state) => state.user);
   const navigate = useNavigate();
-
-  const signature = searchParams.get("signature");
-  const checkout_id = searchParams.get("checkout_id");
 
   useEffect(() => {
     // Make an API call to /success-transaction, send signature and checkout_id
-    if (!signature || !checkout_id) return;
+    if (!secret_token) {
+      console.error(`Secret Token not found`);
+      alert("Something went wrong. Please try again.");
+      navigate("/account");
+      return;
+    }
     async function updatePayments() {
       const url = `${BACKEND_URL}/payments/success-transaction`;
       try {
         const response = await axios.post(
           url,
-          { checkout_id, secret_token },
+          { secret_token },
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${user?.token}`,
             },
           }
         );
@@ -45,7 +43,7 @@ export default function Payment() {
     }
 
     updatePayments();
-  }, [signature, checkout_id, user?.token, navigate]);
+  }, [navigate, secret_token]);
 
   return <Spinner />;
 }

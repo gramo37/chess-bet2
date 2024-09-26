@@ -6,6 +6,7 @@ import axios from "axios";
 import GameHistory from "./gamehistory";
 import { IoMdArrowBack } from "react-icons/io";
 import { Report } from "./report";
+
 export default function Account() {
   const user = usePersonStore((state) => state.user);
   const [transactionType, setTransactionType] = useState("choose");
@@ -20,6 +21,8 @@ export default function Account() {
       action === "Deposit"
         ? `${BACKEND_URL}/payments/get-payment-url`
         : `${BACKEND_URL}/payments/withdraw-money`;
+        console.log(url);
+        
 
     try {
       const response = await axios.post(

@@ -10,16 +10,12 @@ const Random = () => {
     stake,
     setStake
   } = useGameStore([
-    "isGameStarted",
     "setIsGameStarted",
     "setResult",
     "socket",
     "setColor",
     "stake",
     "setStake",
-    "type",
-    "setType",
-    "setGameId",
   ]);
   const startGame = () => {
     if (!socket) return;

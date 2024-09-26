@@ -6,18 +6,7 @@ import Random from "./Random";
 import MainOptions from "./MainOptions";
 
 const ChessOptions: React.FC = () => {
-  const { isGameStarted, type } = useGameStore([
-    "isGameStarted",
-    "setIsGameStarted",
-    "setResult",
-    "socket",
-    "setColor",
-    "stake",
-    "setStake",
-    "type",
-    "setType",
-    "setGameId",
-  ]);
+  const { isGameStarted, type } = useGameStore(["isGameStarted", "type"]);
 
   if (isGameStarted) return null;
 

@@ -36,14 +36,12 @@ type Game = {
 
 type State = {
   user: TUser | null;
-  isLoading: boolean;
   transactions: Transaction[] | null;
   games: Game[] | null;
 };
 
 type Action = {
   updateUser: (user: State["user"]) => void;
-  setIsLoading: (isLoading: boolean) => void;
   setTransactions: (transactions: Transaction[]) => void;
   setGames: (games: Game[]) => void;
 };
@@ -57,8 +55,6 @@ const usePersonStore = create<State & Action>((set) => ({
   updateUser: (user) => {
     set({ user: { ...user, balance: user?.balance ?? "" } });
   },
-  
-  setIsLoading: (isLoading) => set(() => ({ isLoading })), 
   
   setTransactions: (transactions) => set(() => ({ transactions })),
   

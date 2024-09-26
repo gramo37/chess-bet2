@@ -2,13 +2,6 @@ import { useGameStore } from "../../../contexts/game.context";
 
 const MainOptions = () => {
   const { type, setType, setGameId } = useGameStore([
-    "isGameStarted",
-    "setIsGameStarted",
-    "setResult",
-    "socket",
-    "setColor",
-    "stake",
-    "setStake",
     "type",
     "setType",
     "setGameId",

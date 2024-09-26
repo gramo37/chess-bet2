@@ -164,5 +164,3 @@ export async function BussinesProfits(req:Request,res:Response) {
   }
   }
 
-  
-

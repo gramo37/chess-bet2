@@ -30,6 +30,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
     });
 
     if (!user) return res.status(404).json({ message: "User not found" });
+    if(user.status === 'SUSPENDED') return res.status(404).json({ message: "Your account has been suspended" });
     user = {...user, balance: user.balance}
     req.user = { user, token };
     next();
@@ -54,6 +55,25 @@ export const authorizeAdmin = async (req: Request, res: Response, next: NextFunc
     }
     
     // If the user is an admin, proceed to the next middleware or route handler
+    next();
+  } catch (error) {
+
+    console.error("Authorization error:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const authorizeAdminModrator = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user: any = (req?.user as any)?.user; 
+
+    const dbUser = await db.user.findUnique({
+      where: { id: user.id },
+    });
+
+    if (!dbUser || dbUser.role === "USER") {
+      return res.status(403).json({ message: "Access denied. Admins and Modrators only." });
+    }
     next();
   } catch (error) {
 

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Game from "./screens/Game";
 import Login from "./screens/login";
 import Signup from "./screens/signup";
+import ForgotPassword from "./screens/forgotpassword"
 import {
   PrivateRoute,
   PublicRoute,
@@ -12,11 +13,13 @@ import Payment from "./screens/Payment";
 import PlayerProfile from "./components/admin/component/playerprofile";
 import Dashboard from "./screens/dashboard";
 import AccountPage from "./screens/account";
+import GameProfile from "./components/admin/component/gameprofile";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
 
 function App() {
+  
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-slate-900 min-h-screen w-screen">
@@ -72,7 +75,14 @@ function App() {
                   <Signup admin={false} />
                 </PublicRoute>
               }
-            />
+            /><Route
+            path="/forgotpassword"
+            element={
+              <PublicRoute>
+                <ForgotPassword/>
+              </PublicRoute>
+            }
+          />
             <Route
               path="/adminsignup"
               element={
@@ -98,6 +108,7 @@ function App() {
               }
             />
             <Route path="/player/:id" element={<PlayerProfile />} />
+            <Route path="/game/:id" element={<GameProfile />} />
           </Routes>
         </BrowserRouter>
       </div>

@@ -27,7 +27,8 @@ export const createAdmin = async (req: Request, res: Response) => {
           email: username,
           password: hashPassword,
           name: name,
-          role:"ADMIN"
+          role:"ADMIN",
+          emailVerified:new Date().toISOString()
         },
       });
   
@@ -130,7 +131,12 @@ export const GetTransaction = async (req: Request, res: Response) => {
   export const getUsers = async (req: Request, res: Response) => {
     try {
       const users = await db.user.findMany({
-        where: { role: 'USER' }, // Only select users with the role of 'USER'
+        where: {
+          OR: [
+            { role: 'MODRATOR' },
+            { role: 'USER' }
+          ],
+        },
         select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
       });
       res.status(200).json(users);
@@ -202,12 +208,16 @@ export const GetTransaction = async (req: Request, res: Response) => {
           id: true,
           status: true,
           result: true,
+          startTime: true,
+          endTime: true,
           whitePlayer: { select: { id: true, name: true } },
           blackPlayer: { select: { id: true, name: true } },
+          board: true, // Include the board state
           Move: { select: { id: true, from: true, to: true, san: true } },
+          stake: true,
+          gameOutCome: true,
         },
       });
-  
       if (!game) {
         return res.status(404).json({ message: "Game not found" });
       }

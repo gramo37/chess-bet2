@@ -13,7 +13,8 @@ type usersProps = {
 };
 
 export const Users: React.FC<usersProps> = ({ users }) => {
-  const [filter, setFilter] = useState<string>("ALL"); // State to hold the selected filter
+  const [statusFilter, setStatusFilter] = useState<string>("ALL"); // State to hold the selected status filter
+  const [roleFilter, setRoleFilter] = useState<string>("ALL"); // State to hold the selected role filter
 
   // Function to handle user profile view
   function onViewProfile(id: string): void {
@@ -21,25 +22,39 @@ export const Users: React.FC<usersProps> = ({ users }) => {
     window.location.href = `/player/${id}`;
   }
 
-  // Filter users based on selected status
+  // Filter users based on selected status and role
   const filteredUsers = users.filter((user) => {
-    if (filter === "ACTIVE") return user.status === "ACTIVE";
-    if (filter === "SUSPENDED") return user.status === "SUSPENDED";
-    return true; // If "ALL" is selected, return all users
+    const statusMatch = 
+      statusFilter === "ALL" || user.status === statusFilter;
+    const roleMatch = 
+      roleFilter === "ALL" || user.role === roleFilter;
+    return statusMatch && roleMatch;
   });
 
   return (
     <div className="p-4">
-      <div className="mb-4">
-        {/* Filter options */}
+      <div className="mb-4 flex space-x-4">
+        {/* Status Filter */}
         <select 
-          value={filter} 
-          onChange={(e) => setFilter(e.target.value)} 
+          value={statusFilter} 
+          onChange={(e) => setStatusFilter(e.target.value)} 
           className="p-2 border border-gray-300 rounded"
         >
           <option value="ALL">All Users</option>
           <option value="ACTIVE">Active Users</option>
           <option value="SUSPENDED">Suspended Users</option>
+        </select>
+
+        {/* Role Filter */}
+        <select 
+          value={roleFilter} 
+          onChange={(e) => setRoleFilter(e.target.value)} 
+          className="p-2 border border-gray-300 rounded"
+        >
+          <option value="ALL">All Roles</option>
+          <option value="MODERATOR">Moderator</option>
+          <option value="USER">User</option>
+          {/* Add more roles as needed */}
         </select>
       </div>
       <div className="space-y-4">

@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { EmailVerification } from "./verify";
+import { EmailVerification, SendForgotPassword} from "./verify";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -94,7 +94,7 @@ export const refresh = async (req: Request, res: Response) => {
 
 export const verifyToken = async (req: Request, res: Response) => {
   console.log("verify");
-
+  
   try {
     const decoded = jwtVerify(req.params.token) as {
       data: string;
@@ -134,11 +134,124 @@ export const verifyToken = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (req: Request, res: Response) => {
+export async function ForgotPassword(req:Request,res:Response){
+  
+  try{
+    const { email } = req.body;
+
+  // Find the user by email
+  const user = await db.user.findFirst({
+    where: { email },
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const token = generateToken({ id: user.id, email: user.email }, "10m");
+  await db.user.update({
+    where: { email },
+    data: {
+      otp: token,
+      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
+    },
+  });
+ await SendForgotPassword(email,token);
+  res.status(200).json({ message: "Password reset link sent to your email" });
+  }catch(e){
+    return res.status(500).json({
+      message: "Something went wrong",
+      e,
+    }); 
+  }
+  
+}
+
+export const resetPassword = async (req: Request, res: Response) => {
   try {
-    res.clearCookie("jwt");
-    res.redirect(FRONTEND_URL)
+    const { token, newPassword } = req.body;
+
+    // Verify the token
+    let decoded;
+    try {
+       decoded = jwtVerify(token) as {
+        id:string;
+        data: string;
+      };
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Find the user by the decoded token ID and token
+    const user = await db.user.findFirst({
+      where: {
+        id: decoded.id,
+        otp: token,
+        otpExpiresAt: {
+          gte: new Date(), // Check if the token is still valid
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash the new password
+    const saltRounds = 10;
+    const hashPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update the user's password and clear the reset token
+    await db.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashPassword,
+        otp: null,
+        otpExpiresAt: null,
+      },
+    });
+
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to log out" });
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const verifyResetToken = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    // Verify the token
+    let decoded;
+    try {
+      decoded = jwtVerify(token) as {
+        id:string;
+        data: string;
+      };
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Check if the token matches and has not expired
+    const user = await db.user.findFirst({
+      where: {
+        id: decoded.id,
+        otp: token,
+        otpExpiresAt: {
+          gte: new Date(), // Ensure the token is still valid
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Token is valid
+    res.status(200).json({ message: "Token is valid", userId: user.id });
+  } catch (error) {
+    console.error("Error verifying reset token:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

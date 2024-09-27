@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const Crypto = () => {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("USD");
 
   const handleCryptoDeposit = async () => {};
@@ -13,7 +13,7 @@ const Crypto = () => {
         <input
           type="number"
           value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
+          onChange={(e) => setAmount(e.target.value)}
           className="w-full p-2 rounded bg-gray-700 text-white"
           placeholder="Enter amount"
         />

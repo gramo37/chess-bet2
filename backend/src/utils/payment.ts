@@ -1,4 +1,4 @@
-import { CURRENCY, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY } from "../constants";
+import { INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY } from "../constants";
 import crypto from "crypto";
 
 type TUser = {
@@ -9,7 +9,7 @@ type TUser = {
     balance: number;
 } | null
 
-export const withdrawMoneyToUser = async (amount: number, account: string, user: TUser) => {
+export const withdrawMPesaToUser = async (amount: number, account: string, user: TUser) => {
     try {
         if (!user || !user?.id) return false;
         console.log("Deposit Money to user", amount, "Received from", user)
@@ -32,11 +32,12 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
 
         let payouts = intasend.payouts();
 
-        console.log("User Details", user?.name, account, amount, CURRENCY)
+        console.log("User Details", user?.name, account, amount)
 
         await payouts
             .mpesa({
-                currency: CURRENCY,
+                currency: "KES",
+                
                 transactions: [{
                     name: user?.name ?? "",
                     account,

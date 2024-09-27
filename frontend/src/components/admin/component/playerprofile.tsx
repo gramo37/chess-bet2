@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../../../constants/routes";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
-import { delUser, updateUser } from "../fetch";
+import { updateUser } from "../fetch";
 import usePersonStore from "../../../contexts/auth";
 import { useGetUser } from "../../../hooks/useGetUser";
 

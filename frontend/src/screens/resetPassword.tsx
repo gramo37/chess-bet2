@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { BACKEND_URL } from "../constants/routes";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { set } from "lodash";
 
 export default function ResetPassword(){
     const [pass,setPass]=useState("");

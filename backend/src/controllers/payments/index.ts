@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { generateSignature, withdrawMoneyToUser } from "../../utils/payment";
+import { generateSignature, withdrawMPesaToUser } from "../../utils/payment";
 import {
-  CURRENCY,
   CURRENCY_RATE_URL,
   HOST,
   INSTASEND_DEPOSIT_PERCENT,
@@ -29,18 +28,13 @@ export const getMPesaURL = async (req: Request, res: Response) => {
       typeof INTASEND_IS_TEST
     );
     console.log("Deposit Money: ", req.body);
-    let { amount, currency } = req.body;
+    let { amount } = req.body;
+    const currency = "KES"; // All Mpesa payments are in KES
     amount = Math.floor(amount);
-
-    if (!amount || amount <= 5 || !currency) {
-      return res.status(400).json({
-        message: "Please provide a valid amount to be deposited and currency",
-      });
-    }
 
     let rates: any = {};
     try {
-      const response = await axios.get(`${CURRENCY_RATE_URL}/${CURRENCY}`);
+      const response = await axios.get(`${CURRENCY_RATE_URL}/USD`);
       rates = response.data;
     } catch (error) {
       console.log("Error fetching currency rates", error);
@@ -59,6 +53,16 @@ export const getMPesaURL = async (req: Request, res: Response) => {
       return res
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
+    }
+
+    const finalamountInUSD = parseFloat(
+      (amount / rates.rates[currency]).toFixed(2)
+    );
+
+    if (!amount || finalamountInUSD <= 5 || !currency) {
+      return res.status(400).json({
+        message: "Please provide a valid amount to be deposited and currency",
+      });
     }
 
     const IntaSend = require("intasend-node");
@@ -96,6 +100,7 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         last_name,
         email,
         host: HOST,
+        method: "M-PESA",
         amount,
         currency,
         api_ref,
@@ -111,16 +116,13 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         // }
         // Store the currency in the transaction table
         // Store the amount as well in the transaction table
-        const finalamountInUSD = parseFloat(
-          (amount / rates.rates[currency]).toFixed(2)
-        );
         const platform_charges = parseFloat(
           (finalamountInUSD * INSTASEND_DEPOSIT_PERCENT).toFixed(2)
         );
         console.log(
           "Payment Details ->",
           amount,
-          rates.rates[currency],
+          finalamountInUSD,
           INSTASEND_DEPOSIT_PERCENT
         );
         db.transaction
@@ -236,15 +238,42 @@ export const successTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const withdrawMoney = async (req: Request, res: Response) => {
-  console.log("comming here1vsdv");
-
+export const withdrawMPesa = async (req: Request, res: Response) => {
   try {
     let { amount, account } = req.body;
     amount = Math.floor(amount);
-    console.log("comming here");
+    const currency = "KES"; // All Mpesa withdrawals are in KES
 
-    if (!amount || amount <= 5) {
+    let rates: any = {};
+    try {
+      const response = await axios.get(`${CURRENCY_RATE_URL}/USD`);
+      rates = response.data;
+    } catch (error) {
+      console.log("Error fetching currency rates", error);
+      return res
+        .status(500)
+        .json({ message: "Internal server error", status: "error" });
+    }
+
+    if (!rates || !rates?.rates || !rates?.rates?.[currency]) {
+      console.log(
+        `Currency "${currency}" not found in ->`,
+        rates,
+        rates?.rates,
+        rates?.rates?.[currency]
+      );
+      return res
+        .status(500)
+        .json({ message: "Invalid currency", status: "error" });
+    }
+
+    const finalamountInUSD = parseFloat(
+      (amount / rates.rates[currency]).toFixed(2)
+    );
+
+    console.log("Converted KES ", amount, "in $", finalamountInUSD);
+
+    if (!amount || finalamountInUSD <= 5) {
       return res.status(400).json({
         message: "Please provide a valid amount to be withdrawn",
       });
@@ -259,13 +288,13 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     const user: any = (req?.user as any)?.user;
     const currentBalance = user?.balance;
 
-    if (amount > currentBalance) {
+    if (finalamountInUSD > currentBalance) {
       return res.status(400).json({
         message: "Insufficient funds",
       });
     }
 
-    if (amount <= INSTASEND_WITHDRAWAL_LIMIT) {
+    if (finalamountInUSD <= INSTASEND_WITHDRAWAL_LIMIT) {
       return res.status(400).json({
         message: "Amount less than minimum withdrawal amount",
       });
@@ -286,7 +315,8 @@ export const withdrawMoney = async (req: Request, res: Response) => {
     }
 
     // Initiate the transaction and set its status to 'PENDING'
-    const platform_charges = INSTASEND_WITHDRAWAL_CHARGE;
+    // const platform_charges = INSTASEND_WITHDRAWAL_CHARGE;
+    const platform_charges = finalamountInUSD * 0.1;
     const transaction = await db.transaction.create({
       data: {
         userId: user.id,
@@ -296,13 +326,13 @@ export const withdrawMoney = async (req: Request, res: Response) => {
         // TODO: Temporary change
         signature: "",
         checkout_id: "",
-        finalamountInUSD: amount - platform_charges,
+        finalamountInUSD: finalamountInUSD - platform_charges,
         platform_charges,
       },
     });
 
     // Attempt to send the amount to the user's account
-    const withdrawSuccess = await withdrawMoneyToUser(amount, account, user);
+    const withdrawSuccess = await withdrawMPesaToUser(amount, account, user);
 
     if (!withdrawSuccess) {
       // If sending to the user failed, update transaction status to 'CANCELLED'
@@ -325,7 +355,7 @@ export const withdrawMoney = async (req: Request, res: Response) => {
           email: user.email,
         },
         data: {
-          balance: currentBalance - amount,
+          balance: currentBalance - finalamountInUSD,
         },
       }),
       db.transaction.update({
@@ -390,7 +420,8 @@ export const getCryptoURL = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const binanceApiUrl = "https://bpay.binanceapi.com/binancepay/openapi/v3/order";
+    const binanceApiUrl =
+      "https://bpay.binanceapi.com/binancepay/openapi/v3/order";
     const payload = {
       merchantTradeNo: `TXN-${Date.now()}`, // Unique transaction number
       amount,

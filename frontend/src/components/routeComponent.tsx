@@ -4,6 +4,7 @@ import usePersonStore from "../contexts/auth"; // Your auth store
 import Login from "../screens/login";
 import { useGetUser } from "../hooks/useGetUser";
 import ModratorDashboard from "./modrator";
+import Spinner from "./spinner";
 
 interface RouteProps {
   children: ReactNode;
@@ -11,8 +12,9 @@ interface RouteProps {
 
 // PrivateRoute: Redirect to /login if user is not logged in
 export const PrivateRoute = ({ children }: RouteProps) => {
-  useGetUser(); // Fetch and set the user on component mount
+  const {isLoading} = useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
+  if(isLoading) return <Spinner />
   if (user && user.role === "ADMIN") return <Navigate to="/dashboard" />;
   if(user&&user.role === "MODRATOR") return <ModratorDashboard/>;
   return user ? <>{children}</> : <Navigate to="/login" />;
@@ -25,7 +27,6 @@ export const PublicRoute = ({ children }: RouteProps) => {
 };
 
 export const AdminPrivateRoute = ({ children }: RouteProps) => {
-  useGetUser();
   const user = usePersonStore((state) => state.user);
   console.log(user)
   if (!user) return <Navigate to="/login" />;

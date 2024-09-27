@@ -7,7 +7,7 @@ export const useGetUser = () => {
   const updateUser = usePersonStore((state) => state.updateUser);
   const token = localStorage.getItem("token");
 
-  useQuery({
+  return useQuery({
     queryKey: ["UserDetails"],
     queryFn: async () => {
       try {

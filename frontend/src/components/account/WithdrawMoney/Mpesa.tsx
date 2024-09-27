@@ -4,18 +4,18 @@ import axios from "axios";
 import { BACKEND_URL } from "../../../constants/routes";
 
 const Mpesa = () => {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const user = usePersonStore((state) => state.user);
 
   const handleMpesaWithdrawal = async () => {
-    const url = `${BACKEND_URL}/payments/withdraw-money`;
+    const url = `${BACKEND_URL}/payments/withdraw-mpesa`;
 
     try {
       const response = await axios.post(
         url,
         {
-          amount,
+          amount: Number(amount),
           account: phoneNumber,
         },
         {
@@ -41,7 +41,7 @@ const Mpesa = () => {
           <input
             type="number"
             value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Enter amount"
           />
@@ -52,6 +52,14 @@ const Mpesa = () => {
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Enter phone number"
           />
+          <select
+            name="currency"
+            value="KES"
+            disabled
+            className="px-4 rounded bg-gray-700 text-white"
+          >
+            <option value="KES">KES</option>
+          </select>
         </div>
         <button
           onClick={handleMpesaWithdrawal}

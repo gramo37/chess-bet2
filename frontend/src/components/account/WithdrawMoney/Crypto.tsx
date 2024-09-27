@@ -1,8 +1,9 @@
 import { useState } from "react";
 
 const Crypto = () => {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [currency, setCurrency] = useState("USD");
 
   const handleCryptoWithdrawal = () => {};
 
@@ -14,7 +15,7 @@ const Crypto = () => {
           <input
             type="number"
             value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Enter amount"
           />
@@ -25,6 +26,15 @@ const Crypto = () => {
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Enter phone number"
           />
+          <select
+            name="currency"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className="px-4 rounded bg-gray-700 text-white"
+          >
+            <option value="USD">USD</option>
+            <option value="KES">KES</option>
+          </select>
         </div>
         <button
           onClick={handleCryptoWithdrawal}

@@ -21,12 +21,12 @@ model User {
   gamesAsWhite  Game[]        @relation("GamesAsWhite")
   gamesAsBlack  Game[]        @relation("GamesAsBlack")
   rating        Int           @default(800)
-  balance       Float         @default(0)
+  balance       Float         @default(3)
   transactions  Transaction[]
   reports       UserReport[]
   role          Roles         @default(USER)
   status        UserStatus    @default(ACTIVE)
-  otp           String?  
+  otp           String?
   otpExpiresAt  DateTime?
 }
 
@@ -96,9 +96,9 @@ model UserReport {
   @@index([userId])
 }
 
-model DeletedUser{
-  id       String      @id @default(cuid())
-  email    String      @unique
+model DeletedUser {
+  id    String @id @default(cuid())
+  email String @unique
 }
 
 enum ReportStatus {
@@ -144,7 +144,6 @@ enum Roles {
   ADMIN
   MODRATOR
 }
-
 
 enum UserStatus {
   ACTIVE

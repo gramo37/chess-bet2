@@ -88,7 +88,7 @@ function Logout(){
               }`}
             onClick={() => setActiveTab("modrator")}
           >
-            Manage Morators
+            Manage Modrators
           </button>
         </div>
 

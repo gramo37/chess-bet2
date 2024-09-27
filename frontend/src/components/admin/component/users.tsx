@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import usePersonStore from "../../../contexts/auth";
 
 type user = {
   email: string;
@@ -15,6 +16,7 @@ type usersProps = {
 export const Users: React.FC<usersProps> = ({ users }) => {
   const [statusFilter, setStatusFilter] = useState<string>("ALL"); // State to hold the selected status filter
   const [roleFilter, setRoleFilter] = useState<string>("ALL"); // State to hold the selected role filter
+  const user = usePersonStore((state) => state.user);
 
   // Function to handle user profile view
   function onViewProfile(id: string): void {
@@ -45,7 +47,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
           <option value="SUSPENDED">Suspended Users</option>
         </select>
 
-        {/* Role Filter */}
+        {(user&&user.role==="ADMIN")&&
         <select 
           value={roleFilter} 
           onChange={(e) => setRoleFilter(e.target.value)} 
@@ -55,7 +57,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
           <option value="MODERATOR">Moderator</option>
           <option value="USER">User</option>
           {/* Add more roles as needed */}
-        </select>
+        </select>}
       </div>
       <div className="space-y-4">
         {filteredUsers.map((user) => (

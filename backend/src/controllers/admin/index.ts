@@ -130,16 +130,27 @@ export const GetTransaction = async (req: Request, res: Response) => {
 
   export const getUsers = async (req: Request, res: Response) => {
     try {
-      const users = await db.user.findMany({
-        where: {
-          OR: [
-            { role: 'MODRATOR' },
-            { role: 'USER' }
-          ],
-        },
-        select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
-      });
-      res.status(200).json(users);
+      const user: any = (req?.user as any)?.user; 
+      const role = user.role  as string
+         
+if(role === 'MODRATOR') {
+  const users = await db.user.findMany({
+    where: { role: 'USER' },
+    select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
+  });
+  res.status(200).json(users);
+}else{
+  const users = await db.user.findMany({
+    where: {
+      OR: [
+        { role: 'MODRATOR' },
+        { role: 'USER' }
+      ]
+    },
+    select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
+  });
+  res.status(200).json(users);
+}
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Internal server error" });

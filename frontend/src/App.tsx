@@ -14,6 +14,7 @@ import PlayerProfile from "./components/admin/component/playerprofile";
 import Dashboard from "./screens/dashboard";
 import AccountPage from "./screens/account";
 import GameProfile from "./components/admin/component/gameprofile";
+import ResetPassword from "./screens/resetPassword";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
@@ -108,6 +109,7 @@ function App() {
             />
             <Route path="/player/:id" element={<PlayerProfile />} />
             <Route path="/game/:id" element={<GameProfile />} />
+            <Route path="/reset-password/:id" element={<ResetPassword />} />
           </Routes>
         </BrowserRouter>
       </div>

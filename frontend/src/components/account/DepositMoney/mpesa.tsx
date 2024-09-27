@@ -9,7 +9,7 @@ const Mpesa = () => {
   const [currency, setCurrency] = useState("USD");
   
   const handleMpesaDeposit = async () => {
-    const url = `${BACKEND_URL}/payments/get-payment-url`;
+    const url = `${BACKEND_URL}/payments/get-mpesa-url`;
 
     try {
       const response = await axios.post(

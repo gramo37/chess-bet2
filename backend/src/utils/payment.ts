@@ -1,5 +1,5 @@
 import { CURRENCY, INTASEND_IS_TEST, INTASEND_PUBLISHABLE_KEY, INTASEND_SECRET_KEY } from "../constants";
-
+import crypto from "crypto";
 
 type TUser = {
     id: string;
@@ -50,3 +50,10 @@ export const withdrawMoneyToUser = async (amount: number, account: string, user:
         return false;
     }
 }
+
+export const generateSignature = (data: string, secretKey: string) => {
+    return crypto
+      .createHmac("sha256", secretKey)
+      .update(data)
+      .digest("hex");
+  };

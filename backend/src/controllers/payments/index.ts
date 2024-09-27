@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { withdrawMoneyToUser } from "../../utils/payment";
+import { generateSignature, withdrawMoneyToUser } from "../../utils/payment";
 import {
   CURRENCY,
   CURRENCY_RATE_URL,
@@ -12,11 +12,14 @@ import {
   INTASEND_SECRET_KEY,
   REDIRECT_URL,
   INSTASEND_WITHDRAWAL_LIMIT,
+  BINANCE_SECRET_KEY,
+  BINANCE_API_KEY,
 } from "../../constants";
 import { generateUniqueId, isValidEmail } from "../../utils";
 import axios from "axios";
+import crypto from "crypto";
 
-export const getPaymentURL = async (req: Request, res: Response) => {
+export const getMPesaURL = async (req: Request, res: Response) => {
   try {
     console.log(
       "INSTA SEND Details",
@@ -184,7 +187,7 @@ export const successTransaction = async (req: Request, res: Response) => {
         id: true,
         userId: true,
         finalamountInUSD: true,
-        status: true
+        status: true,
       },
     });
 
@@ -194,12 +197,13 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
-    
+
     // Check for if the transaction is pending
-    if(transaction.status !== "PENDING") {
-      return res
-        .status(401)
-        .json({ message: "Transaction already completed or cancelled", status: "error" });
+    if (transaction.status !== "PENDING") {
+      return res.status(401).json({
+        message: "Transaction already completed or cancelled",
+        status: "error",
+      });
     }
 
     // Update transaction it as successful
@@ -273,9 +277,9 @@ export const withdrawMoney = async (req: Request, res: Response) => {
       },
     });
 
-    console.log('Games played by user ->', games)
-    if(games < 3) {
-      console.log("Less number of games played by user -> ", games)
+    console.log("Games played by user ->", games);
+    if (games < 3) {
+      console.log("Less number of games played by user -> ", games);
       return res.status(401).json({
         message: "Please play atleast 3 games before withdrawing money.",
       });
@@ -371,6 +375,79 @@ export const transactionHistory = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error fetching transaction history:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const getCryptoURL = async (req: Request, res: Response) => {
+  try {
+    const { amount, currency } = req.body;
+    const user: any = (req?.user as any)?.user;
+    const userId = user?.id;
+
+    if (!amount || !currency || !userId) {
+      console.log(amount, currency, userId);
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const binanceApiUrl = "https://bpay.binanceapi.com/binancepay/openapi/v3/order";
+    const payload = {
+      merchantTradeNo: `TXN-${Date.now()}`, // Unique transaction number
+      amount,
+      currency,
+      goods: {
+        goodsType: "01",
+        goodsCategory: "0000",
+        referenceGoodsId: "123456",
+        goodsName: "Crypto Payment",
+        goodsDetail: "Payment for services",
+      },
+      returnUrl: "http://localhost:3000/payments", // Redirect after successful payment
+      cancelUrl: "http://yourdomain.com/cancelled",
+      userId, // Custom user ID for tracking
+    };
+
+    // Generate signature
+    const signature = generateSignature(
+      JSON.stringify(payload),
+      BINANCE_SECRET_KEY
+    );
+    // return res.status(200).json({
+    //   message: "Payment success",
+    //   signature
+    // })
+    try {
+      const response = await axios.post(binanceApiUrl, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "BinancePay-Timestamp": `${Date.now()}`,
+          "BinancePay-Certificate-SN": BINANCE_API_KEY,
+          "BinancePay-Signature": signature,
+        },
+      });
+
+      if (response.data && response.data.status === "SUCCESS") {
+        const paymentLink = response.data.data.checkoutUrl;
+        const secretToken = crypto.randomBytes(16).toString("hex"); // Create a secret token
+
+        // Store the transaction and secretToken in your database
+
+        res.json({
+          message: "Payment link created",
+          paymentLink,
+          secretToken,
+        });
+      } else {
+        res.status(400).json({ error: "Failed to create payment link" });
+      }
+    } catch (error) {
+      console.error("Error Sending Crypto Payment URL1:", error);
+      res
+        .status(500)
+        .json({ message: "Internal server error", status: "error" });
+    }
+  } catch (error) {
+    console.error("Error Sending Crypto Payment URL2:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };

@@ -48,6 +48,10 @@ export const getMPesaURL = async (req: Request, res: Response) => {
       });
     }
 
+    const platform_charges = parseFloat(
+      (finalamountInUSD * INSTASEND_DEPOSIT_PERCENT).toFixed(2)
+    );
+
     const IntaSend = require("intasend-node");
     const user: any = (req?.user as any)?.user;
 
@@ -77,8 +81,9 @@ export const getMPesaURL = async (req: Request, res: Response) => {
       api_ref,
       `${REDIRECT_URL}/${secret_token}`
     );
-    collection
-      .charge({
+    let resp: any = {};
+    try {
+      resp = await collection.charge({
         first_name,
         last_name,
         email,
@@ -88,66 +93,58 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         currency,
         api_ref,
         redirect_url: `${REDIRECT_URL}/${secret_token}`, // Add some secret key here which will be stored in the transaction table and it will checked again in the success-transaction route
-      })
-      .then((resp: any) => {
-        // Create a transaction entry as PENDING in db
-        console.log(`Charge Resp:`, resp);
-        // TODO: GET the deducted amount and add that in the transaction table
-        // if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
-        //   console.error(`Charge details Not Found!!`, resp);
-        //   res.status(500).json({ message: "URL Not Found", status: "error" });
-        // }
-        // Store the currency in the transaction table
-        // Store the amount as well in the transaction table
-        const platform_charges = parseFloat(
-          (finalamountInUSD * INSTASEND_DEPOSIT_PERCENT).toFixed(2)
-        );
-        console.log(
-          "Payment Details ->",
-          amount,
-          finalamountInUSD,
-          INSTASEND_DEPOSIT_PERCENT
-        );
-        db.transaction
-          .create({
-            data: {
-              user: {
-                connect: {
-                  id: user.id,
-                },
-              },
-              amount,
-              type: "DEPOSIT",
-              status: "PENDING",
-              signature: resp.signature,
-              checkout_id: resp.id,
-              api_ref,
-              currency,
-              finalamountInUSD: finalamountInUSD - platform_charges,
-              platform_charges,
-              secret_token,
-            },
-          })
-          .then(() => {
-            // Redirect user to URL to complete payment
-            res.status(200).json({
-              message: "Payment request successful",
-              paymentDetails: resp.url,
-            });
-          })
-          .catch((err: any) => {
-            console.error(`Charge error 1:`, "" + err, JSON.parse("" + err));
-            res.status(500).json({
-              message:
-                "Something went wrong in adding data to transaction table",
-              status: "error",
-            });
-          });
-      })
-      .catch((err: any) => {
-        console.error(`Charge error 2:`, "" + err, JSON.parse("" + err));
-        res.status(500).json({ message: "Invalid Request", status: "error" });
       });
+      // console.log(`Charge Resp:`, resp);
+      // TODO: GET the deducted amount and add that in the transaction table
+      // if (!resp ?? !resp?.url ?? !resp?.signature ?? !resp?.id) {
+      //   console.error(`Charge details Not Found!!`, resp);
+      //   res.status(500).json({ message: "URL Not Found", status: "error" });
+      // }
+      // Store the currency in the transaction table
+      // Store the amount as well in the transaction table
+      console.log(
+        "Payment Details ->",
+        amount,
+        finalamountInUSD,
+        INSTASEND_DEPOSIT_PERCENT
+      );
+    } catch (error) {
+      console.error(`Charge error 2:`, "" + error, JSON.parse("" + error));
+      return res.status(500).json({ message: "Invalid Request", status: "error" });
+    }
+
+    try {
+      await db.transaction.create({
+        data: {
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+          amount,
+          type: "DEPOSIT",
+          status: "PENDING",
+          signature: resp.signature,
+          checkout_id: resp.id,
+          api_ref,
+          currency,
+          finalamountInUSD: finalamountInUSD - platform_charges,
+          platform_charges,
+          secret_token,
+        },
+      });
+    } catch (error) {
+      console.error(`Charge error 1:`, "" + error, JSON.parse("" + error));
+      return res.status(500).json({
+        message: "Something went wrong in adding data to transaction table",
+        status: "error",
+      });
+    }
+    
+    res.status(200).json({
+      message: "Payment request successful",
+      paymentDetails: resp.url
+    })
   } catch (error) {
     console.error("Error Sending Payment URL:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

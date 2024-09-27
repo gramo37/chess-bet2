@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import usePersonStore from "../contexts/auth"; // Your auth store
 import Login from "../screens/login";
+import { useGetUser } from "../hooks/useGetUser";
 
 interface RouteProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface RouteProps {
 // PrivateRoute: Redirect to /login if user is not logged in
 export const PrivateRoute = ({ children }: RouteProps) => {
   const user = usePersonStore((state) => state.user);
+  useGetUser(); // Fetch and set the user on component mount
   if (user && user.role === "ADMIN") return <Navigate to="/dashboard" />;
   return user ? <>{children}</> : <Navigate to="/login" />;
 };

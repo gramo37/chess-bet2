@@ -14,13 +14,11 @@ import PlayerProfile from "./components/admin/component/playerprofile";
 import Dashboard from "./screens/dashboard";
 import AccountPage from "./screens/account";
 import GameProfile from "./components/admin/component/gameprofile";
-import { useGetUser } from "./hooks/useGetUser";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
 
 function App() {
-  useGetUser(); // Fetch and set the user on component mount
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-slate-900 min-h-screen w-screen">

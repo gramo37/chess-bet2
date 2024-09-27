@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { randomUUID } from "crypto";
+import axios from "axios";
+import { CURRENCY_RATE_URL } from "../constants";
 
 dotenv.config();
 
@@ -28,11 +30,35 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function generateRandomPassword(length = 12) {
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
   let password = "";
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * charset.length);
     password += charset[randomIndex];
   }
   return password;
+}
+
+export async function getFinalAmountInUSD(amount: number, currency: string) {
+  let rates: any = {};
+  try {
+    const response = await axios.get(`${CURRENCY_RATE_URL}/USD`);
+    rates = response.data;
+  } catch (error) {
+    console.log("Error fetching currency rates", error);
+    return false;
+  }
+
+  if (!rates || !rates?.rates || !rates?.rates?.[currency]) {
+    console.log(
+      `Currency "${currency}" not found in ->`,
+      rates,
+      rates?.rates,
+      rates?.rates?.[currency]
+    );
+    return false;
+  }
+
+  return parseFloat((amount / rates.rates[currency]).toFixed(2));
 }

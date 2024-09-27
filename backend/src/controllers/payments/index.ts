@@ -5,7 +5,6 @@ import {
   CURRENCY_RATE_URL,
   HOST,
   INSTASEND_DEPOSIT_PERCENT,
-  INSTASEND_WITHDRAWAL_CHARGE,
   INTASEND_IS_TEST,
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
@@ -14,7 +13,11 @@ import {
   BINANCE_SECRET_KEY,
   BINANCE_API_KEY,
 } from "../../constants";
-import { generateUniqueId, isValidEmail } from "../../utils";
+import {
+  generateUniqueId,
+  getFinalAmountInUSD,
+  isValidEmail,
+} from "../../utils";
 import axios from "axios";
 import crypto from "crypto";
 
@@ -32,32 +35,12 @@ export const getMPesaURL = async (req: Request, res: Response) => {
     const currency = "KES"; // All Mpesa payments are in KES
     amount = Math.floor(amount);
 
-    let rates: any = {};
-    try {
-      const response = await axios.get(`${CURRENCY_RATE_URL}/USD`);
-      rates = response.data;
-    } catch (error) {
-      console.log("Error fetching currency rates", error);
-      return res
-        .status(500)
-        .json({ message: "Internal server error", status: "error" });
-    }
+    const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
 
-    if (!rates || !rates?.rates || !rates?.rates?.[currency]) {
-      console.log(
-        `Currency "${currency}" not found in ->`,
-        rates,
-        rates?.rates,
-        rates?.rates?.[currency]
-      );
+    if (!finalamountInUSD)
       return res
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
-    }
-
-    const finalamountInUSD = parseFloat(
-      (amount / rates.rates[currency]).toFixed(2)
-    );
 
     if (!amount || finalamountInUSD <= 5 || !currency) {
       return res.status(400).json({
@@ -413,72 +396,17 @@ export const getCryptoURL = async (req: Request, res: Response) => {
   try {
     const { amount, currency } = req.body;
     const user: any = (req?.user as any)?.user;
-    const userId = user?.id;
-
-    if (!amount || !currency || !userId) {
-      console.log(amount, currency, userId);
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const binanceApiUrl =
-      "https://bpay.binanceapi.com/binancepay/openapi/v3/order";
-    const payload = {
-      merchantTradeNo: `TXN-${Date.now()}`, // Unique transaction number
-      amount,
-      currency,
-      goods: {
-        goodsType: "01",
-        goodsCategory: "0000",
-        referenceGoodsId: "123456",
-        goodsName: "Crypto Payment",
-        goodsDetail: "Payment for services",
-      },
-      returnUrl: "http://localhost:3000/payments", // Redirect after successful payment
-      cancelUrl: "http://yourdomain.com/cancelled",
-      userId, // Custom user ID for tracking
-    };
-
-    // Generate signature
-    const signature = generateSignature(
-      JSON.stringify(payload),
-      BINANCE_SECRET_KEY
-    );
-    // return res.status(200).json({
-    //   message: "Payment success",
-    //   signature
-    // })
-    try {
-      const response = await axios.post(binanceApiUrl, payload, {
-        headers: {
-          "Content-Type": "application/json",
-          "BinancePay-Timestamp": `${Date.now()}`,
-          "BinancePay-Certificate-SN": BINANCE_API_KEY,
-          "BinancePay-Signature": signature,
-        },
-      });
-
-      if (response.data && response.data.status === "SUCCESS") {
-        const paymentLink = response.data.data.checkoutUrl;
-        const secretToken = crypto.randomBytes(16).toString("hex"); // Create a secret token
-
-        // Store the transaction and secretToken in your database
-
-        res.json({
-          message: "Payment link created",
-          paymentLink,
-          secretToken,
-        });
-      } else {
-        res.status(400).json({ error: "Failed to create payment link" });
-      }
-    } catch (error) {
-      console.error("Error Sending Crypto Payment URL1:", error);
-      res
-        .status(500)
-        .json({ message: "Internal server error", status: "error" });
-    }
   } catch (error) {
     console.error("Error Sending Crypto Payment URL2:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const withdrawCrypto = async (req: Request, res: Response) => {
+  try {
+    // const {} = req.body;
+  } catch (error) {
+    console.error("Error Withdrawing Crypto:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };

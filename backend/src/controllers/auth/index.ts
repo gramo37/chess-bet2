@@ -10,13 +10,23 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const { username, name, password } = req.body;
 
-    const user = await db.user.findFirst({
+    const deletedUser = await db.deletedUser.findUnique({
       where: {
         email: username,
       },
     });
 
-    if (user) {
+    if (deletedUser) {
+      return res.status(403).json({ message: "This email is not allowed to sign up." });
+    }
+
+    const existingUser = await db.user.findFirst({
+      where: {
+        email: username,
+      },
+    });
+
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -33,9 +43,7 @@ export const signup = async (req: Request, res: Response) => {
 
     const token = generateToken({ id: newUser.id, email: newUser.email });
     EmailVerification(username);
-    res
-      .status(200)
-      .json({ message: "User created successfully", token });
+    res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

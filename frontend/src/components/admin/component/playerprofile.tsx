@@ -4,8 +4,9 @@ import { BACKEND_URL } from "../../../constants/routes";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
-import { updateUser } from "../fetch";
+import { delUser, updateUser } from "../fetch";
 import usePersonStore from "../../../contexts/auth";
+import { useGetUser } from "../../../hooks/useGetUser";
 
 // type Game = {
 //     id: string;
@@ -36,7 +37,9 @@ const PlayerProfile: React.FC = () => {
   const [player, setPlayer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
+
   useEffect(() => {
     console.log(id);
 
@@ -103,6 +106,18 @@ const PlayerProfile: React.FC = () => {
     
   window.location.href = `/game/${id}`    
   }
+
+   function DeleteUser() {
+    if (!id) return;
+  
+    const confirmation = prompt("ARE YOU SURE TO DELETE THIS USER? THEN TYPE 'YES'");
+    if (confirmation !== 'YES') {
+      return;
+    }
+    // delUser(id)
+  }
+  
+
   return (
     <div className="flex flex-col w-full items-center p-8 min-h-screen">
       <a className="absolute top-10 left-10 text-white" href="/dashboard">
@@ -131,7 +146,7 @@ const PlayerProfile: React.FC = () => {
                 ACTIVATE
               </button>
             )}
-            <button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2">
+            <button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2" onClick={DeleteUser}>
               Delete
             </button>
           </div>}

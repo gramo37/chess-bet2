@@ -54,7 +54,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
           className="p-2 border border-gray-300 rounded"
         >
           <option value="ALL">All Roles</option>
-          <option value="MODERATOR">Moderator</option>
+          <option value="MODRATOR">Modrator</option>
           <option value="USER">User</option>
           {/* Add more roles as needed */}
         </select>}

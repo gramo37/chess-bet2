@@ -125,6 +125,7 @@ enum GameOutCome {
   CHECKMATE
   DRAW
   TIMER_EXPIRED
+  ADMIN
 }
 
 enum TransactionType {

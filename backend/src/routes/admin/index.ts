@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticateJWT,authorizeAdmin, authorizeAdminModrator } from "../../middlewares/auth";
 import { createAdmin, getGames,getGame, GetTransaction, GetTransactions, getUser, getUsers, adminLogin, getAllReports } from "../../controllers/admin";
-import { DeleteUserAccount, MarkIssueCompleted, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount } from "../../controllers/admin/updateuser";
+import { DeleteUserAccount, MarkIssueCompleted, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount, UpdateGameResult } from "../../controllers/admin/updateuser";
 import { BussinesProfits, DailyGames, UserProfits, UsersWinLoss } from "../../controllers/admin/stats";
 import { createModrator } from "../../controllers/admin/modrators";
 
@@ -34,6 +34,7 @@ router.put("/users/:id/suspend", authenticateJWT, authorizeAdmin, SuspendUserAcc
 router.put("/users/:id/active", authenticateJWT, authorizeAdmin, ActiveUserAccount);
 router.delete("/users/:id", authenticateJWT, authorizeAdmin, DeleteUserAccount);
 router.put("/reports/:id/complete", authenticateJWT, authorizeAdmin, MarkIssueCompleted);
+router.put("/game/:id/result", authenticateJWT, authorizeAdmin, UpdateGameResult);
 
 //stats
 router.get("/stats/daily-games", authenticateJWT, authorizeAdmin, DailyGames);

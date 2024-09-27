@@ -21,7 +21,7 @@ model User {
   gamesAsWhite  Game[]        @relation("GamesAsWhite")
   gamesAsBlack  Game[]        @relation("GamesAsBlack")
   rating        Int           @default(800)
-  balance       Float         @default(3)
+  balance       Float         @default(0)
   transactions  Transaction[]
   reports       UserReport[]
   role          Roles         @default(USER)
@@ -94,6 +94,11 @@ model UserReport {
   updatedAt   DateTime     @updatedAt
 
   @@index([userId])
+}
+
+model DeletedUser{
+  id       String      @id @default(cuid())
+  email    String      @unique
 }
 
 enum ReportStatus {

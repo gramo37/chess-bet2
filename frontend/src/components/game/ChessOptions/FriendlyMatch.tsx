@@ -44,7 +44,10 @@ const FriendlyMatch = () => {
         type: INIT_GAME,
       })
     );
+
   };
+
+  
 
   return (
     <>

@@ -97,7 +97,6 @@ export async function ActiveUserAccount(req: Request, res: Response) {
     }
 }
 
-
 export async function DeleteUserAccount(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -106,13 +105,33 @@ export async function DeleteUserAccount(req: Request, res: Response) {
     }
 
     try {
+        // Find the user by ID
+        const user = await db.user.findUnique({
+            where: { id: id },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await db.transaction.deleteMany({
+            where: { userId: id },
+          });
+        // Store the deleted user's email in DeletedUser model
+        await db.deletedUser.create({
+            data: {
+                email: user.email,
+            },
+        });
+
+        // Delete the user
         await db.user.delete({
             where: { id: id },
         });
 
         res.status(200).json({ message: "User account and related data deleted" });
     } catch (error) {
-        res.status(500).json({ error: "Failed to delete user account", details: error});
+        res.status(500).json({ error: "Failed to delete user account", details: error });
     }
 }
 

@@ -87,3 +87,30 @@ export async function fetchedStatsData(type: string, date: Date | null) {
     alert(`Error fetching stats for ${type}`);
   }
 }
+
+export async  function delUser (id:string){
+  const url = `${BACKEND_URL}/admin/users/${id}`;
+
+  try {
+    const token = localStorage.getItem("token"); // Assuming JWT token is stored in localStorage
+
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete user");
+    }
+
+    alert("User deleted successfully.");
+    // Add any additional logic after successful deletion (e.g., refreshing a list of users)
+
+  } catch (error: any) {
+    alert(`Error: ${error.message}`);
+    console.error("Error deleting user:", error);
+  }}

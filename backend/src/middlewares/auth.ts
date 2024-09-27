@@ -29,7 +29,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
       }
     });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(403).json({ message: "User not found" });
     if(user.status === 'SUSPENDED') return res.status(404).json({ message: "Your account has been suspended" });
     user = {...user, balance: user.balance}
     req.user = { user, token };

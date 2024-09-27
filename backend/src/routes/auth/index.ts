@@ -9,8 +9,8 @@ router.post(`/login`, login);
 router.get(`/refresh`, authenticateJWT, refresh);
 router.get(`/verify/:token`, verifyToken);
 router.post('/forgotpassword',ForgotPassword);
-router.get('/verifyResetToken',verifyResetToken);
-router.get('/updateforgotpassword',resetPassword);
+router.get('/verifyResetToken/:token',verifyResetToken);
+router.post('/updateforgotpassword',resetPassword);
 
 
 

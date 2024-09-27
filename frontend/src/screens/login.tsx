@@ -30,13 +30,15 @@ export default function Login({ admin }: props) {
         }),
       });
 
+      const data = await response.json();
       if (response.status === 400) {
         throw new Error("Invalid username or password.");
       } else if (response.status >= 500) {
         throw new Error("Internal server error. Please try again later.");
       }
-
-      const data = await response.json();
+      else if (response.status === 403) {
+        throw new Error(data.message);
+      }
       console.log("Login successful:", data);
 
       localStorage.setItem("token", data.token);

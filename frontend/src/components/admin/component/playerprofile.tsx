@@ -5,6 +5,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
 import { updateUser } from "../fetch";
+import usePersonStore from "../../../contexts/auth";
 
 // type Game = {
 //     id: string;
@@ -35,7 +36,7 @@ const PlayerProfile: React.FC = () => {
   const [player, setPlayer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const user = usePersonStore((state) => state.user);
   useEffect(() => {
     console.log(id);
 
@@ -59,6 +60,7 @@ const PlayerProfile: React.FC = () => {
         setPlayer(data);
       } catch (err) {
         setError((err as Error).message);
+
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +76,7 @@ const PlayerProfile: React.FC = () => {
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p className="text-xl text-center text-white">{error}</p>;
   }
 
   if (!player) {
@@ -96,6 +98,11 @@ const PlayerProfile: React.FC = () => {
     updateUser(type, id, a);
   }
 
+  function onViewProfile(id:string): void {
+    console.log(id);
+    
+  window.location.href = `/game/${id}`    
+  }
   return (
     <div className="flex flex-col w-full items-center p-8 min-h-screen">
       <a className="absolute top-10 left-10 text-white" href="/dashboard">
@@ -107,7 +114,7 @@ const PlayerProfile: React.FC = () => {
             {player.name}'s Profile
           </h1>
 
-          <div>
+          {(user&&user.role==='ADMIN')&&<div>
             {player.status === "ACTIVE" && (
               <button
                 className="bg-yellow-500 rounded-lg text-white px-3 py-1 m-2"
@@ -127,7 +134,7 @@ const PlayerProfile: React.FC = () => {
             <button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2">
               Delete
             </button>
-          </div>
+          </div>}
         </div>
 
         <p className="text-gray-600 text-lg mb-4">
@@ -137,9 +144,9 @@ const PlayerProfile: React.FC = () => {
         <p className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Balance:</span>{" "}
           <span className="text-green-600">${player.balance.toFixed(2)}</span>
-          <div onClick={() => Edit("balance")}>
+          {user&&user.role==="ADMIN"&&<div onClick={() => Edit("balance")}>
             <MdEdit />
-          </div>
+          </div>}
         </p>
         <p className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Rating:</span>{" "}
@@ -171,6 +178,8 @@ const PlayerProfile: React.FC = () => {
                     <span className="font-semibold">Result:</span>{" "}
                     {game.result || "N/A"}
                   </p>
+              {(user&&user.role==='MODRATOR')&&<p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>}
+
                 </li>
               ))}
             </ul>

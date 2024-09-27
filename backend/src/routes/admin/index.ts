@@ -16,8 +16,8 @@ router.get("/transactions", authenticateJWT,authorizeAdmin, GetTransactions);
 router.get("/transactions/:id", authenticateJWT,authorizeAdmin, GetTransaction); 
 
 // User routes
-router.get("/users", authenticateJWT,authorizeAdmin, getUsers); 
-router.get("/users/:id", authenticateJWT,authorizeAdmin, getUser);
+router.get("/users", authenticateJWT,authorizeAdminModrator, getUsers); 
+router.get("/users/:id", authenticateJWT,authorizeAdminModrator, getUser);
 
 // Game routes
 router.get("/games", authenticateJWT,authorizeAdmin, getGames); 

@@ -8,8 +8,7 @@ import { EmailVerification, SendModeratorNotification } from "../auth/verify";
 export const createModrator = async (req: Request, res: Response) => {
     try {
       const { username, name} = req.body;
-      const password = "amansingh"
-      // generateRandomPassword(8)// 8 digit random password
+      const password =  generateRandomPassword(8)
       const user = await db.user.findFirst({
         where: {
           email: username,

@@ -55,7 +55,8 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
-
+    if(user.status === 'SUSPENDED') return res.status(403).json({ message: "Your account has been suspended" });
+    
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -155,6 +156,8 @@ export async function ForgotPassword(req:Request,res:Response){
       otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
     },
   });
+  console.log(token);
+  
  await SendForgotPassword(email,token);
   res.status(200).json({ message: "Password reset link sent to your email" });
   }catch(e){
@@ -249,7 +252,7 @@ export const verifyResetToken = async (req: Request, res: Response) => {
     }
 
     // Token is valid
-    res.status(200).json({ message: "Token is valid", userId: user.id });
+    res.status(200).json({ message: "Token is valid", email: user.email });
   } catch (error) {
     console.error("Error verifying reset token:", error);
     res.status(500).json({ message: "Internal server error" });

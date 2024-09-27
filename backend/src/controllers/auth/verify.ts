@@ -23,11 +23,10 @@ export async function EmailVerification(email: string) {
       from: `amansample786@gmail.com <no-reply@chessbet.com>`,
       to: email,
       subject: "Email Verification",
-      text: `Hi! There, You have recently visited 
+      html: `<p>Hi! There, You have recently visited 
            our website and entered your email.
-           Please follow the given link to verify your email:
-           http://localhost:5000/api/auth/verify/${token}
-
+           Please follow the given link to verify your email:</p>
+           <a href="http://localhost:5000/api/auth/verify/${token}">Verify</a>
            Thanks`,
     };
 
@@ -42,7 +41,7 @@ export async function EmailVerification(email: string) {
 export const SendForgotPassword = async (email: string, token: string) => {
   try {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-console.log('Sending: ',resetLink);
+console.log('Sending: ',token);
 
     const mailOptions = {
       from: `amansample786@gmail.com <no-reply@chessbet.com>`,

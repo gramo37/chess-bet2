@@ -1,5 +1,5 @@
 import { Request,Response } from "express";
-import { db } from "../../db";
+import { db, UserStatus } from "../../db";
 
 export async function UpdateUserRating(req:Request,res:Response){
     const { id } = req.params;
@@ -30,6 +30,40 @@ export async function UpdateUserRating(req:Request,res:Response){
     }
 }
 
+export async function UpdateGameResult(req: Request, res: Response) {
+    const { id } = req.params; // Game ID from the URL parameters
+    const { result } = req.body; // New result from the request body
+
+    if (!id || !result) {
+        return res.status(400).json({ error: "Game ID and result are required" });
+    }
+
+    // Check if the provided result is a valid GameResult enum value
+    if (!["WHITE_WINS","BLACK_WINS","DRAW"].includes(result)) {
+        return res.status(400).json({ error: "Invalid game result" });
+    }
+
+    try {
+        // Find the game in the database
+        const game = await db.game.findUnique({
+            where: { id: id },
+        });
+
+        if (!game) {
+            return res.status(404).json({ error: "Game not found" });
+        }
+
+        // Update the game's result
+        const updatedGame = await db.game.update({
+            where: { id: id },
+            data: { result: result ,gameOutCome:"ADMIN"},
+        });
+
+        res.status(200).json({ message: "Game result updated", game: updatedGame });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update game result", details: error });
+    }
+}
 export async function UpdateUserBalance(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -97,6 +131,8 @@ export async function ActiveUserAccount(req: Request, res: Response) {
     }
 }
 
+
+
 export async function DeleteUserAccount(req: Request, res: Response) {
     const { id } = req.params;
 
@@ -114,26 +150,19 @@ export async function DeleteUserAccount(req: Request, res: Response) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        await db.transaction.deleteMany({
-            where: { userId: id },
-          });
-        // Store the deleted user's email in DeletedUser model
-        await db.deletedUser.create({
-            data: {
-                email: user.email,
-            },
-        });
+        // const updatedUser = await db.user.update({
+        //     where: { id: id },
+        //     data: { status: "BANNED" }, 
+        // });
 
-        // Delete the user
-        await db.user.delete({
-            where: { id: id },
-        });
 
-        res.status(200).json({ message: "User account and related data deleted" });
+        res.status(200).json({ message: "User account Deleted, data retained" });
     } catch (error) {
         res.status(500).json({ error: "Failed to delete user account", details: error });
     }
 }
+
+
 
 export async function MarkIssueCompleted(req: Request, res: Response) {
     const {id}=req.params

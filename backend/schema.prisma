@@ -96,10 +96,6 @@ model UserReport {
   @@index([userId])
 }
 
-model DeletedUser {
-  id    String @id @default(cuid())
-  email String @unique
-}
 
 enum ReportStatus {
   PENDING
@@ -125,6 +121,7 @@ enum GameOutCome {
   CHECKMATE
   DRAW
   TIMER_EXPIRED
+  ADMIN
 }
 
 enum TransactionType {

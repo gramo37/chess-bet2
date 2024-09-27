@@ -13,3 +13,10 @@ export const INSTASEND_WITHDRAWAL_LIMIT = process.env.INSTASEND_WITHDRAWAL_LIMIT
 export const CURRENCY = process.env.INSTASEND_CURRENCY ?? "USD";
 export const REDIRECT_URL = process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/payment` : "http://localhost:3000/payment";
 export const HOST = process.env.FRONTEND_URL ?? "http://localhost:3000";
+
+
+
+
+// Binance Secret Keys
+export const BINANCE_API_KEY = process.env.BINANCE_API_KEY as string;
+export const BINANCE_SECRET_KEY = process.env.BINANCE_SECRET_KEY as string;

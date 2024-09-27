@@ -1,13 +1,13 @@
 import create from "zustand";
 
 type TUser = {
-  balance: string;
+  balance?: string | undefined;
   id?: string | undefined;
   token?: string | undefined;
   rating?: number | undefined;
   name?: string | undefined;
   email?: string | undefined;
-  role?:string | undefined;
+  role?: string | undefined;
 };
 
 type Transaction = {
@@ -24,8 +24,8 @@ type Game = {
   id: string;
   whitePlayerId: string;
   blackPlayerId: string;
-  whitePlayer:{id:string,name:string};
-  blackPlayer:{id:string,name:string};
+  whitePlayer: { id: string; name: string };
+  blackPlayer: { id: string; name: string };
   status: string;
   result: string;
   startTime: string;
@@ -48,17 +48,18 @@ type Action = {
 
 const usePersonStore = create<State & Action>((set) => ({
   user: null,
-  isLoading: false, 
+  isLoading: false,
   transactions: null,
   games: null,
-  
+
   updateUser: (user) => {
-    set({ user: { ...user, balance: user?.balance ?? "" } });
+    if (user?.balance) set({ user: { ...user, balance: user?.balance } });
+    else set({ user });
   },
-  
+
   setTransactions: (transactions) => set(() => ({ transactions })),
-  
-  setGames: (games) => set(() => ({ games })), 
+
+  setGames: (games) => set(() => ({ games })),
 }));
 
 export default usePersonStore;

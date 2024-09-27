@@ -43,8 +43,8 @@ export default function Login({ admin }: props) {
 
       alert("Login successful");
       window.location.href = admin ? "/dashboard" : "/game";
-    } catch (error:any) {
-      alert(error.message)
+    } catch (error: any) {
+      alert(error.message);
       console.error("Error:", error);
     }
 
@@ -98,8 +98,8 @@ export default function Login({ admin }: props) {
               </div>
 
               <button
-onClick={()=>window.location.href = '/forgotpassword'}
-className="text-sm font-medium text-white hover:underline "
+                onClick={() => (window.location.href = "/forgotpassword")}
+                className="text-sm font-medium text-white hover:underline "
               >
                 Forgot password?
               </button>

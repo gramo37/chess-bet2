@@ -10,9 +10,9 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const { username, name, password } = req.body;
 
-    const deletedUser = await db.deletedUser.findUnique({
+    const deletedUser = await db.user.findUnique({
       where: {
-        email: username,
+        email:username
       },
     });
 
@@ -32,7 +32,7 @@ export const signup = async (req: Request, res: Response) => {
 
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
-
+    
     const newUser = await db.user.create({
       data: {
         email: username,
@@ -40,7 +40,7 @@ export const signup = async (req: Request, res: Response) => {
         name: name,
       },
     });
-
+    
     const token = generateToken({ id: newUser.id, email: newUser.email });
     EmailVerification(username);
     res.status(200).json({ message: "User created successfully", token });

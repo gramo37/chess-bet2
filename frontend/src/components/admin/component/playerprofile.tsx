@@ -114,6 +114,7 @@ const PlayerProfile: React.FC = () => {
     if (confirmation !== 'YES') {
       return;
     }
+    
     // delUser(id)
   }
   
@@ -146,9 +147,10 @@ const PlayerProfile: React.FC = () => {
                 ACTIVATE
               </button>
             )}
-            <button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2" onClick={DeleteUser}>
+            {player.status==="DELETED"&&<button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2" onClick={DeleteUser}>
               Delete
-            </button>
+            </button>}
+            
           </div>}
         </div>
 
@@ -193,7 +195,7 @@ const PlayerProfile: React.FC = () => {
                     <span className="font-semibold">Result:</span>{" "}
                     {game.result || "N/A"}
                   </p>
-              {(user&&user.role==='MODRATOR')&&<p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>}
+              {(user&&user.role==='ADMIN')&&<p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>}
 
                 </li>
               ))}

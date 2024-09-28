@@ -400,6 +400,7 @@ export class GameManager {
           await game?.createGame();
         }
       }
+      
     }
     // Create a new game if no ongoing game found
     // if (this.pendingUser === null) {

@@ -47,7 +47,7 @@ export const GamesList: React.FC<GamesListProps> = ({ games }) => {
               <p className="text-lg font-bold">Game ID: {game.id}</p>
               <p>Status: {game.status}</p>
               <p>Outcome: {game.gameOutCome}</p>
-              <p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>
+              <p className="font-semibold cursor-pointer inline text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">

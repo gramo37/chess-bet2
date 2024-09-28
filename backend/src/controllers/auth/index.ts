@@ -64,6 +64,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User does not exist" });
     }
     if(user.status === 'SUSPENDED') return res.status(403).json({ message: "Your account has been suspended" });
+    if(user.status === 'BANNED') return res.status(403).json({ message: "Your account has been permanently banned" });
     
     const isPasswordValid = await bcrypt.compare(password, user.password);
 

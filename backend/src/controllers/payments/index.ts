@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { createTransaction, generateSignature, withdrawMPesaToUser } from "../../utils/payment";
+import {
+  createTransaction,
+  generateSignature,
+  withdrawMPesaToUser,
+} from "../../utils/payment";
 import {
   CURRENCY_RATE_URL,
   HOST,
@@ -74,8 +78,9 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         : " ";
     const email = user?.email && isValidEmail(user?.email) ? user?.email : " ";
     const secret_token = generateUniqueId();
-    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development")
-    if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
+    if (NODE_ENV === "development")
+      console.log("Secret Token", secret_token, mode, api_ref);
     try {
       let resp = await collection.charge({
         first_name,
@@ -112,7 +117,7 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         finalamountInUSD,
         platform_charges,
         secret_token,
-        mode
+        mode,
       });
 
       if (!createRecord) {
@@ -143,8 +148,9 @@ export const successTransaction = async (req: Request, res: Response) => {
   try {
     const { secret_token, mode, api_ref } = req.body;
 
-    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development")
-    if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
+    if (NODE_ENV === "development")
+      console.log("Secret Token", secret_token, mode, api_ref);
 
     if (!secret_token || !mode) {
       return res.status(401).json({
@@ -155,14 +161,14 @@ export const successTransaction = async (req: Request, res: Response) => {
     const transaction = await db.transaction.findFirst({
       where: {
         api_ref,
-        mode
+        mode,
       },
       select: {
         id: true,
         userId: true,
         finalamountInUSD: true,
         status: true,
-        secret_token: true
+        secret_token: true,
       },
     });
 
@@ -170,10 +176,13 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
-    
-    const isValidTransaction = await compareHash(secret_token, transaction.secret_token)
 
-    if(!isValidTransaction) {
+    const isValidTransaction = await compareHash(
+      secret_token,
+      transaction.secret_token
+    );
+
+    if (!isValidTransaction) {
       return res.status(401).json({
         message: "Unauthorized Transaction",
         status: "error",
@@ -221,35 +230,15 @@ export const successTransaction = async (req: Request, res: Response) => {
 export const withdrawMPesa = async (req: Request, res: Response) => {
   try {
     let { amount, account } = req.body;
-    amount = Math.floor(amount);
+    amount = Number(amount);
     const currency = "KES"; // All Mpesa withdrawals are in KES
 
-    let rates: any = {};
-    try {
-      const response = await axios.get(`${CURRENCY_RATE_URL}/USD`);
-      rates = response.data;
-    } catch (error) {
-      console.log("Error fetching currency rates", error);
-      return res
-        .status(500)
-        .json({ message: "Internal server error", status: "error" });
-    }
+    const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
 
-    if (!rates || !rates?.rates || !rates?.rates?.[currency]) {
-      console.log(
-        `Currency "${currency}" not found in ->`,
-        rates,
-        rates?.rates,
-        rates?.rates?.[currency]
-      );
+    if (!finalamountInUSD)
       return res
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
-    }
-
-    const finalamountInUSD = parseFloat(
-      (amount / rates.rates[currency]).toFixed(2)
-    );
 
     console.log("Converted KES ", amount, "in $", finalamountInUSD);
 
@@ -461,7 +450,7 @@ export const getCryptoURL = async (req: Request, res: Response) => {
         finalamountInUSD,
         platform_charges,
         secret_token,
-        mode
+        mode,
       });
 
       if (!createRecord) {

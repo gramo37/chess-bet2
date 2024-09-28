@@ -1,5 +1,5 @@
 import { Request,Response } from "express";
-import { db, UserStatus } from "../../db";
+import { db } from "../../db";
 
 export async function UpdateUserRating(req:Request,res:Response){
     const { id } = req.params;

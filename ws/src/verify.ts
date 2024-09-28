@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 export async function SendRandomPlayNotificationTotheAdmin(){
     try {
     const admins = await db.user.findMany({where:{role:'ADMIN'}})
-    admins.forEach((admin)=>{
+    admins.forEach((admin: any)=>{
         const mailConfigurations = {
             from: `amansample786@gmail.com <no-reply@chessbet.com>`,
             to: admin.email,

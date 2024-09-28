@@ -74,6 +74,7 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         : " ";
     const email = user?.email && isValidEmail(user?.email) ? user?.email : " ";
     const secret_token = generateUniqueId();
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development")
     if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
     try {
       let resp = await collection.charge({
@@ -142,6 +143,7 @@ export const successTransaction = async (req: Request, res: Response) => {
   try {
     const { secret_token, mode, api_ref } = req.body;
 
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development")
     if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
 
     if (!secret_token || !mode) {

@@ -97,11 +97,6 @@ model UserReport {
   @@index([userId])
 }
 
-model DeletedUser {
-  id    String @id @default(cuid())
-  email String @unique
-}
-
 enum ReportStatus {
   PENDING
   RESOLVED
@@ -150,4 +145,5 @@ enum Roles {
 enum UserStatus {
   ACTIVE
   SUSPENDED
+  DELETED
 }

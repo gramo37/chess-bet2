@@ -9,7 +9,7 @@ const Mpesa = () => {
   const user = usePersonStore((state) => state.user);
 
   const handleMpesaWithdrawal = async () => {
-    const url = `${BACKEND_URL}/payments/withdraw-mpesa`;
+    const url = `${BACKEND_URL}/payments/mpesa/withdraw`;
 
     try {
       const response = await axios.post(
@@ -17,6 +17,8 @@ const Mpesa = () => {
         {
           amount: Number(amount),
           account: phoneNumber,
+          currency: "KES",
+          mode: "mpesa"
         },
         {
           headers: {

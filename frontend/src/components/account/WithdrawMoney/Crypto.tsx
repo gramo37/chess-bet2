@@ -9,7 +9,32 @@ const Crypto = () => {
   const [currency, setCurrency] = useState("USD");
   const user = usePersonStore((state) => state.user);
 
-  const handleCryptoWithdrawal = () => {};
+  const handleCryptoWithdrawal = async () => {
+    try {
+      const url = `${BACKEND_URL}/payments/crypto/withdraw-money`;
+
+      const response = await axios.post(
+        url,
+        {
+          amount: Number(amount),
+          account: walletId, // Wallet Address
+          currency,
+          mode: "crypto",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      const data = response.data;
+      alert(data.message);
+    } catch (error) {
+      console.error("Error during Withdrawal:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <>

@@ -7,6 +7,8 @@ import { connect as connectToRedis, sendMovesToDB } from "./db/redis";
 import user from "./routes/users";
 import auth from "./routes/auth";
 import game from "./routes/game";
+import mpesa from "./routes/payments/mpesa";
+import crypto from "./routes/payments/crypto";
 import payment from "./routes/payments";
 import report from "./routes/report";
 import admin from "./routes/admin";
@@ -38,6 +40,8 @@ app.use(
 app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
 app.use(`/${BACKEND_ROUTE}/payments`, payment);
+app.use(`/${BACKEND_ROUTE}/payments/crypto`, crypto);
+app.use(`/${BACKEND_ROUTE}/payments/mpesa`, mpesa);
 app.use(`/${BACKEND_ROUTE}/game/`, game);
 app.use(`/${BACKEND_ROUTE}/report/`, report);
 app.use(`/${BACKEND_ROUTE}/admin/`, admin);

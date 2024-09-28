@@ -6,9 +6,9 @@ import { useState } from "react";
 const Mpesa = () => {
   const user = usePersonStore((state) => state.user);
   const [amount, setAmount] = useState("");
-  
+
   const handleMpesaDeposit = async () => {
-    const url = `${BACKEND_URL}/payments/get-mpesa-url`;
+    const url = `${BACKEND_URL}/payments/mpesa/get-url`;
 
     try {
       const response = await axios.post(

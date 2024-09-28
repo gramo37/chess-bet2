@@ -6,6 +6,7 @@ import {
   INTASEND_IS_TEST,
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
+  INSTASEND_WITHDRAWAL_LIMIT,
 } from "../constants";
 import crypto from "crypto";
 import { db } from "../db";
@@ -83,8 +84,7 @@ export const withdrawCryptoToUser = async (
       .toString("base64")
       .concat(CRYPTO_PAYOUT_API_KEY);
 
-      const signature = generateSignature(bufferData);
-      console.log("Payout details", CRYPTO_PAYOUT_API_KEY, CRYPTO_MERCHANT_ID, url, signature);
+    const signature = generateSignature(bufferData);
 
     const { data } = await axios.post(url, payload, {
       headers: {
@@ -164,5 +164,104 @@ export async function createTransaction({
   } catch (error) {
     console.error(`Charge error 1:`, "" + error, JSON.parse("" + error));
     return false;
+  }
+}
+
+export async function withdrawalChecks(
+  amount: number,
+  finalamountInUSD: number,
+  account: string,
+  currentBalance: number,
+  user: TUser
+) {
+  try {
+    if (!user || !user?.id)
+      return {
+        status: false,
+        message: "Unauthorized",
+      };
+    if (!amount || finalamountInUSD <= 5) {
+      return {
+        status: false,
+        message: "Please provide a valid amount to be withdrawn",
+      };
+    }
+
+    if (!account) {
+      return {
+        status: false,
+        message: "Please provide a valid account for sending amount",
+      };
+    }
+
+    if (finalamountInUSD > currentBalance) {
+      return {
+        status: false,
+        message: "Insufficient funds",
+      };
+    }
+
+    if (finalamountInUSD <= INSTASEND_WITHDRAWAL_LIMIT) {
+      return {
+        status: false,
+        message: "Amount less than minimum withdrawal amount",
+      };
+    }
+
+    const games = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+      },
+    });
+
+    console.log("Games played by user ->", games);
+    if (games < 3) {
+      console.log("Less number of games played by user -> ", games);
+      return {
+        status: false,
+        message: "Please play atleast 3 games before withdrawing money.",
+      };
+    }
+
+    return {
+      status: true,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      message: "Internal Server Error",
+    };
+  }
+}
+
+export async function depositChecks(
+  amount: number,
+  currency: string,
+  finalamountInUSD: number
+) {
+  try {
+    if (!amount || !currency) {
+      return {
+        status: false,
+        message: "Please provide a valid amount to be deposited and currency",
+      };
+    }
+
+    if (finalamountInUSD <= 5) {
+      return {
+        status: false,
+        message: "Please provide a amount more than 5 dollars",
+      };
+    }
+    return {
+      status: true,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      message: "Internal Server Error",
+    };
   }
 }

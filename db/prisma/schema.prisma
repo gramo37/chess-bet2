@@ -97,7 +97,6 @@ model UserReport {
   @@index([userId])
 }
 
-
 enum ReportStatus {
   PENDING
   RESOLVED
@@ -146,5 +145,5 @@ enum Roles {
 enum UserStatus {
   ACTIVE
   SUSPENDED
-  DELETED
+  BANNED
 }

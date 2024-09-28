@@ -45,6 +45,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
           <option value="ALL">All Users</option>
           <option value="ACTIVE">Active Users</option>
           <option value="SUSPENDED">Suspended Users</option>
+          <option value="BANNED">Banned Users</option>
         </select>
 
         {(user&&user.role==="ADMIN")&&
@@ -76,7 +77,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
                 </p>
               </div>
             </div>
-            <p className="font-semibold text-blue-500 cursor-pointer hover:underline" onClick={() => onViewProfile(user.id)}>View User</p>
+            <p className="font-semibold text-blue-500 inline cursor-pointer hover:underline" onClick={() => onViewProfile(user.id)}>View User</p>
           </div>
         ))}
       </div>

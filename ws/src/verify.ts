@@ -11,24 +11,27 @@ const transporter = nodemailer.createTransport({
 });
 
 
-export async function SendRandomPlayNotificationTotheAdmin(){
-    try {
-    const admins = await db.user.findMany({where:{role:'ADMIN'}})
-    admins.forEach((admin: any)=>{
-        const mailConfigurations = {
-            from: `amansample786@gmail.com <no-reply@chessbet.com>`,
-            to: admin.email,
-            subject: "Email Verification",
-            html: `<p>A New User Has Created a random play with gameid:</p>
+export async function SendRandomPlayNotificationToAdmin(gameId: string) {
+  try {
+    const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
 
-                 Thanks`,
-          };
-      
-        transporter.sendMail(mailConfigurations);
-    })
+    const mailConfigurations = (email: string) => ({
+      from: 'amansample786@gmail.com <no-reply@chessbet.com>',
+      to: email,
+      subject: 'New Random Play Created',
+      html: `
+        <p>A new user has created a random play with game ID: ${gameId}</p>
+        <p>Thanks,</p>
+        <p>The ChessBet Team</p>
+      `,
+    });
 
-    console.log("Email Sent Successfully");
+    admins.forEach((admin: any) => {
+      transporter.sendMail(mailConfigurations(admin.email));
+    });
+
+    console.log('Emails sent successfully to admins');
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error('Error sending emails:', error);
   }
 }

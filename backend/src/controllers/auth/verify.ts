@@ -61,9 +61,6 @@ console.log('Sending: ',token);
 
 export async function SendModeratorNotification(email: string, password:string) {
   try {
-    // Generate a random password
-
-    // Configure the email content
     const mailOptions = {
       from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
       to: email,
@@ -75,13 +72,65 @@ export async function SendModeratorNotification(email: string, password:string) 
              <p>Best regards,<br>Your Team at ChessBet</p>`,
     };
 
-    // Send the email
     await transporter.sendMail(mailOptions);
     console.log("Moderator notification email sent successfully");
 
-    return password; // Optionally return the password if you need to store it
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; // Rethrow error if you want to handle it in a calling function
+    throw error; 
+  }
+}
+
+export async function SendUserSuspentionNotification(email: string) {
+  try {
+    const mailOptions = {
+      from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
+      to: email,
+      subject: "Your Account the been suspended",
+      html: `<p>Sorry to Inform you that your account has been suspended</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error; 
+  }
+}
+
+export async function SendUserActivationNotification(email: string) {
+  try {
+    const mailOptions = {
+      from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
+      to: email,
+      subject: "Your Account the been Activated",
+      html: `<p>Congrats Your Account has been activated</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error; 
+  }
+}
+
+export async function SendUserBannedNotification(email: string,message:string) {
+  try {
+    const mailOptions = {
+      from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
+      to: email,
+      subject: "Your Account the been Banned",
+      html: `<p>Sorry to Inform you that your account has been Banned Because </p>
+      <p>${message}</p>        
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Moderator notification email sent successfully");
+
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error; 
   }
 }

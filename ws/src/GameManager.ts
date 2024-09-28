@@ -24,6 +24,7 @@ import { db } from "./db";
 import { TMove } from "./types/game.types";
 import { TEndGamePayload } from "./types";
 import { seedBoard } from "./utils/game";
+import { SendRandomPlayNotificationToAdmin } from "./verify";
 
 export class GameManager {
   private games: Game[];
@@ -384,6 +385,7 @@ export class GameManager {
         const game = new Game(player1, player2, false, stake);
         console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
+        SendRandomPlayNotificationToAdmin(game.getGameId());//sends notification to the admin that player has created random play
       } else {
         // match the opponent and start the game
 
@@ -400,7 +402,6 @@ export class GameManager {
           await game?.createGame();
         }
       }
-      
     }
     // Create a new game if no ongoing game found
     // if (this.pendingUser === null) {

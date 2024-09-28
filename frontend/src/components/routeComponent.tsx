@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
-import usePersonStore from "../contexts/auth"; // Your auth store
+import usePersonStore from "../contexts/auth";
 import Login from "../screens/login";
 import { useGetUser } from "../hooks/useGetUser";
 import ModratorDashboard from "./modrator";
@@ -10,33 +10,49 @@ interface RouteProps {
   children: ReactNode;
 }
 
-// PrivateRoute: Redirect to /login if user is not logged in
 export const PrivateRoute = ({ children }: RouteProps) => {
-  const {isLoading} = useGetUser(); // Fetch and set the user on component mount
+  const { isLoading } = useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
-  if(isLoading) return <Spinner />
-  if (user && user.role === "ADMIN") return <Navigate to="/dashboard" />;
-  if(user&&user.role === "MODRATOR") return <ModratorDashboard/>;
-  return user ? <>{children}</> : <Navigate to="/login" />;
+
+  if (isLoading) return <Spinner />;
+
+  if (!user) return <Navigate to="/login" />;
+
+  switch (user.role) {
+    case "ADMIN":
+      return <Navigate to="/dashboard" />;
+    case "MODRATOR":
+      return <ModratorDashboard />;
+    default:
+      return <>{children}</>;
+  }
 };
 
-// PublicRoute: Redirect to /game if user is logged in
 export const PublicRoute = ({ children }: RouteProps) => {
+  const { isLoading } = useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
+  
+  if (isLoading) return <Spinner />;
+
   return user ? <Navigate to="/game" /> : <>{children}</>;
 };
 
 export const AdminPrivateRoute = ({ children }: RouteProps) => {
+  const { isLoading } = useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
+  
+  if (isLoading) return <Spinner />;
+
   if (!user) return <Navigate to="/login" />;
-  if (user.role === "USER") {
-    return <Navigate to="/game" />;
+
+  switch (user.role) {
+    case "USER":
+      return <Navigate to="/game" />;
+    case "MODRATOR":
+      return <ModratorDashboard />;
+    case "ADMIN":
+      return <>{children}</>;
+    default:
+      return <Navigate to="/login" />;
   }
- else if (user.role === "MODRATOR") {
-    return <ModratorDashboard/>;
-  }
-  else if (user) {
-    return <>{children}</>;
-  }
-  return <Login admin={true} />;
 };

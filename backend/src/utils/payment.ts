@@ -1,4 +1,8 @@
 import {
+  CRYPTO_MERCHANT_ID,
+  CRYPTO_PAYOUT_API_KEY,
+  CRYTPOMUS_URI,
+  BACKEND_URL,
   INTASEND_IS_TEST,
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
@@ -6,6 +10,7 @@ import {
 import crypto from "crypto";
 import { db } from "../db";
 import { createHash } from ".";
+import axios from "axios";
 
 type TUser = {
   id: string;
@@ -48,6 +53,57 @@ export const withdrawMPesaToUser = async (
         },
       ],
     });
+    return true;
+  } catch (error) {
+    console.log("Error in payment to user", error, "" + error);
+    return false;
+  }
+};
+
+export const withdrawCryptoToUser = async (
+  amount: number,
+  account: string,
+  user: TUser,
+  checkout_id: string
+) => {
+  try {
+    const url = `${CRYTPOMUS_URI}/payout`;
+
+    const payload = {
+      amount,
+      currency: "USDT",
+      network: "TRON",
+      address: account,
+      url_callback: `${BACKEND_URL}/payments/update-withdrawal`,
+      is_subtract: "1",
+      order_id: checkout_id,
+    };
+
+    const bufferData = Buffer.from(JSON.stringify(payload))
+      .toString("base64")
+      .concat(CRYPTO_PAYOUT_API_KEY);
+
+      const signature = generateSignature(bufferData);
+      console.log("Payout details", CRYPTO_PAYOUT_API_KEY, CRYPTO_MERCHANT_ID, url, signature);
+
+    const { data } = await axios.post(url, payload, {
+      headers: {
+        merchant: CRYPTO_MERCHANT_ID,
+        sign: signature,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (
+      !data ||
+      !data?.result ||
+      !data?.result?.url ||
+      !data?.result?.order_id
+    ) {
+      console.error("Data not received from cryptomus");
+      return false;
+    }
+
     return true;
   } catch (error) {
     console.log("Error in payment to user", error, "" + error);

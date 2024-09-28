@@ -97,7 +97,6 @@ model UserReport {
   @@index([userId])
 }
 
-
 enum ReportStatus {
   PENDING
   RESOLVED
@@ -135,6 +134,7 @@ enum TransactionStatus {
   PENDING
   COMPLETED
   CANCELLED
+  REQUESTED
 }
 
 enum Roles {

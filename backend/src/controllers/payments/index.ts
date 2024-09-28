@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../../db";
-import { generateSignature, withdrawMPesaToUser } from "../../utils/payment";
+import { createTransaction, generateSignature, withdrawMPesaToUser } from "../../utils/payment";
 import {
   CURRENCY_RATE_URL,
   HOST,
@@ -10,30 +10,28 @@ import {
   INTASEND_SECRET_KEY,
   REDIRECT_URL,
   INSTASEND_WITHDRAWAL_LIMIT,
-  BINANCE_SECRET_KEY,
-  BINANCE_API_KEY,
+  CRYPTO_DEPOSIT_PERCENT,
+  CRYTPOMUS_URI,
+  CRYPTO_MERCHANT_ID,
+  CRYPTO_API_KEY,
+  NODE_ENV,
 } from "../../constants";
 import {
+  compareHash,
+  createHash,
   generateUniqueId,
   getFinalAmountInUSD,
   isValidEmail,
 } from "../../utils";
 import axios from "axios";
-import crypto from "crypto";
 
 export const getMPesaURL = async (req: Request, res: Response) => {
   try {
-    console.log(
-      "INSTA SEND Details",
-      INTASEND_PUBLISHABLE_KEY,
-      INTASEND_SECRET_KEY,
-      INTASEND_IS_TEST,
-      typeof INTASEND_IS_TEST
-    );
     console.log("Deposit Money: ", req.body);
     let { amount } = req.body;
     const currency = "KES"; // All Mpesa payments are in KES
-    amount = Math.floor(amount);
+    const mode = "mpesa";
+    amount = Number(amount);
 
     const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
 
@@ -42,9 +40,15 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
 
-    if (!amount || finalamountInUSD <= 5 || !currency) {
+    if (!amount || !currency) {
       return res.status(400).json({
         message: "Please provide a valid amount to be deposited and currency",
+      });
+    }
+
+    if (finalamountInUSD <= 5) {
+      return res.status(400).json({
+        message: "Please provide a amount more than 5 dollars",
       });
     }
 
@@ -70,20 +74,9 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         : " ";
     const email = user?.email && isValidEmail(user?.email) ? user?.email : " ";
     const secret_token = generateUniqueId();
-    console.log(
-      "User Details",
-      first_name,
-      last_name,
-      email,
-      HOST,
-      amount,
-      currency,
-      api_ref,
-      `${REDIRECT_URL}/${secret_token}`
-    );
-    let resp: any = {};
+    if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
     try {
-      resp = await collection.charge({
+      let resp = await collection.charge({
         first_name,
         last_name,
         email,
@@ -92,7 +85,7 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         amount,
         currency,
         api_ref,
-        redirect_url: `${REDIRECT_URL}/${secret_token}`, // Add some secret key here which will be stored in the transaction table and it will checked again in the success-transaction route
+        redirect_url: `${REDIRECT_URL}/${secret_token}/${api_ref}/${mode}`, // Add some secret key here which will be stored in the transaction table and it will checked again in the success-transaction route
       });
       // console.log(`Charge Resp:`, resp);
       // TODO: GET the deducted amount and add that in the transaction table
@@ -108,43 +101,37 @@ export const getMPesaURL = async (req: Request, res: Response) => {
         finalamountInUSD,
         INSTASEND_DEPOSIT_PERCENT
       );
+      const createRecord = await createTransaction({
+        userID: user.id,
+        amount,
+        signature: resp.signature,
+        checkout_id: resp.id,
+        api_ref,
+        currency,
+        finalamountInUSD,
+        platform_charges,
+        secret_token,
+        mode
+      });
+
+      if (!createRecord) {
+        console.error("Something went wrong while creating a transaction");
+        return res.status(500).json({
+          message: "Something went wrong in adding data to transaction table",
+          status: "error",
+        });
+      }
+
+      res.status(200).json({
+        message: "Payment request successful",
+        paymentDetails: resp.url,
+      });
     } catch (error) {
       console.error(`Charge error 2:`, "" + error, JSON.parse("" + error));
-      return res.status(500).json({ message: "Invalid Request", status: "error" });
+      return res
+        .status(500)
+        .json({ message: "Invalid Request", status: "error" });
     }
-
-    try {
-      await db.transaction.create({
-        data: {
-          user: {
-            connect: {
-              id: user.id,
-            },
-          },
-          amount,
-          type: "DEPOSIT",
-          status: "PENDING",
-          signature: resp.signature,
-          checkout_id: resp.id,
-          api_ref,
-          currency,
-          finalamountInUSD: finalamountInUSD - platform_charges,
-          platform_charges,
-          secret_token,
-        },
-      });
-    } catch (error) {
-      console.error(`Charge error 1:`, "" + error, JSON.parse("" + error));
-      return res.status(500).json({
-        message: "Something went wrong in adding data to transaction table",
-        status: "error",
-      });
-    }
-    
-    res.status(200).json({
-      message: "Payment request successful",
-      paymentDetails: resp.url
-    })
   } catch (error) {
     console.error("Error Sending Payment URL:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
@@ -153,9 +140,11 @@ export const getMPesaURL = async (req: Request, res: Response) => {
 
 export const successTransaction = async (req: Request, res: Response) => {
   try {
-    const { secret_token } = req.body;
-    console.log(secret_token);
-    if (!secret_token) {
+    const { secret_token, mode, api_ref } = req.body;
+
+    if(NODE_ENV === "development") console.log("Secret Token", secret_token, mode, api_ref)
+
+    if (!secret_token || !mode) {
       return res.status(401).json({
         message: "Unauthorized Payment",
       });
@@ -163,22 +152,31 @@ export const successTransaction = async (req: Request, res: Response) => {
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
       where: {
-        secret_token,
+        api_ref,
+        mode
       },
       select: {
         id: true,
         userId: true,
         finalamountInUSD: true,
         status: true,
+        secret_token: true
       },
     });
-
-    console.log(transaction, "Transactions");
 
     if (!transaction)
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
+    
+    const isValidTransaction = await compareHash(secret_token, transaction.secret_token)
+
+    if(!isValidTransaction) {
+      return res.status(401).json({
+        message: "Unauthorized Transaction",
+        status: "error",
+      });
+    }
 
     // Check for if the transaction is pending
     if (transaction.status !== "PENDING") {
@@ -359,7 +357,6 @@ export const withdrawMPesa = async (req: Request, res: Response) => {
 export const transactionHistory = async (req: Request, res: Response) => {
   try {
     const user: any = (req?.user as any)?.user;
-    console.log("working2");
 
     const transactions = await db.transaction.findMany({
       where: {
@@ -391,8 +388,102 @@ export const transactionHistory = async (req: Request, res: Response) => {
 
 export const getCryptoURL = async (req: Request, res: Response) => {
   try {
-    const { amount, currency } = req.body;
+    let { amount, currency } = req.body;
     const user: any = (req?.user as any)?.user;
+    const mode = "crypto";
+
+    amount = Number(amount);
+
+    const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
+
+    if (!finalamountInUSD)
+      return res
+        .status(500)
+        .json({ message: "Invalid currency", status: "error" });
+
+    if (!amount || finalamountInUSD <= 5 || !currency) {
+      return res.status(400).json({
+        message: "Please provide a valid amount to be deposited and currency",
+        status: "error",
+      });
+    }
+
+    const platform_charges = parseFloat(
+      (finalamountInUSD * CRYPTO_DEPOSIT_PERCENT).toFixed(2)
+    );
+
+    // Main Crypto related coding
+    const secret_token = generateUniqueId();
+    let api_ref = generateUniqueId();
+    try {
+      const payload = {
+        amount: finalamountInUSD,
+        currency: "USD",
+        order_id: api_ref,
+        url_callback: `${REDIRECT_URL}/${secret_token}/${api_ref}/${mode}`,
+      };
+
+      const bufferData = Buffer.from(JSON.stringify(payload))
+        .toString("base64")
+        .concat(CRYPTO_API_KEY);
+
+      const signature = generateSignature(bufferData);
+
+      const { data } = await axios.post(`${CRYTPOMUS_URI}/payment`, payload, {
+        headers: {
+          merchant: CRYPTO_MERCHANT_ID,
+          sign: signature,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (
+        !data ||
+        !data?.result ||
+        !data?.result?.url ||
+        !data?.result?.order_id
+      ) {
+        console.error("Data not received from cryptomus");
+        return res
+          .status(500)
+          .json({ message: "Internal server error", status: "error" });
+      }
+
+      const createRecord = await createTransaction({
+        userID: user.id,
+        amount,
+        signature,
+        checkout_id: data.result.order_id, // We will get this from data
+        api_ref,
+        currency,
+        finalamountInUSD,
+        platform_charges,
+        secret_token,
+        mode
+      });
+
+      if (!createRecord) {
+        console.error("Something went wrong while creating a transaction");
+        return res.status(500).json({
+          message: "Something went wrong in adding data to transaction table",
+          status: "error",
+        });
+      }
+
+      res.status(200).json({
+        message: "Payment request successful",
+        paymentDetails: data.result.url, // We will get this from data
+      });
+    } catch (error) {
+      console.log(
+        "Something went wrong while creating order",
+        error,
+        "" + error
+      );
+      return res.status(500).json({
+        message: "Something went wrong while creating order",
+      });
+    }
   } catch (error) {
     console.error("Error Sending Crypto Payment URL2:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

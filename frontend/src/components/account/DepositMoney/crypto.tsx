@@ -1,10 +1,37 @@
 import { useState } from "react";
+import { BACKEND_URL } from "../../../constants/routes";
+import usePersonStore from "../../../contexts/auth";
+import axios from "axios";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState("USD");
+  const user = usePersonStore((state) => state.user);
 
-  const handleCryptoDeposit = async () => {};
+  const handleCryptoDeposit = async () => {
+    const url = `${BACKEND_URL}/payments/get-crypto-url`;
+
+    try {
+      const response = await axios.post(
+        url,
+        {
+          amount: Number(amount),
+          currency
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+      const data = response.data;
+      window.location.href = data.paymentDetails;
+    } catch (error) {
+      console.error("Error during Deposit:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div>

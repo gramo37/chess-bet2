@@ -5,13 +5,13 @@ import axios from "axios";
 import Spinner from "../components/spinner";
 
 export default function Payment() {
-  const { secret_token } = useParams();
+  const { secret_token, mode, api_ref } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Make an API call to /success-transaction, send signature and checkout_id
-    if (!secret_token) {
-      console.error(`Secret Token not found`);
+    if (!secret_token || !mode) {
+      console.error(`Secret or Mode Token not found`, secret_token, mode);
       alert("Something went wrong. Please try again.");
       navigate("/account");
       return;
@@ -21,7 +21,7 @@ export default function Payment() {
       try {
         const response = await axios.post(
           url,
-          { secret_token },
+          { secret_token, mode, api_ref },
           {
             headers: {
               "Content-Type": "application/json",

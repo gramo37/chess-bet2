@@ -45,6 +45,7 @@ model Transaction {
   api_ref          String            @default("")
   currency         String            @default("USD")
   secret_token     String            @default("")
+  mode             String            @default("")
 
   @@index([userId])
 }

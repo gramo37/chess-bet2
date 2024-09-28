@@ -51,7 +51,7 @@ function App() {
               }
             />
             <Route
-              path="/payment/:secret_token"
+              path="/payment/:secret_token/:api_ref/:mode"
               element={
                 <PublicRoute>
                   <Payment />

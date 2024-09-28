@@ -108,7 +108,6 @@ export const verifyToken = async (req: Request, res: Response) => {
     const decoded = jwtVerify(req.params.token) as {
       data: string;
     };
-    console.log(decoded.data);
 
     const user = await db.user.findFirst({
       where: {
@@ -164,7 +163,6 @@ export async function ForgotPassword(req:Request,res:Response){
       otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
     },
   });
-  console.log(token);
   
  await SendForgotPassword(email,token);
   res.status(200).json({ message: "Password reset link sent to your email" });

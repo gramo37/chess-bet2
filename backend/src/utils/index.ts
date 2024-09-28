@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { randomUUID } from "crypto";
 import axios from "axios";
-import { CURRENCY_RATE_URL } from "../constants";
+import { BCRYPT_SECRET_KEY, CURRENCY_RATE_URL } from "../constants";
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -61,4 +62,32 @@ export async function getFinalAmountInUSD(amount: number, currency: string) {
   }
 
   return parseFloat((amount / rates.rates[currency]).toFixed(2));
+}
+
+// Function to create a hash
+export async function createHash(password: string): Promise<string> {
+  const saltRounds = 10;
+  const passwordWithSecret = password + BCRYPT_SECRET_KEY;
+  
+  try {
+    const hash = await bcrypt.hash(passwordWithSecret, saltRounds);
+    return hash;
+  } catch (error) {
+    throw new Error('Error creating hash');
+  }
+}
+
+// Function to compare a password with the stored hash
+export async function compareHash(password: string, storedHash: string): Promise<boolean> {
+  const passwordWithSecret = password + BCRYPT_SECRET_KEY;
+
+  try {
+    const isMatch = await bcrypt.compare(passwordWithSecret, storedHash);
+    console.log("IS Matching", isMatch)
+
+    return isMatch;
+  } catch (error) {
+    console.error('Error comparing hash');
+    return false;
+  }
 }

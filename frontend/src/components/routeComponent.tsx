@@ -28,7 +28,6 @@ export const PublicRoute = ({ children }: RouteProps) => {
 
 export const AdminPrivateRoute = ({ children }: RouteProps) => {
   const user = usePersonStore((state) => state.user);
-  console.log(user)
   if (!user) return <Navigate to="/login" />;
   if (user.role === "USER") {
     return <Navigate to="/game" />;

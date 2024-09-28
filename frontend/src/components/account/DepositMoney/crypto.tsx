@@ -9,7 +9,7 @@ const Crypto = () => {
   const user = usePersonStore((state) => state.user);
 
   const handleCryptoDeposit = async () => {
-    const url = `${BACKEND_URL}/payments/get-crypto-url`;
+    const url = `${BACKEND_URL}/payments/crypto/get-url`;
 
     try {
       const response = await axios.post(

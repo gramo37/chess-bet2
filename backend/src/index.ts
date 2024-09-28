@@ -17,9 +17,13 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.BACKEND_PORT ?? 5000;
-const BACKEND_ROUTE = "api";
+export const BACKEND_ROUTE = "api";
 
-app.use(express.json());
+app.use(express.json({
+  verify: (req: any, _, buf) => {
+    req.rawBody = buf.toString();
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 connectToRedis();
 

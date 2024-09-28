@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { createTransaction, generateSignature } from "../../utils/payment";
+import {
+  createTransaction,
+  depositChecks,
+  generateSignature,
+} from "../../utils/payment";
 import {
   REDIRECT_URL,
   CRYPTO_DEPOSIT_PERCENT,
@@ -7,14 +11,16 @@ import {
   CRYPTO_MERCHANT_ID,
   CRYPTO_PAYMENT_API_KEY,
   NODE_ENV,
+  BACKEND_URL,
+  FRONTEND_URL,
 } from "../../constants";
 import {
-  compareHash,
   generateUniqueId,
   getFinalAmountInUSD,
 } from "../../utils";
 import axios from "axios";
 import { db } from "../../db";
+import { BACKEND_ROUTE } from "../..";
 
 export const getURL = async (req: Request, res: Response) => {
   try {
@@ -31,10 +37,16 @@ export const getURL = async (req: Request, res: Response) => {
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
 
-    if (!amount || finalamountInUSD <= 5 || !currency) {
+    const depositCheck = await depositChecks(
+      amount,
+      currency,
+      finalamountInUSD
+    );
+
+    if (!depositCheck.status) {
       return res.status(400).json({
-        message: "Please provide a valid amount to be deposited and currency",
-        status: "error",
+        status: false,
+        message: depositCheck.message,
       });
     }
 
@@ -50,7 +62,7 @@ export const getURL = async (req: Request, res: Response) => {
         amount: finalamountInUSD,
         currency: "USD",
         order_id: api_ref,
-        url_callback: `${REDIRECT_URL}/${secret_token}/${api_ref}/${mode}`,
+        url_callback: `${BACKEND_URL}/${BACKEND_ROUTE}/payments/crypto/success/transaction`,
       };
 
       const bufferData = Buffer.from(JSON.stringify(payload))
@@ -120,24 +132,43 @@ export const getURL = async (req: Request, res: Response) => {
   }
 };
 
-export const successTransaction = async (req: Request, res: Response) => {
+export const successTransaction = async (req: any, res: Response) => {
   try {
-    const { secret_token, mode, api_ref } = req.body;
+    const { order_id, sign } = req.body;
 
     console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
     if (NODE_ENV === "development")
-      console.log("Secret Token", secret_token, mode, api_ref);
+      console.log("Secret Token", order_id);
 
-    if (!secret_token || !mode) {
+    if(!sign) {
       return res.status(401).json({
-        message: "Unauthorized Payment",
+        status: false,
+        message: "Unauthorized User"
+      })
+    }
+
+    const data = JSON.parse(req.rawBody);
+
+    delete data.sign;
+
+    const bufferData = Buffer.from(JSON.stringify(data))
+    .toString("base64")
+    .concat(CRYPTO_PAYMENT_API_KEY);
+
+    const hash = generateSignature(bufferData);
+
+    if (hash !== sign) {
+      return res.status(401).json({
+        message: "Unauthorized Transaction",
+        status: "error",
       });
     }
+
     // Check for the transaction using signature and checkout_id
     const transaction = await db.transaction.findFirst({
       where: {
-        api_ref,
-        mode,
+        checkout_id: order_id,
+        mode: "crypto",
       },
       select: {
         id: true,
@@ -152,18 +183,6 @@ export const successTransaction = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
-
-    const isValidTransaction = await compareHash(
-      secret_token,
-      transaction.secret_token
-    );
-
-    if (!isValidTransaction) {
-      return res.status(401).json({
-        message: "Unauthorized Transaction",
-        status: "error",
-      });
-    }
 
     // Check for if the transaction is pending
     if (transaction.status !== "PENDING") {
@@ -194,9 +213,7 @@ export const successTransaction = async (req: Request, res: Response) => {
       }),
     ]);
 
-    res.status(200).json({
-      message: "Payment Successful",
-    });
+    res.redirect(`${FRONTEND_URL}/account`);
   } catch (error) {
     console.error("Internal Error:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

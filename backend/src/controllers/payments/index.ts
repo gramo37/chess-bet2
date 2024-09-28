@@ -28,6 +28,7 @@ import {
   isValidEmail,
 } from "../../utils";
 import axios from "axios";
+import { WithdrawalRequestNotification } from "../auth/verify";
 
 export const getMPesaURL = async (req: Request, res: Response) => {
   try {
@@ -334,7 +335,7 @@ export const withdrawMPesa = async (req: Request, res: Response) => {
         },
       }),
     ]);
-
+    WithdrawalRequestNotification(transaction.finalamountInUSD,transaction.id);
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object

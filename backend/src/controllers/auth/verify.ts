@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { generateToken } from "../../utils";
+import { db } from "../../db";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -133,4 +134,24 @@ export async function SendUserBannedNotification(email: string,message:string) {
     console.error("Error sending email:", error);
     throw error; 
   }
+}
+
+export async function WithdrawalRequestNotification(amount:number,id:string) {
+  const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
+  const mailConfigurations = (email: string) => ({
+    from: 'amansample786@gmail.com <no-reply@chessbet.com>',
+    to: email,
+    subject: 'Withdrawal Request has been made',
+    html: `<p>Kindly check withdrawal request has been made with : </p>
+    <p>Id: ${id}</p>
+    <p>${amount}</p>
+    `
+    ,
+  });
+
+  admins.forEach((admin: any) => {
+    transporter.sendMail(mailConfigurations(admin.email));
+  });
+
+  console.log('Emails sent successfully to admins');
 }

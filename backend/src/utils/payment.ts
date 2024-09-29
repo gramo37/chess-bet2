@@ -12,6 +12,7 @@ import crypto from "crypto";
 import { db } from "../db";
 import { createHash } from ".";
 import axios from "axios";
+import { BACKEND_ROUTE } from "..";
 
 type TUser = {
   id: string;
@@ -79,7 +80,7 @@ export const withdrawCryptoToUser = async (
       currency: "USDT",
       network: "TRON",
       address: account,
-      url_callback: `${BACKEND_URL}/payments/crypto/approve/withdraw`,
+      url_callback: `${BACKEND_URL}/${BACKEND_ROUTE}/payments/crypto/approve/withdraw`,
       is_subtract: "1",
       order_id: checkout_id,
     };

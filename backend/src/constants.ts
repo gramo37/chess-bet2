@@ -7,7 +7,7 @@ export const REDIRECT_URL = process.env.FRONTEND_URL ? `${process.env.FRONTEND_U
 export const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:3000";
 export const BCRYPT_SECRET_KEY = process.env.BCRYPT_SECRET_KEY ?? "fsudckkncsdkjbvkjbkjsdbvjsdnvjsndjvn483984378hfewuibf2fjBHIYLDUCVHADJSKBHAGFLASHFKJHKKKKKKKKKKKdbhvsdigskdkvjsdkjvbisdvhhh"
 export const NODE_ENV = process.env.NODE_ENV ?? "development"
-export const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:5000" 
+export const BACKEND_URL = process.env.VITE_BACKEND_URL ?? "http://localhost:5000" 
 
 // Instasend related constants
 export const INTASEND_PUBLISHABLE_KEY = process.env.INTASEND_PUBLISHABLE_KEY ?? "";

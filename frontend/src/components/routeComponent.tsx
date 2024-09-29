@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import usePersonStore from "../contexts/auth";
-import Login from "../screens/login";
 import { useGetUser } from "../hooks/useGetUser";
 import ModratorDashboard from "./modrator";
 import Spinner from "./spinner";

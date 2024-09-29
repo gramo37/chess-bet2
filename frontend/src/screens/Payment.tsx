@@ -17,7 +17,7 @@ export default function Payment() {
       return;
     }
     async function updatePayments() {
-      const url = `${BACKEND_URL}/payments/success-transaction`;
+      const url = `${BACKEND_URL}/payments/${mode}/success-transaction`;
       try {
         const response = await axios.post(
           url,

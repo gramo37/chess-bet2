@@ -1,11 +1,18 @@
 import {
+  CRYPTO_MERCHANT_ID,
+  CRYPTO_PAYOUT_API_KEY,
+  CRYTPOMUS_URI,
+  BACKEND_URL,
   INTASEND_IS_TEST,
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
+  INSTASEND_WITHDRAWAL_LIMIT,
 } from "../constants";
 import crypto from "crypto";
 import { db } from "../db";
 import { createHash } from ".";
+import axios from "axios";
+import { BACKEND_ROUTE } from "..";
 
 type TUser = {
   id: string;
@@ -59,6 +66,56 @@ export const generateSignature = (data: string) => {
   return crypto.createHash("md5").update(data).digest("hex");
 };
 
+export const withdrawCryptoToUser = async (
+  amount: number,
+  account: string,
+  user: TUser,
+  checkout_id: string
+) => {
+  try {
+    const url = `${CRYTPOMUS_URI}/payout`;
+
+    const payload = {
+      amount,
+      currency: "USDT",
+      network: "TRON",
+      address: account,
+      url_callback: `${BACKEND_URL}/${BACKEND_ROUTE}/payments/crypto/approve/withdraw`,
+      is_subtract: "1",
+      order_id: checkout_id,
+    };
+
+    const bufferData = Buffer.from(JSON.stringify(payload))
+      .toString("base64")
+      .concat(CRYPTO_PAYOUT_API_KEY);
+
+    const signature = generateSignature(bufferData);
+
+    const { data } = await axios.post(url, payload, {
+      headers: {
+        merchant: CRYPTO_MERCHANT_ID,
+        sign: signature,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (
+      !data ||
+      !data?.result ||
+      !data?.result?.url ||
+      !data?.result?.order_id
+    ) {
+      console.error("Data not received from cryptomus");
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.log("Error in payment to user", error, "" + error);
+    return false;
+  }
+};
+
 export async function createTransaction({
   userID,
   amount,
@@ -108,5 +165,104 @@ export async function createTransaction({
   } catch (error) {
     console.error(`Charge error 1:`, "" + error, JSON.parse("" + error));
     return false;
+  }
+}
+
+export async function withdrawalChecks(
+  amount: number,
+  finalamountInUSD: number,
+  account: string,
+  currentBalance: number,
+  user: TUser
+) {
+  try {
+    if (!user || !user?.id)
+      return {
+        status: false,
+        message: "Unauthorized",
+      };
+    if (!amount || finalamountInUSD <= 5) {
+      return {
+        status: false,
+        message: "Please provide a valid amount to be withdrawn",
+      };
+    }
+
+    if (!account) {
+      return {
+        status: false,
+        message: "Please provide a valid account for sending amount",
+      };
+    }
+
+    if (finalamountInUSD > currentBalance) {
+      return {
+        status: false,
+        message: "Insufficient funds",
+      };
+    }
+
+    if (finalamountInUSD <= INSTASEND_WITHDRAWAL_LIMIT) {
+      return {
+        status: false,
+        message: "Amount less than minimum withdrawal amount",
+      };
+    }
+
+    const games = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+      },
+    });
+
+    console.log("Games played by user ->", games);
+    if (games < 3) {
+      console.log("Less number of games played by user -> ", games);
+      return {
+        status: false,
+        message: "Please play atleast 3 games before withdrawing money.",
+      };
+    }
+
+    return {
+      status: true,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      message: "Internal Server Error",
+    };
+  }
+}
+
+export async function depositChecks(
+  amount: number,
+  currency: string,
+  finalamountInUSD: number
+) {
+  try {
+    if (!amount || !currency) {
+      return {
+        status: false,
+        message: "Please provide a valid amount to be deposited and currency",
+      };
+    }
+
+    if (finalamountInUSD <= 5) {
+      return {
+        status: false,
+        message: "Please provide a amount more than 5 dollars",
+      };
+    }
+    return {
+      status: true,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      message: "Internal Server Error",
+    };
   }
 }

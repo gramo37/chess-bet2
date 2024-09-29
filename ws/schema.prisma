@@ -134,6 +134,7 @@ enum TransactionStatus {
   PENDING
   COMPLETED
   CANCELLED
+  REQUESTED
 }
 
 enum Roles {

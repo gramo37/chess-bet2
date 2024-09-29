@@ -15,10 +15,7 @@ import {
   BACKEND_URL,
   FRONTEND_URL,
 } from "../../constants";
-import {
-  generateUniqueId,
-  getFinalAmountInUSD,
-} from "../../utils";
+import { generateUniqueId, getFinalAmountInUSD } from "../../utils";
 import axios from "axios";
 import { db } from "../../db";
 import { BACKEND_ROUTE } from "../..";
@@ -96,7 +93,7 @@ export const getURL = async (req: Request, res: Response) => {
         userID: user.id,
         amount,
         signature,
-        checkout_id: data.result.order_id, 
+        checkout_id: data.result.order_id,
         api_ref,
         currency,
         finalamountInUSD,
@@ -138,14 +135,13 @@ export const successTransaction = async (req: any, res: Response) => {
     const { order_id, sign } = req.body;
 
     console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
-    if (NODE_ENV === "development")
-      console.log("Order id", order_id);
+    if (NODE_ENV === "development") console.log("Order id", order_id);
 
-    if(!sign) {
+    if (!sign) {
       return res.status(401).json({
         status: false,
-        message: "Unauthorized User"
-      })
+        message: "Unauthorized User",
+      });
     }
 
     const data = JSON.parse(req.rawBody);
@@ -153,8 +149,8 @@ export const successTransaction = async (req: any, res: Response) => {
     delete data.sign;
 
     const bufferData = Buffer.from(JSON.stringify(data))
-    .toString("base64")
-    .concat(CRYPTO_PAYMENT_API_KEY);
+      .toString("base64")
+      .concat(CRYPTO_PAYMENT_API_KEY);
 
     const hash = generateSignature(bufferData);
 
@@ -188,7 +184,7 @@ export const successTransaction = async (req: any, res: Response) => {
     // Check for if the transaction is pending
     if (transaction.status !== "PENDING") {
       return res.status(401).json({
-        message: "Transaction already completed or cancelled",
+        message: "Transaction already completed, cancelled or requested",
         status: "error",
       });
     }
@@ -243,11 +239,11 @@ export const withdraw = async (req: Request, res: Response) => {
       user
     );
 
-    if(!withdrawalCheck.status) {
+    if (!withdrawalCheck.status) {
       return res.status(400).json({
         status: false,
-        message: withdrawalCheck.message
-      })
+        message: withdrawalCheck.message,
+      });
     }
 
     // Initiate the transaction and set its status to 'PENDING'
@@ -268,7 +264,12 @@ export const withdraw = async (req: Request, res: Response) => {
       },
     });
 
-    const withdrawSuccess = await withdrawCryptoToUser(amount, account, user, checkout_id);
+    const withdrawSuccess = await withdrawCryptoToUser(
+      amount,
+      account,
+      user,
+      checkout_id
+    );
 
     if (!withdrawSuccess) {
       // If sending to the user failed, update transaction status to 'CANCELLED'
@@ -306,18 +307,83 @@ export const withdraw = async (req: Request, res: Response) => {
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object
     });
-
   } catch (error) {
     console.log(error),
-    res.status(500).json({ message: "Internal server error", status: "error" });
+      res
+        .status(500)
+        .json({ message: "Internal server error", status: "error" });
   }
-}
+};
 
 // Callback for approving crypto withdrawals
 // Update the status of transaction to COMPLETED
-export const approveWithdrawal = async (req: Request, res: Response) => {
+export const approveWithdrawal = async (req: any, res: Response) => {
   try {
-    const {} = req.body;
+    const { order_id, sign } = req.body;
+
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
+    if (NODE_ENV === "development") console.log("Order id", order_id);
+
+    if (!sign) {
+      return res.status(401).json({
+        status: false,
+        message: "Unauthorized User",
+      });
+    }
+
+    const data = JSON.parse(req.rawBody);
+
+    delete data.sign;
+
+    const bufferData = Buffer.from(JSON.stringify(data))
+      .toString("base64")
+      .concat(CRYPTO_PAYMENT_API_KEY);
+
+    const hash = generateSignature(bufferData);
+
+    if (hash !== sign) {
+      return res.status(401).json({
+        message: "Unauthorized Transaction",
+        status: "error",
+      });
+    }
+
+    // Check for the transaction using signature and checkout_id
+    const transaction = await db.transaction.findFirst({
+      where: {
+        checkout_id: order_id,
+        mode: "crypto",
+      },
+      select: {
+        id: true,
+        userId: true,
+        finalamountInUSD: true,
+        status: true,
+        secret_token: true,
+      },
+    });
+
+    if (!transaction)
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", status: "error" });
+
+    // Check for if the transaction is pending
+    if (transaction.status !== "REQUESTED") {
+      return res.status(401).json({
+        message: "Transaction is pending, completed or cancelled",
+        status: "error",
+      });
+    }
+
+    // Update transaction it as successful
+    await db.transaction.update({
+      where: { id: transaction.id },
+      data: {
+        status: "COMPLETED", // Mark transaction as completed
+      },
+    }),
+      res.redirect(`${FRONTEND_URL}/account`);
   } catch (error) {
     console.error("Error Approving Crypto Withdrawal:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

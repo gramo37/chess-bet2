@@ -170,18 +170,24 @@ if(role === 'MODRATOR') {
           balance:true,
           rating:true,
           status:true,
-          gamesAsWhite: { select: { id: true, status: true ,result:true} },
-          gamesAsBlack: { select: { id: true, status: true ,result:true} },
+          gamesAsWhite: { select: { id: true, status: true ,result:true,stake:true} },
+          gamesAsBlack: { select: { id: true, status: true ,result:true ,stake:true} },
           transactions: { select: { id: true, amount: true, status: true } },
         },
       });
-     console.log(user);
      
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
+      const whiteWins = user.gamesAsWhite.filter((game:any)=>game.status==='COMPLETED'&&game.result==="WHITE_WINS");
+      const blackWins = user.gamesAsBlack.filter((game:any)=>game.status==='COMPLETED'&&game.result==='BLACK_WINS');
+      const totalEarnings =
+        [...whiteWins, ...blackWins]
+          .map(game => parseFloat(game.stake))
+          .reduce((acc, stake) => acc + stake * 0.85, 0);
+  console.log(whiteWins,blackWins);
   
-      res.status(200).json(user);
+      res.status(200).json({...user,totalEarnings});
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Internal server error" });

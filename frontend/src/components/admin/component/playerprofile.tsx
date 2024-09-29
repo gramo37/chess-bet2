@@ -163,6 +163,10 @@ const PlayerProfile: React.FC = () => {
           <span className="font-semibold text-gray-700">Status:</span>{" "}
           {player.status}
         </div>
+        <div className="text-gray-600 text-lg mb-4">
+          <span className="font-semibold text-gray-700">Total Earnings: </span>
+          {player.totalEarnings} $
+        </div>
         <div className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Balance:</span>{" "}
           <span className="text-green-600">${player.balance.toFixed(2)}</span>
@@ -189,19 +193,14 @@ const PlayerProfile: React.FC = () => {
         ...player.gamesAsBlack.map((game:any) => ({ ...game, color: 'Black' }))].map((game: any) => (
         <li
           key={game.id}
-          className="bg-gray-100 p-4 rounded-md shadow-sm"
-        >
+          className="bg-gray-100 p-4 flex justify-between rounded-md shadow-sm"
+        ><div>
+
           <p className="text-gray-800">
             <span className="font-semibold">Game ID:</span> {game.id}
           </p>
           <p className="text-gray-600">
-            <span className="font-semibold">Color:</span> {game.color}
-          </p>
-          <p className="text-gray-600">
-            <span className="font-semibold">Status:</span> {game.status}
-          </p>
-          <p className="text-gray-600">
-            <span className="font-semibold">Result:</span>{" "}
+            <span className="font-semibold">Result:</span>
             {game.result ? (
               game.result === 'WHITE_WINS' ? (
                 <span className={game.color === 'White' ? 'text-green-500' : 'text-red-500'}>
@@ -218,6 +217,7 @@ const PlayerProfile: React.FC = () => {
               "N/A"
             )}
           </p>
+          
           {(user && user.role === 'ADMIN') && (
             <p
               className="font-semibold cursor-pointer inline text-blue-500 hover:underline"
@@ -226,6 +226,20 @@ const PlayerProfile: React.FC = () => {
               Game Report
             </p>
           )}
+        </div>
+<div>
+<p className="text-gray-600">
+            <span className="font-semibold">Color:</span> {game.color}
+          </p>
+          
+          <p className="text-gray-600">
+            <span className="font-semibold">Status:</span> {game.status}
+          </p>
+          
+          <p className="text-gray-600">
+            <span className="font-semibold">Stake:</span> {game.stake}
+          </p>
+          </div>
         </li>
       ))}
     </ul>
@@ -247,7 +261,7 @@ const PlayerProfile: React.FC = () => {
                   className="bg-gray-100 p-4 rounded-md shadow-sm"
                 >
                   <p className="text-gray-800">
-                    <span className="font-semibold">Transaction ID:</span>{" "}
+                    <span className="font-semibold">Transaction ID:</span>
                     {transaction.id}
                   </p>
                   <p className="text-gray-600">

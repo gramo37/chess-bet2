@@ -61,6 +61,10 @@ export const withdrawMPesaToUser = async (
   }
 };
 
+export const generateSignature = (data: string) => {
+  return crypto.createHash("md5").update(data).digest("hex");
+};
+
 export const withdrawCryptoToUser = async (
   amount: number,
   account: string,
@@ -75,7 +79,7 @@ export const withdrawCryptoToUser = async (
       currency: "USDT",
       network: "TRON",
       address: account,
-      url_callback: `${BACKEND_URL}/payments/update-withdrawal`,
+      url_callback: `${BACKEND_URL}/payments/crypto/approve/withdraw`,
       is_subtract: "1",
       order_id: checkout_id,
     };
@@ -109,10 +113,6 @@ export const withdrawCryptoToUser = async (
     console.log("Error in payment to user", error, "" + error);
     return false;
   }
-};
-
-export const generateSignature = (data: string) => {
-  return crypto.createHash("md5").update(data).digest("hex");
 };
 
 export async function createTransaction({

@@ -13,7 +13,6 @@ import {
   INTASEND_PUBLISHABLE_KEY,
   INTASEND_SECRET_KEY,
   REDIRECT_URL,
-  INSTASEND_WITHDRAWAL_LIMIT,
   NODE_ENV,
 } from "../../constants";
 import {
@@ -22,6 +21,7 @@ import {
   getFinalAmountInUSD,
   isValidEmail,
 } from "../../utils";
+import { WithdrawalRequestNotification } from "../auth/verify";
 
 export const getURL = async (req: Request, res: Response) => {
   try {
@@ -304,6 +304,7 @@ export const withdraw = async (req: Request, res: Response) => {
       }),
     ]);
 
+    WithdrawalRequestNotification(transaction.finalamountInUSD,transaction.id);
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object

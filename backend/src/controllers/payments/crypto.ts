@@ -3,9 +3,10 @@ import {
   createTransaction,
   depositChecks,
   generateSignature,
+  withdrawalChecks,
+  withdrawCryptoToUser,
 } from "../../utils/payment";
 import {
-  REDIRECT_URL,
   CRYPTO_DEPOSIT_PERCENT,
   CRYTPOMUS_URI,
   CRYPTO_MERCHANT_ID,
@@ -95,7 +96,7 @@ export const getURL = async (req: Request, res: Response) => {
         userID: user.id,
         amount,
         signature,
-        checkout_id: data.result.order_id, // We will get this from data
+        checkout_id: data.result.order_id, 
         api_ref,
         currency,
         finalamountInUSD,
@@ -138,7 +139,7 @@ export const successTransaction = async (req: any, res: Response) => {
 
     console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
     if (NODE_ENV === "development")
-      console.log("Secret Token", order_id);
+      console.log("Order id", order_id);
 
     if(!sign) {
       return res.status(401).json({
@@ -219,6 +220,98 @@ export const successTransaction = async (req: any, res: Response) => {
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };
+
+export const withdraw = async (req: Request, res: Response) => {
+  try {
+    let { amount, account, currency } = req.body;
+    amount = Number(amount);
+    const user: any = (req?.user as any)?.user;
+    const currentBalance = user?.balance;
+
+    const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
+
+    if (!finalamountInUSD)
+      return res
+        .status(500)
+        .json({ message: "Invalid currency or amount", status: "error" });
+
+    const withdrawalCheck = await withdrawalChecks(
+      amount,
+      finalamountInUSD,
+      account,
+      currentBalance,
+      user
+    );
+
+    if(!withdrawalCheck.status) {
+      return res.status(400).json({
+        status: false,
+        message: withdrawalCheck.message
+      })
+    }
+
+    // Initiate the transaction and set its status to 'PENDING'
+    const platform_charges = finalamountInUSD * 0.1;
+    const checkout_id = generateUniqueId();
+    const transaction = await db.transaction.create({
+      data: {
+        userId: user.id,
+        amount: amount,
+        type: "WITHDRAWAL",
+        status: "PENDING",
+        // TODO: Temporary change
+        signature: "",
+        checkout_id,
+        finalamountInUSD: finalamountInUSD - platform_charges,
+        platform_charges,
+        mode: "mpesa",
+      },
+    });
+
+    const withdrawSuccess = await withdrawCryptoToUser(amount, account, user, checkout_id);
+
+    if (!withdrawSuccess) {
+      // If sending to the user failed, update transaction status to 'CANCELLED'
+      await db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "CANCELLED",
+        },
+      });
+      return res.status(500).json({
+        message:
+          "Something went wrong when sending money to the user's account",
+      });
+    }
+
+    // If sending to the user succeeded, update balance and mark transaction as 'COMPLETED'
+    await db.$transaction([
+      db.user.update({
+        where: {
+          email: user.email,
+        },
+        data: {
+          balance: currentBalance - finalamountInUSD,
+        },
+      }),
+      db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "REQUESTED",
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      message: "Money withdrawal initiated! Kindly wait till it is approved.",
+      transaction, // Return the transaction object
+    });
+
+  } catch (error) {
+    console.log(error),
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+}
 
 // Callback for approving crypto withdrawals
 // Update the status of transaction to COMPLETED

@@ -132,13 +132,13 @@ window.location.reload();
         <div className="font-mono bg-gray-100 p-2 rounded-lg my-3"><strong>Board State:</strong> {game.board}</div>
         <div className="flex justify-between">
           <div className="w-[60%]">
-            <Chessboard position={game.board} />
+          <Chessboard position={game.board} arePiecesDraggable={false}/>
           </div>
           <div>
-            <p className="font-semibold text-blue-500 cursor-pointer hover:underline" onClick={() => onViewProfile(game.blackPlayer.id)}>
+            <p className="font-semibold text-blue-500 inline cursor-pointer hover:underline" onClick={() => onViewProfile(game.blackPlayer.id)}>
               Black player: {game.blackPlayer.name}
             </p>
-            <p className="font-semibold text-blue-500 cursor-pointer hover:underline" onClick={() => onViewProfile(game.whitePlayer.id)}>
+            <p className="font-semibold text-blue-500 inline cursor-pointer hover:underline" onClick={() => onViewProfile(game.whitePlayer.id)}>
               White player: {game.whitePlayer.name}
             </p>
             <h3 className="text-xl font-semibold text-gray-700">Moves Made</h3>

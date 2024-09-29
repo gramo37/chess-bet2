@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../../../constants/routes";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
-import { updateUser } from "../fetch";
+import { delUser, updateUser } from "../fetch";
 import usePersonStore from "../../../contexts/auth";
 import { useGetUser } from "../../../hooks/useGetUser";
 
@@ -110,27 +110,28 @@ const PlayerProfile: React.FC = () => {
    function DeleteUser() {
     if (!id) return;
   
-    const confirmation = prompt("ARE YOU SURE TO DELETE THIS USER? THEN TYPE 'YES'");
-    if (confirmation !== 'YES') {
-      return;
-    }
+    const confirmation = prompt("ARE YOU SURE TO BAN THIS USER PERMANENTLY? THEN TYPE 'YES'");
+    if (confirmation !== 'YES') return;
+
+    const reason = prompt("WHY DO U WANT TO PERMANENTLY BAN THIS USER?");
+    if(!reason)return;
     
-    // delUser(id)
+    delUser(id,reason)
   }
   
 
   return (
-    <div className="flex flex-col w-full items-center p-8 min-h-screen">
+    <div className="flex flex-col w-full items-center p-8 min-h-screen ">
       <a className="absolute top-10 left-10 text-white" href="/dashboard">
         <IoMdArrowBack />
       </a>
       <div className="p-6 bg-gray-50 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">
+          <h1 className="text-3xl font-bold mb-6 text-gray-800 capitalize">
             {player.name}'s Profile
           </h1>
 
-          {(user&&user.role==='ADMIN')&&<div>
+          {(user&&user.role==='ADMIN'&&player.status!=='BANNED')&&<div>
             {player.status === "ACTIVE" && (
               <button
                 className="bg-yellow-500 rounded-lg text-white px-3 py-1 m-2"
@@ -147,93 +148,91 @@ const PlayerProfile: React.FC = () => {
                 ACTIVATE
               </button>
             )}
-            {player.status==="DELETED"&&<button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2" onClick={DeleteUser}>
-              Delete
+            {player.status!=="BANNED"&&<button className="bg-red-500 px-3 rounded-lg text-white py-1 m-2" onClick={DeleteUser}>
+              BANNED
             </button>}
             
           </div>}
         </div>
 
-        <p className="text-gray-600 text-lg mb-4">
+        <div className="text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Email:</span>{" "}
           {player.email}
-        </p>
-        <p className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg mb-4">
+        </div>
+        <div className="text-gray-600 text-lg mb-4">
+          <span className="font-semibold text-gray-700">Status:</span>{" "}
+          {player.status}
+        </div>
+        <div className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Balance:</span>{" "}
           <span className="text-green-600">${player.balance.toFixed(2)}</span>
           {user&&user.role==="ADMIN"&&<div onClick={() => Edit("balance")}>
             <MdEdit />
           </div>}
-        </p>
-        <p className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg mb-4">
+        </div>
+        <div className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg mb-4">
           <span className="font-semibold text-gray-700">Rating:</span>{" "}
           <span className="text-indigo-600">{player.rating}</span>
           <div onClick={() => Edit("rating")}>
             <MdEdit />
           </div>
-        </p>
+        </div>
 
         {/* Games as White */}
         <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
-            Games as White
-          </h2>
-          {player.gamesAsWhite.length > 0 ? (
-            <ul className="space-y-2">
-              {player.gamesAsWhite.map((game: any) => (
-                <li
-                  key={game.id}
-                  className="bg-gray-100 p-4 rounded-md shadow-sm"
-                >
-                  <p className="text-gray-800">
-                    <span className="font-semibold">Game ID:</span> {game.id}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Status:</span> {game.status}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Result:</span>{" "}
-                    {game.result || "N/A"}
-                  </p>
-              {(user&&user.role==='ADMIN')&&<p className="font-semibold cursor-pointer text-blue-500 hover:underline" onClick={() => onViewProfile(game.id)}>Game Report</p>}
-
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">No games as White player.</p>
+  <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
+    Games Played
+  </h2>
+  {player.gamesAsWhite.length > 0 || player.gamesAsBlack.length > 0 ? (
+    <ul className="space-y-2">
+      {[...player.gamesAsWhite.map((game:any) => ({ ...game, color: 'White' })), 
+        ...player.gamesAsBlack.map((game:any) => ({ ...game, color: 'Black' }))].map((game: any) => (
+        <li
+          key={game.id}
+          className="bg-gray-100 p-4 rounded-md shadow-sm"
+        >
+          <p className="text-gray-800">
+            <span className="font-semibold">Game ID:</span> {game.id}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold">Color:</span> {game.color}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold">Status:</span> {game.status}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold">Result:</span>{" "}
+            {game.result ? (
+              game.result === 'WHITE_WINS' ? (
+                <span className={game.color === 'White' ? 'text-green-500' : 'text-red-500'}>
+                  {game.result} ({game.color === 'White' ? 'Won' : 'Lost'})
+                </span>
+              ) : game.result === 'BLACK_WINS' ? (
+                <span className={game.color === 'Black' ? 'text-green-500' : 'text-red-500'}>
+                  {game.result} ({game.color === 'Black' ? 'Won' : 'Lost'})
+                </span>
+              ) : (
+                <span>{game.result}</span>
+              )
+            ) : (
+              "N/A"
+            )}
+          </p>
+          {(user && user.role === 'ADMIN') && (
+            <p
+              className="font-semibold cursor-pointer inline text-blue-500 hover:underline"
+              onClick={() => onViewProfile(game.id)}
+            >
+              Game Report
+            </p>
           )}
-        </div>
-
-        {/* Games as Black */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
-            Games as Black
-          </h2>
-          {player.gamesAsBlack.length > 0 ? (
-            <ul className="space-y-2">
-              {player.gamesAsBlack.map((game: any) => (
-                <li
-                  key={game.id}
-                  className="bg-gray-100 p-4 rounded-md shadow-sm"
-                >
-                  <p className="text-gray-800">
-                    <span className="font-semibold">Game ID:</span> {game.id}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Status:</span> {game.status}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Result:</span>{" "}
-                    {game.result || "N/A"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">No games as Black player.</p>
-          )}
-        </div>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-gray-500 italic">No games played as White or Black player.</p>
+  )}
+</div>
 
         {/* Transactions */}
         <div className="mt-6">

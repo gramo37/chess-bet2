@@ -32,6 +32,20 @@ const GameHistory: React.FC = () => {
     queryFn: fetchGameHistory,
   });
 
+    function getWinner(game: any) {
+      if (!user || !user.id) return;
+      if (game.result === "WHITE_WINS") {
+          if (game.whitePlayer.id === user.id) return 'WON';
+          else return 'LOST';
+      } else if (game.result === "BLACK_WINS") {
+          if (game.blackPlayer.id === user.id) return 'WON';
+          else return 'LOST';
+      } else {
+          return 'DRAW';
+      }
+  }
+
+
   if (error) {
     return <div className="text-center py-6 text-red-500">{error.message}</div>;
   }
@@ -82,9 +96,12 @@ const GameHistory: React.FC = () => {
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {game.status}
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-600">
-                    {game.result || "N/A"}
-                  </td>
+                  <td className="text-sm text-gray-600">
+    {game.result.replace('_'," ")} 
+    <span className={getWinner(game) === 'WON' ? 'text-green-600' : getWinner(game) === 'LOST' ? 'text-red-600' : 'text-yellow-600' + "text-xs"}>
+        {` (${getWinner(game)})`}
+    </span>
+</td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {new Date(game.startTime).toLocaleString()}
                   </td>

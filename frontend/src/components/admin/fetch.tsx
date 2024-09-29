@@ -88,7 +88,7 @@ export async function fetchedStatsData(type: string, date: Date | null) {
   }
 }
 
-export async  function delUser (id:string){
+export async  function delUser (id:string,message:string){
   const url = `${BACKEND_URL}/admin/users/${id}`;
 
   try {
@@ -100,17 +100,17 @@ export async  function delUser (id:string){
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body:JSON.stringify({message})
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to delete user");
     }
-
-    alert("User deleted successfully.");
-    // Add any additional logic after successful deletion (e.g., refreshing a list of users)
+const data = await response.json();
+    alert(data.message);
 
   } catch (error: any) {
     alert(`Error: ${error.message}`);
-    console.error("Error deleting user:", error);
+    console.error("Error banning user:", error);
   }}

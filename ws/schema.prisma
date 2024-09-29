@@ -146,5 +146,5 @@ enum Roles {
 enum UserStatus {
   ACTIVE
   SUSPENDED
-  DELETED
+  BANNED
 }

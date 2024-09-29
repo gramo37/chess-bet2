@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import { db } from "../../db";
+import { SendUserActivationNotification, SendUserBannedNotification, SendUserSuspentionNotification } from "../auth/verify";
 
 export async function UpdateUserRating(req:Request,res:Response){
     const { id } = req.params;
@@ -99,12 +100,24 @@ export async function SuspendUserAccount(req: Request, res: Response) {
     if (!id) {
         return res.status(400).json({ error: "userId is required" });
     }
-
+       
     try {
+        const user = await db.user.findUnique({
+            where: { id: id },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (user.status!=='ACTIVE') {
+            return res.status(404).json({ error: "This user has been banned" });
+        }
+
         const updatedUser = await db.user.update({
             where: { id: id },
             data: { status: "SUSPENDED" }, // Change this to a dedicated SUSPENDED role if needed
         });
+        SendUserSuspentionNotification(updatedUser.email);
 
         res.status(200).json({ message: "User account suspended", user: updatedUser });
     } catch (error) {
@@ -114,16 +127,27 @@ export async function SuspendUserAccount(req: Request, res: Response) {
 
 export async function ActiveUserAccount(req: Request, res: Response) {
     const {id}=req.params
-
     if (!id) {
         return res.status(400).json({ error: "userId is required" });
     }
 
     try {
+        const user = await db.user.findUnique({
+            where: { id: id },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (user.status!=='SUSPENDED') {
+            return res.status(404).json({ error: "This user has been banned" });
+        }
         const updatedUser = await db.user.update({
             where: { id: id },
             data: { status: "ACTIVE" }, // Change this to a dedicated SUSPENDED role if needed
         });
+        SendUserActivationNotification(updatedUser.email);
+        
 
         res.status(200).json({ message: "User account Activated", user: updatedUser });
     } catch (error) {
@@ -133,8 +157,9 @@ export async function ActiveUserAccount(req: Request, res: Response) {
 
 
 
-export async function DeleteUserAccount(req: Request, res: Response) {
+export async function BannedUserAccount(req: Request, res: Response) {
     const { id } = req.params;
+    const {message}=req.body;
 
     if (!id) {
         return res.status(400).json({ error: "userId is required" });
@@ -150,15 +175,16 @@ export async function DeleteUserAccount(req: Request, res: Response) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // const updatedUser = await db.user.update({
-        //     where: { id: id },
-        //     data: { status: "BANNED" }, 
-        // });
+        const updatedUser = await db.user.update({
+            where: { id: id },
+            data: { status: "BANNED" }, 
+        });
+        
+        SendUserBannedNotification(updatedUser.email,message);
 
-
-        res.status(200).json({ message: "User account Deleted, data retained" });
+        res.status(200).json({ message: "User account Banned" });
     } catch (error) {
-        res.status(500).json({ error: "Failed to delete user account", details: error });
+        res.status(500).json({ error: "Failed to ban user account", details: error });
     }
 }
 

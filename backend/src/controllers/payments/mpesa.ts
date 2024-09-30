@@ -186,7 +186,13 @@ export const successTransaction = async (req: Request, res: Response) => {
     }
 
     // Check for if the transaction is pending
-    if (transaction.status !== "PENDING") {
+    if (transaction.status === "COMPLETED") {
+      return res.status(200).json({
+        message: "Payment Successful",
+      });
+    }
+
+    if (transaction.status === "CANCELLED") {
       return res.status(401).json({
         message: "Transaction already completed or cancelled",
         status: "error",

@@ -11,7 +11,7 @@ const Crypto = () => {
 
   const handleCryptoWithdrawal = async () => {
     try {
-      const url = `${BACKEND_URL}/payments/crypto/withdraw-money`;
+      const url = `${BACKEND_URL}/payments/crypto/withdraw`;
 
       const response = await axios.post(
         url,

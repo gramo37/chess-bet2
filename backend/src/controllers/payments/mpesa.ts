@@ -14,6 +14,7 @@ import {
   INTASEND_SECRET_KEY,
   REDIRECT_URL,
   NODE_ENV,
+  INSTASEND_CHALLENGE,
 } from "../../constants";
 import {
   compareHash,
@@ -38,13 +39,17 @@ export const getURL = async (req: Request, res: Response) => {
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
 
-    const depositCheck = await depositChecks(amount, currency, finalamountInUSD);
+    const depositCheck = await depositChecks(
+      amount,
+      currency,
+      finalamountInUSD
+    );
 
-    if(!depositCheck.status) {
+    if (!depositCheck.status) {
       return res.status(400).json({
         status: false,
-        message: depositCheck.message
-      })
+        message: depositCheck.message,
+      });
     }
 
     const platform_charges = parseFloat(
@@ -243,11 +248,11 @@ export const withdraw = async (req: Request, res: Response) => {
       user
     );
 
-    if(!withdrawalCheck.status) {
+    if (!withdrawalCheck.status) {
       return res.status(400).json({
         status: false,
-        message: withdrawalCheck.message
-      })
+        message: withdrawalCheck.message,
+      });
     }
 
     // Initiate the transaction and set its status to 'PENDING'
@@ -304,7 +309,7 @@ export const withdraw = async (req: Request, res: Response) => {
       }),
     ]);
 
-    WithdrawalRequestNotification(transaction.finalamountInUSD,transaction.id);
+    WithdrawalRequestNotification(transaction.finalamountInUSD, transaction.id);
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object
@@ -347,6 +352,91 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error withdrawing Money:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const validateTransaction = async (req: Request, res: Response) => {
+  try {
+    const { api_ref, challenge, state } = req.body;
+    // Check for challenge and match it
+    if(challenge !== INSTASEND_CHALLENGE) {
+      return res.status(400).json({
+        status: "error",
+        message: "User is unauthorized"
+      })
+    }
+
+    // Check for api_ref and match it
+    const transaction = await db.transaction.findFirst({
+      where: {
+        api_ref,
+      },
+      select: {
+        id: true,
+        userId: true,
+        finalamountInUSD: true,
+        status: true,
+        secret_token: true,
+      },
+    });
+
+    if (!transaction) {
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", status: "error" });
+    }
+
+    if (state !== "COMPLETE") {
+      await db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: ["PROCESSING", "PENDING"].includes(state)
+            ? "PENDING"
+            : "CANCELLED", 
+        },
+      });
+
+      return res.status(400).json({
+        message: `Status is ${state}`,
+        status: "error",
+      });
+    }
+
+    // Check for if the transaction is pending
+    if (transaction.status !== "PENDING") {
+      return res.status(401).json({
+        message: "Transaction already completed or cancelled",
+        status: "error",
+      });
+    }
+
+    // Update transaction it as successful
+    await db.$transaction([
+      db.user.update({
+        where: {
+          // email: user.email,
+          id: transaction.userId,
+        },
+        data: {
+          balance: {
+            increment: transaction.finalamountInUSD,
+          },
+        },
+      }),
+      db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "COMPLETED", // Mark transaction as completed
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      message: "Payment Successful",
+    });
+  } catch (error) {
+    console.error("Error Validating Deposit:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };

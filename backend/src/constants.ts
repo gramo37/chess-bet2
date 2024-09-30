@@ -16,6 +16,7 @@ export const INTASEND_IS_TEST = process.env.INTASEND_IS_TEST ? true : false; // 
 export const INSTASEND_DEPOSIT_PERCENT = process.env.INSTASEND_DEPOSIT_PERCENT ? Number(process.env.INSTASEND_DEPOSIT_PERCENT) : 0.035
 export const INSTASEND_WITHDRAWAL_CHARGE = process.env.INSTASEND_WITHDRAWAL_CHARGE ? Number(process.env.INSTASEND_WITHDRAWAL_CHARGE) : 10 // In USD
 export const INSTASEND_WITHDRAWAL_LIMIT = process.env.INSTASEND_WITHDRAWAL_LIMIT ? Number(process.env.INSTASEND_WITHDRAWAL_LIMIT) : 5;
+export const INSTASEND_CHALLENGE = process.env.INSTASEND_CHALLENGE ?? "ncvdsjkvnsdkjvkjsdnvkjsdnvjds"
 
 // Crpto related constants
 export const CRYPTO_DEPOSIT_PERCENT = process.env.CRYPTO_DEPOSIT_PERCENT ? Number(process.env.CRYPTO_DEPOSIT_PERCENT) : 0.035;

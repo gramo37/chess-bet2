@@ -9,29 +9,6 @@ import  updateUser from "../fetch/updateuser";
 import usePersonStore from "../../../contexts/auth";
 import { useGetUser } from "../../../hooks/useGetUser";
 import fetchPlayer from "../fetch/fetchplayer"
-// type Game = {
-//     id: string;
-//     status: string;
-//     result: string | null;
-//   };
-
-// type Transaction = {
-//   id: string;
-//   amount: number;
-//   status: string;
-// };
-
-// type Player = {
-//   id: string;
-//   name: string;
-//   email: string;
-//   balance: number;
-//   rating: number;
-//   status:string;
-//   gamesAsWhite: Game[];
-//   gamesAsBlack: Game[];
-//   transactions: Transaction[];
-// };
 
 const PlayerProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -254,8 +231,7 @@ data();
                     {transaction.id}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-semibold">Amount:</span> $
-                    {transaction.amount.toFixed(2)}
+                    <span className="font-semibold">Amount:</span> {transaction.currency + " "+ transaction.amount.toFixed(2)} 
                   </p>
                   <p className="text-gray-600">
                     <span className="font-semibold">Status:</span>{" "}

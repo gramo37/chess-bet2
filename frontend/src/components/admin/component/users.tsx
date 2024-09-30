@@ -4,10 +4,12 @@ import { usersProps } from "../schema";
 
 
 export const Users: React.FC<usersProps> = ({ users }) => {
-  const [statusFilter, setStatusFilter] = useState<string>("ALL"); // State to hold the selected status filter
-  const [roleFilter, setRoleFilter] = useState<string>("ALL"); // State to hold the selected role filter
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [roleFilter, setRoleFilter] = useState<string>("ALL"); 
+  const [search,setSearch]=useState("");
+  const [filterUsers,setFilterUsers]=useState(users);
   const user = usePersonStore((state) => state.user);
-
+  
   // Function to handle user profile view
   function onViewProfile(id: string): void {
     console.log(id);
@@ -16,17 +18,16 @@ export const Users: React.FC<usersProps> = ({ users }) => {
 
   // Filter users based on selected status and role
   const filteredUsers = users.filter((user) => {
-    const statusMatch = 
-      statusFilter === "ALL" || user.status === statusFilter;
-    const roleMatch = 
-      roleFilter === "ALL" || user.role === roleFilter;
-    return statusMatch && roleMatch;
+    const statusMatch = statusFilter === "ALL" || user.status === statusFilter;
+    const roleMatch = roleFilter === "ALL" || user.role === roleFilter;
+    const a = user.email.toLowerCase().includes(search.toLowerCase()) || user.name.toLowerCase().includes(search.toLowerCase());
+
+    return statusMatch && roleMatch && a;
   });
 
   return (
-    <div className="p-4">
-      <div className="mb-4 flex space-x-4">
-        {/* Status Filter */}
+    <div className="p-4 w-full">
+      <div className="mb-4 flex flex-wrap space-x-4 w-full">
         <select 
           value={statusFilter} 
           onChange={(e) => setStatusFilter(e.target.value)} 
@@ -47,8 +48,10 @@ export const Users: React.FC<usersProps> = ({ users }) => {
           <option value="ALL">All Roles</option>
           <option value="MODRATOR">Modrator</option>
           <option value="USER">User</option>
-          {/* Add more roles as needed */}
         </select>}
+        <div className="flex gap-2">
+          <input type="text" placeholder="Search user by Email or Name" value={search} onChange={(e)=>setSearch(e.target.value)} className="py-2 max-w-[80%] w-[400px] px-4 rounded" />
+        </div>
       </div>
       <div className="space-y-4">
         {filteredUsers.map((user) => (

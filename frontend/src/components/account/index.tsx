@@ -7,6 +7,7 @@ import { Report } from "./report";
 import DepositMoney from "./DepositMoney";
 import WithdrawMoney from "./WithdrawMoney";
 import { useNavigate } from "react-router-dom";
+import {ReportHistory} from "./reporthistory"
 
 export default function Account() {
   const user = usePersonStore((state) => state.user);
@@ -23,7 +24,7 @@ export default function Account() {
       case "withdraw":
         return <WithdrawMoney />;
       default:
-        return <TransactionHistory />;
+        return <ReportHistory />;
     }
   };
 
@@ -40,8 +41,8 @@ export default function Account() {
 
       <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
-      <h3 className="mb-2">Total Earnings: {user?.totalEarnings}$</h3>
-      <h3 className="mb-2">Balance: {user?.balance}$</h3>
+      <h3 className="mb-2">Total Earnings: $ {user?.totalEarnings}</h3>
+      <h3 className="mb-2">Balance: $ {user?.balance}</h3>
        
 
       <div className="flex space-x-3 w-full my-4">
@@ -68,7 +69,12 @@ export default function Account() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           tabKey="withdraw"
-        />
+        /><TabButton
+        title="Reports"
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        tabKey="reports"
+      />
       </div>
 
       <div className="mt-4">{renderActiveTab()}</div>

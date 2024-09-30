@@ -65,7 +65,7 @@ export default function Account() {
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
 
       <div className="flex justify-between items-center my-4">
-        <p>Balance: {user?.balance ? `${Number(user.balance).toFixed(2)}$` : "0$"}</p>
+        <p>Balance: {user?.balance ? `${"$ " + Number(user.balance).toFixed(2)}` : "$ 0"}</p>
 
         <select
           name="transactionType"

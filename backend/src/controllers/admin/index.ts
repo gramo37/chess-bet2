@@ -172,7 +172,7 @@ if(role === 'MODRATOR') {
           status:true,
           gamesAsWhite: { select: { id: true, status: true ,result:true,stake:true} },
           gamesAsBlack: { select: { id: true, status: true ,result:true ,stake:true} },
-          transactions: { select: { id: true, amount: true, status: true } },
+          transactions: { select: { id: true, amount: true, status: true , currency:true} },
         },
       });
      

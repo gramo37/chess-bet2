@@ -12,18 +12,14 @@ type UserReport = {
   updatedAt: string;
 };
 
-type UserReportsProps = {
-  token: string;
-  openModal:()=>void;
-};
-
-export function ReportHistory({ token,openModal }: UserReportsProps) {
+export function ReportHistory() {
   const [reports, setReports] = useState<UserReport[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchReports = async () => {
+      const token = localStorage.getItem('token');
       if (!token) {
         setError("Login again");
         setLoading(false);
@@ -48,33 +44,46 @@ export function ReportHistory({ token,openModal }: UserReportsProps) {
     };
 
     fetchReports();
-  }, [token,openModal]);
+  }, []);
 
   if (loading) return <Spinner/>;
   if (error) return <p>{error}</p>;
 
-  return (
-    <div className="mt-6 p-4 bg-gray-100 rounded-lg shadow-md max-w-md w-full">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">Your Reports</h2>
-      {reports.length === 0 ? (
-        <p className="text-gray-500">No reports found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {reports.map((report) => (
-            <li
-              key={report.id}
-              className="border border-gray-300 rounded-md p-4 bg-white hover:shadow-lg transition-shadow"
-            >
-              <h3 className="font-bold text-gray-800">{report.title}</h3>
-              <p className="text-gray-600">{report.description}</p>
-              <p className="text-gray-500 text-sm">
-                Status: <span className="font-medium">{report.status}</span> | Created at:{" "}
-                <span className="font-medium">{new Date(report.createdAt).toLocaleString()}</span>
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
+  return (<div className="container mx-auto px-4 py-8">
+    <div className="overflow-x-auto">
+      <div className="bg-white border border-gray-200 shadow-md">
+
+        {reports.length === 0 ? (
+          <div className="p-4 text-left text-gray-500">No reports found.</div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {reports.map((report) => (
+              <div
+                key={report.id}
+                className="p-4 hover:bg-gray-50 text-left transition-colors flex capitalize justify-between"
+              >
+                <div>
+                <h3 className="font-bold mb-2 text-gray-800">{report.title}</h3>
+                <p className="text-gray-600 mb-2">{report.description}</p>
+                </div>
+                <div className="text-gray-500 text-sm text-right">
+                <p className="mb-2">
+                  <span>Status: </span>
+                  <span className="font-medium">{report.status}</span>
+                  </p>
+                  <p className="mb-2">
+                  <span>Created at: </span>
+                  <span className="font-medium">
+                    {new Date(report.createdAt).toLocaleString()}
+                  </span>
+                </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
+  </div>
   );
 }

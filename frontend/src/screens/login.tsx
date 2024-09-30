@@ -26,7 +26,7 @@ export default function Login({ admin }: props) {
         },
         body: JSON.stringify({
           username: email,
-          password: password,
+          password: password,  
         }),
       });
 

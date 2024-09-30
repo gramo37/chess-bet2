@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchData } from "./fetch";
+import fetchData  from "./fetch/fetchdata";
 import { GamesList } from "./component/game";
 import { ReportsList } from "./component/report";
 import { TransactionsList } from "./component/transaction"

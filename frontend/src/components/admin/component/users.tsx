@@ -1,17 +1,7 @@
 import React, { useState } from "react";
 import usePersonStore from "../../../contexts/auth";
+import { usersProps } from "../schema";
 
-type user = {
-  email: string;
-  id: string;
-  name: string;
-  role: string;
-  status: string;
-};
-
-type usersProps = {
-  users: user[];
-};
 
 export const Users: React.FC<usersProps> = ({ users }) => {
   const [statusFilter, setStatusFilter] = useState<string>("ALL"); // State to hold the selected status filter

@@ -1,23 +1,6 @@
 import { BACKEND_URL } from "../../../constants/routes";
+import { ReportsListProps } from "../schema";
 
-type Report = {
-    id: string;
-    title: string;
-    description: string;
-    user: {
-      name: string;
-      email: string; // Added email to user
-      id: string;    // Added user ID
-    };
-    createdAt: string; // Timestamp of when the report was created
-    status: string; 
-  };
-  
-// ReportsList Component
-type ReportsListProps = {
-    reports: Report[];
-  };
-  
   export const ReportsList: React.FC<ReportsListProps> = ({ reports }) => {
     if (!reports || reports.length === 0)
       return <p className="text-gray-600">No Reports found </p>;

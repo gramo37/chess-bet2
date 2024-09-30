@@ -82,3 +82,35 @@ export const authorizeAdminModrator = async (req: Request, res: Response, next: 
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };
+
+
+export const getUserProfits = async (req:Request,res:Response,next:NextFunction)=>{
+  const id: any = (req?.user as any)?.user.id; 
+  
+try{
+  const user = await db.user.findUnique({
+    where: { id },
+    select: {
+      gamesAsWhite: { select: { id: true, status: true ,result:true,stake:true} },
+      gamesAsBlack: { select: { id: true, status: true ,result:true ,stake:true} },
+      transactions: { select: { id: true, amount: true, status: true } },
+    },
+  });
+ 
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  const whiteWins = user.gamesAsWhite.filter((game:any)=>game.status==='COMPLETED'&&game.result==="WHITE_WINS");
+  const blackWins = user.gamesAsBlack.filter((game:any)=>game.status==='COMPLETED'&&game.result==='BLACK_WINS');
+  const totalEarnings =
+    [...whiteWins, ...blackWins]
+      .map(game => parseFloat(game.stake))
+      .reduce((acc, stake) => acc + stake * 0.85, 0);
+      req.user = {...req.user,totalEarnings};
+      console.log(req.user);
+
+next();
+}catch(e){
+  return res.status(403).json({ message: "something happened fetching your profits" });
+}
+}

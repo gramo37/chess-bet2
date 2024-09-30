@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ReportsList } from "../admin/component/report";
 import { Users } from "../admin/component/users";
-import { fetchData } from "../admin/fetch";
+import fetchData  from "../admin/fetch/fetchdata";
 
 
 export default function ModratorDashboard(){

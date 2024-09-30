@@ -1,34 +1,5 @@
 import React from "react";
-// Define types for Game, Transaction, and Report
-interface Player {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: string | null;
-}
-
-interface Game {
-  id: string;
-  areBalancesUpdated: boolean;
-  blackPlayer: Player;
-  blackPlayerId: string;
-  board: string;
-  endTime: string;
-  gameOutCome: string;
-  isFriendly: boolean;
-  result: string;
-  stake: string;
-  startTime: string;
-  status: string;
-  whitePlayer: Player;
-  whitePlayerId: string;
-}
-
-
-// GamesList Component
-type GamesListProps = {
-  games: Game[];
-};
+import { GamesListProps } from "../schema";
 
 export const GamesList: React.FC<GamesListProps> = ({ games }) => {
   

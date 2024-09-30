@@ -4,10 +4,11 @@ import { BACKEND_URL } from "../../../constants/routes";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
-import { delUser, updateUser } from "../fetch";
+import  bannedUser from "../fetch/banneduser";
+import  updateUser from "../fetch/updateuser";
 import usePersonStore from "../../../contexts/auth";
 import { useGetUser } from "../../../hooks/useGetUser";
-
+import fetchPlayer from "../fetch/fetchplayer"
 // type Game = {
 //     id: string;
 //     status: string;
@@ -42,36 +43,19 @@ const PlayerProfile: React.FC = () => {
 
   useEffect(() => {
     console.log(id);
-
-    const fetchPlayer = async () => {
-      const url = `${BACKEND_URL}/admin/users/${id}`;
-      setIsLoading(true);
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure the token is passed
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Player not found");
-        }
-        const data = await response.json();
-        console.log(data);
-
-        setPlayer(data);
-      } catch (err) {
-        setError((err as Error).message);
-
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchPlayer();
+    const data = async ()=>{
+      try{
+  setIsLoading(true)
+  if(!id)throw Error("Player not found")
+  const player =await fetchPlayer(id);
+  setPlayer(player)
+}catch(e:any){
+  setError(e);
+}finally{
+  setIsLoading(false)
+}     
     }
+data();
   }, [id]);
 
   if (isLoading) {
@@ -116,7 +100,7 @@ const PlayerProfile: React.FC = () => {
     const reason = prompt("WHY DO U WANT TO PERMANENTLY BAN THIS USER?");
     if(!reason)return;
     
-    delUser(id,reason)
+    bannedUser(id,reason)
   }
   
 
@@ -154,33 +138,38 @@ const PlayerProfile: React.FC = () => {
             
           </div>}
         </div>
+<div className="flex justify-between">
+  <div>
 
-        <div className="text-gray-600 text-lg mb-4">
+        <div className="text-gray-600 text-lg">
           <span className="font-semibold text-gray-700">Email:</span>{" "}
           {player.email}
         </div>
-        <div className="text-gray-600 text-lg mb-4">
+        <div className="text-gray-600 text-lg">
           <span className="font-semibold text-gray-700">Status:</span>{" "}
           {player.status}
         </div>
-        <div className="text-gray-600 text-lg mb-4">
+        </div><div>
+        <div className="text-gray-600 text-lg ">
           <span className="font-semibold text-gray-700">Total Earnings: </span>
           {player.totalEarnings} $
         </div>
-        <div className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg mb-4">
+        <div className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg">
           <span className="font-semibold text-gray-700">Balance:</span>{" "}
           <span className="text-green-600">${player.balance.toFixed(2)}</span>
           {user&&user.role==="ADMIN"&&<div onClick={() => Edit("balance")}>
             <MdEdit />
           </div>}
         </div>
-        <div className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg mb-4">
+        <div className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg ">
           <span className="font-semibold text-gray-700">Rating:</span>{" "}
           <span className="text-indigo-600">{player.rating}</span>
           <div onClick={() => Edit("rating")}>
             <MdEdit />
           </div>
         </div>
+        </div>
+</div>
 
         {/* Games as White */}
         <div className="mt-6">

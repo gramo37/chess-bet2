@@ -371,6 +371,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
     const transaction = await db.transaction.findFirst({
       where: {
         api_ref,
+        type: "DEPOSIT"
       },
       select: {
         id: true,

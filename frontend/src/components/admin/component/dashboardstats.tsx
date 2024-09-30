@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { fetchedStatsData } from "../fetch";
+import { fetchedStatsData } from "../fetch/fetchstats";
 type User = {
   id: string;
   name: string;

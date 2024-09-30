@@ -1,25 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
+import { TransactionsListProps } from "../schema";
 
-// TransactionsList Component
-type Transaction = {
-    id: string;
-    amount: number;
-    createdAt: Date;
-    status: string;
-    type: string;
-    currency: string;
-    user: {
-      name: string;
-      email: string;
-      id: string;
-    };
-  };
-  
-type TransactionsListProps = {
-    transactions: Transaction[];
-  };
-  
   export const TransactionsList: React.FC<TransactionsListProps> = ({
     transactions,
   }) => {

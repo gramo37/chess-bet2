@@ -55,17 +55,15 @@ export default function GameProfile() {
       return;
     }
 
-    // Check if the new result is different from the current result
     if (newResult === game.result) {
       alert("The new result must be different from the current result.");
       return;
     }
 
-    // Prepare to send the update request
     const url = `${BACKEND_URL}/admin/game/${id}/result`;
     try {
       const response = await fetch(url, {
-        method: "PUT", // or "PUT" depending on your API
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -82,7 +80,7 @@ export default function GameProfile() {
       console.log(updatedGame.game);
       
       alert("Game result updated successfully!");
-window.location.reload();
+       window.location.reload();
     } catch (err) {
       setError((err as Error).message);
     }

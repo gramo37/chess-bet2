@@ -102,7 +102,7 @@ export async function BussinesProfits(req:Request,res:Response) {
         },
       });
   
-      // Convert stake from string to float and calculate business profits
+      // Convert stake from string to float and calculate business profits through games 
       const businessProfit =
         [...whiteWins, ...blackWins]
           .map(game => parseFloat(game.stake))

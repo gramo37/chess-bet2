@@ -12,7 +12,6 @@ export default function Account() {
   const user = usePersonStore((state) => state.user);
   const [activeTab, setActiveTab] = useState("transactions");
   const navigate = useNavigate()
-
   const renderActiveTab = () => {
     switch (activeTab) {
       case "transactions":
@@ -41,6 +40,9 @@ export default function Account() {
 
       <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
+      <h3 className="mb-2">Total Earnings: {user?.totalEarnings}$</h3>
+      <h3 className="mb-2">Balance: {user?.balance}$</h3>
+       
 
       <div className="flex space-x-3 w-full my-4">
         <TabButton

@@ -259,6 +259,9 @@ export const getAllReports = async (req: Request, res: Response) => {
           },
         },
       },
+      where:{
+status:"PENDING"
+      },
       orderBy: {
         createdAt: 'desc', // Order by created date, latest first
       },

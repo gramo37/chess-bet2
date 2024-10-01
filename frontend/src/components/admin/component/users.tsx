@@ -27,12 +27,13 @@ export const Users: React.FC<usersProps> = ({ users }) => {
 
   return (
     <div className="p-4 w-full">
-      <div className="mb-4 flex flex-wrap space-x-4 w-full">
+      <div className="mb-4 flex w-full flex-wrap justify-between space-x-4 w-full">
+        <div >
         <select 
           value={statusFilter} 
           onChange={(e) => setStatusFilter(e.target.value)} 
-          className="p-2 border border-gray-300 rounded"
-        >
+          className="p-2 border border-gray-300 rounded mr-3"
+          >
           <option value="ALL">All Users</option>
           <option value="ACTIVE">Active Users</option>
           <option value="SUSPENDED">Suspended Users</option>
@@ -41,17 +42,16 @@ export const Users: React.FC<usersProps> = ({ users }) => {
 
         {(user&&user.role==="ADMIN")&&
         <select 
-          value={roleFilter} 
-          onChange={(e) => setRoleFilter(e.target.value)} 
-          className="p-2 border border-gray-300 rounded"
+        value={roleFilter} 
+        onChange={(e) => setRoleFilter(e.target.value)} 
+        className="p-2 border border-gray-300 rounded"
         >
           <option value="ALL">All Roles</option>
           <option value="MODRATOR">Modrator</option>
           <option value="USER">User</option>
         </select>}
-        <div className="flex gap-2">
-          <input type="text" placeholder="Search user by Email or Name" value={search} onChange={(e)=>setSearch(e.target.value)} className="py-2 max-w-[80%] w-[400px] px-4 rounded" />
-        </div>
+          </div>
+          <input type="text" placeholder="Search user by Email or Name" value={search} onChange={(e)=>setSearch(e.target.value)} className="py-2 max-w-[60%] w-[500px] px-4 rounded" />
       </div>
       <div className="space-y-4">
         {filteredUsers.map((user) => (

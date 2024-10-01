@@ -93,9 +93,21 @@ model UserReport {
   status      ReportStatus @default(PENDING)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-
+  messages    ReportMessage[] 
   @@index([userId])
 }
+
+model ReportMessage {
+  id         String      @id @default(cuid())
+  report     UserReport  @relation(fields: [reportId], references: [id])
+  reportId   String
+  sender     Roles      
+  message    String
+  createdAt  DateTime    @default(now())
+
+  @@index([reportId])
+}
+
 
 enum ReportStatus {
   PENDING

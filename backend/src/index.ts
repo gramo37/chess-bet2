@@ -12,6 +12,7 @@ import crypto from "./routes/payments/crypto";
 import payment from "./routes/payments";
 import report from "./routes/report";
 import admin from "./routes/admin";
+import { checkTransactionStatus } from "./controllers/payments/crypto";
 
 dotenv.config();
 
@@ -52,6 +53,10 @@ app.use(`/${BACKEND_ROUTE}/admin/`, admin);
 
 cron.schedule("*/10 * * * * *", async function () {
   await sendMovesToDB();
+});
+
+cron.schedule('*/10 * * * * *', async () => {
+  await checkTransactionStatus();
 });
 
 // TODO: Create a cron job to update all old pending transactions (older than 5 mins) as Cancelled every 5mins

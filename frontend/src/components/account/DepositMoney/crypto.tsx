@@ -5,18 +5,21 @@ import axios from "axios";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [address, setAddress] = useState("");
+  const [currency, setCurrency] = useState("BTC");
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const user = usePersonStore((state) => state.user);
 
   const handleCryptoDeposit = async () => {
-    const url = `${BACKEND_URL}/payments/crypto/get-url`;
+    const url = `${BACKEND_URL}/payments/crypto/get-wallet-address`;
 
     try {
       const response = await axios.post(
         url,
         {
+          address: "", // Create a state variable for this
           amount: Number(amount),
-          currency
+          currency,
         },
         {
           headers: {
@@ -26,7 +29,8 @@ const Crypto = () => {
         }
       );
       const data = response.data;
-      window.location.href = data.paymentDetails;
+      setWalletAddress(data.wallet_address);
+      // window.location.href = data.paymentDetails;
     } catch (error) {
       console.error("Error during Deposit:", error);
       alert("Something went wrong. Please try again.");
@@ -44,14 +48,21 @@ const Crypto = () => {
           className="w-full p-2 rounded bg-gray-700 text-white"
           placeholder="Enter amount"
         />
+        <input
+          type="text"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full p-2 rounded bg-gray-700 text-white"
+          placeholder="Enter your wallet address"
+        />
         <select
           name="currency"
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
           className="px-4 rounded bg-gray-700 text-white"
         >
-          <option value="USD">USD</option>
-          <option value="KES">KES</option>
+          <option value="BTC">BTC</option>
+          <option value="ETH">ETH</option>
         </select>
       </div>
       <button
@@ -60,6 +71,13 @@ const Crypto = () => {
       >
         Deposit
       </button>
+      {walletAddress && (
+        <div className="mt-5">
+          <p className="text-white">Wallet Address - {walletAddress}</p>
+          <p className="text-red-500 mt-3">Kindly send money to the above address using your wallet address {address} and select the coin as {currency}.</p>
+          <p className="text-red-500 mt-3">Please make sure the wallet address and the currency matches. Your balance will be updated within 10-15 minutes</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -14,11 +14,190 @@ import {
   NODE_ENV,
   BACKEND_URL,
   FRONTEND_URL,
+  BINANCE_API_KEY,
+  BINANCE_SECRET_KEY,
 } from "../../constants";
 import { generateUniqueId, getFinalAmountInUSD } from "../../utils";
 import axios from "axios";
 import { db } from "../../db";
 import { BACKEND_ROUTE } from "../..";
+
+// Function to get the USD price of a cryptocurrency (BTC, ETH)
+async function convertCryptoToUSD(symbol: string, amount: number) {
+  try {
+    // Get the latest price for the symbol (e.g., BTCUSDT, ETHUSDT)
+    const prices = await client.prices();
+
+    // Symbol example: 'BTCUSDT' for Bitcoin to USD, 'ETHUSDT' for Ethereum to USD
+    const cryptoSymbol = `${symbol.toUpperCase()}USDT`; // e.g., 'BTCUSDT' or 'ETHUSDT'
+
+    // Get the current price in USD
+    const usdPrice = parseFloat(prices[cryptoSymbol]);
+
+    if (!usdPrice) {
+      throw new Error(`Price not available for ${symbol}`);
+    }
+
+    // Calculate the equivalent USD value for the given crypto amount
+    const usdValue = usdPrice * amount;
+
+    console.log(
+      `${amount} ${symbol} is equivalent to $${usdValue.toFixed(2)} USD`
+    );
+    return usdValue;
+  } catch (error: any) {
+    console.error("Error fetching price:", error.message);
+  }
+}
+
+const Binance = require("binance-api-node").default;
+
+const client = Binance({
+  apiKey: BINANCE_API_KEY,
+  apiSecret: BINANCE_SECRET_KEY,
+});
+
+export const checkTransactionStatus = async () => {
+  try {
+    // Get all successful transactions for past 15 mins
+    const currentTime = Date.now();
+    // Set the start time to 15 minutes ago
+    const fifteenMinutesAgo = currentTime - 15 * 60 * 1000;
+    const transactions = await client.depositHistory({
+      status: 1,
+      startTime: fifteenMinutesAgo,
+      endTime: currentTime,
+    });
+    console.log(
+      `Success Transactions between ${new Date(
+        fifteenMinutesAgo
+      )} and ${new Date(currentTime)}`
+    );
+    console.log(transactions);
+    console.log("Transaction Count: ", transactions.length);
+
+    if(!transactions || transactions.length === 0) {
+      return;
+    }
+
+    const conditions = transactions.map((transaction: any) => {
+      return {
+        wallet_address: transaction.address,
+        amount: transaction.amount,
+        mode: "crypto",
+        currency: transaction.coin,
+        status: "PENDING",
+      };
+    });
+
+    const dbTransactions = await db.transaction.findMany({
+      where: {
+        OR: conditions,
+      },
+    });
+
+    if (!dbTransactions || dbTransactions.length === 0) {
+      console.log("No pending transactions found in DB");
+      return;
+    }
+
+    // Example: Search for specific user and amount in the transaction history
+    for (let i = 0; i < dbTransactions.length; i++) {
+      const dbTransaction = transactions[i];
+      console.log(dbTransaction);
+
+      await db.$transaction([
+        db.transaction.update({
+          where: {
+            id: dbTransaction.id,
+          },
+          data: {
+            status: "COMPLETED",
+          },
+        }),
+        db.user.update({
+          where: {
+            id: dbTransaction.userId,
+          },
+          data: {
+            balance: {
+              increment: dbTransaction.finalamountInUSD,
+            },
+          },
+        }),
+      ]);
+
+      console.log("Transaction for ", dbTransaction, "updated");
+      console.log(
+        "Balance updated for User -> ",
+        dbTransaction?.userId,
+        "with $",
+        dbTransaction?.finalamountInUSD
+      );
+    }
+  } catch (error) {
+    console.error("Currency conversion error:", error);
+    throw new Error("Unable to convert currency.");
+  }
+};
+
+export const getId = async (req: Request, res: Response) => {
+  try {
+    let { address, amount, currency } = req.body;
+    const user: any = (req?.user as any)?.user;
+    const mode = "crypto";
+
+    amount = Number(amount);
+
+    if (!amount || !currency)
+      return res.status(404).json({
+        status: "error",
+        message: "Please provide amount currency, network",
+      });
+
+    const finalamountInUSD = await convertCryptoToUSD(currency, amount);
+
+    if (!finalamountInUSD)
+      return res
+        .status(500)
+        .json({ message: "Invalid currency", status: "error" });
+
+    await db.transaction.create({
+      data: {
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+        amount,
+        type: "DEPOSIT",
+        status: "PENDING",
+        signature: "",
+        checkout_id: "",
+        mode,
+        currency,
+        platform_charges: finalamountInUSD * 0.03,
+        finalamountInUSD,
+        wallet_address: address,
+      },
+    });
+
+    const depositAddress = await client.depositAddress({
+      coin: currency,
+      // network: network,
+    });
+
+    console.log(`Deposit Address for ${currency}: ${depositAddress.address}`);
+
+    res.status(200).json({
+      message: "success",
+      wallet_address: depositAddress.address,
+    });
+  } catch (error) {
+    console.error("Error Sending Crypto Payment URL2:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
 
 export const getURL = async (req: Request, res: Response) => {
   try {

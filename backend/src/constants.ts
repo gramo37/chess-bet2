@@ -25,5 +25,8 @@ export const CRYPTO_PAYMENT_API_KEY = process.env.CRYPTO_PAYMENT_API_KEY ?? ""
 export const CRYPTO_PAYOUT_API_KEY = process.env.CRYPTO_PAYOUT_API_KEY ?? ""
 export const CRYTPOMUS_URI = process.env.CRYTPOMUS_URI ?? "https://api.cryptomus.com/v1"
 
+export const BINANCE_SECRET_KEY = process.env.BINANCE_SECRET_KEY ?? "";
+export const BINANCE_API_KEY = process.env.BINANCE_API_KEY ?? ""
+
 // Currency related constants
 export const CURRENCY_RATE_URL = "https://open.er-api.com/v6/latest"

@@ -3,7 +3,6 @@ import { TbMessageReportFilled } from "react-icons/tb";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
-// import {ReportHistory} from "../account/reporthistory";
 type ReportProps = {
   token: string;
 };
@@ -42,16 +41,17 @@ return;
       });
   
       alert(response.data.message);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      closeModal();
     } catch (error:any) {
       if (error.response) {
-        // Server responded with a status other than 2xx
         alert(`Error: ${error.response.data.message}`);
       } else {
-        // Network error or other error
         console.error("Error creating report:", error);
         alert("Something went wrong, please try again later.");
       }
+    }finally{
+      setTitle("")
+      setDescription("")
     }
   }
   

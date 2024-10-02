@@ -27,13 +27,11 @@ getStats();
 
 async function getStats(){
     const date = calculateStartDate()
-    const fetchedStatsGames = await fetchedStatsData('daily-games',date);
-    const fetchedStatsProfits = await fetchedStatsData('business-profits',date)
-    const fetchedStatsUserWin = await fetchedStatsData("users-won-lost",date);
+    const fetchedStats = await fetchedStatsData(date);
 
-    setStatsGamePlayed(fetchedStatsGames.totalGamesPlayed);
-    setStatsProfits(fetchedStatsProfits.businessProfit);
-    setStatsWin(fetchedStatsUserWin.totalWinners);
+    setStatsGamePlayed(fetchedStats.totalGamesPlayed);
+    setStatsProfits(fetchedStats.businessProfit);
+    setStatsWin(fetchedStats.totalWinners);
     const activeCount = users.filter(user => user.status === 'ACTIVE').length;
     const suspendedCount = users.filter(user => user.status === 'SUSPENDED').length;
 
@@ -100,7 +98,7 @@ async function getStats(){
           </div>
           <div className="bg-white p-3 rounded shadow">
             <h3 className="font-semibold">Business Profits</h3>
-            <p className="text-lg">{statsProfits}$</p>
+            <p className="text-lg">$ {statsProfits}</p>
           </div>
           <div className="bg-white p-3 rounded shadow">
             <h3 className="font-semibold">Games Played</h3>

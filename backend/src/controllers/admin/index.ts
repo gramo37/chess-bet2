@@ -172,7 +172,7 @@ if(role === 'MODRATOR') {
           status:true,
           gamesAsWhite: { select: { id: true, status: true ,result:true,stake:true} },
           gamesAsBlack: { select: { id: true, status: true ,result:true ,stake:true} },
-          transactions: { select: { id: true, amount: true, status: true } },
+          transactions: { select: { id: true, amount: true, status: true , currency:true} },
         },
       });
      
@@ -258,6 +258,9 @@ export const getAllReports = async (req: Request, res: Response) => {
             name: true,
           },
         },
+      },
+      where:{
+status:"PENDING"
       },
       orderBy: {
         createdAt: 'desc', // Order by created date, latest first

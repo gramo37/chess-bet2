@@ -4,10 +4,12 @@ import { usersProps } from "../schema";
 
 
 export const Users: React.FC<usersProps> = ({ users }) => {
-  const [statusFilter, setStatusFilter] = useState<string>("ALL"); // State to hold the selected status filter
-  const [roleFilter, setRoleFilter] = useState<string>("ALL"); // State to hold the selected role filter
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [roleFilter, setRoleFilter] = useState<string>("ALL"); 
+  const [search,setSearch]=useState("");
+  const [filterUsers,setFilterUsers]=useState(users);
   const user = usePersonStore((state) => state.user);
-
+  
   // Function to handle user profile view
   function onViewProfile(id: string): void {
     console.log(id);
@@ -16,22 +18,22 @@ export const Users: React.FC<usersProps> = ({ users }) => {
 
   // Filter users based on selected status and role
   const filteredUsers = users.filter((user) => {
-    const statusMatch = 
-      statusFilter === "ALL" || user.status === statusFilter;
-    const roleMatch = 
-      roleFilter === "ALL" || user.role === roleFilter;
-    return statusMatch && roleMatch;
+    const statusMatch = statusFilter === "ALL" || user.status === statusFilter;
+    const roleMatch = roleFilter === "ALL" || user.role === roleFilter;
+    const a = user.email.toLowerCase().includes(search.toLowerCase()) || user.name.toLowerCase().includes(search.toLowerCase());
+
+    return statusMatch && roleMatch && a;
   });
 
   return (
-    <div className="p-4">
-      <div className="mb-4 flex space-x-4">
-        {/* Status Filter */}
+    <div className="p-4 w-full">
+      <div className="mb-4 flex w-full flex-wrap justify-between space-x-4 w-full">
+        <div >
         <select 
           value={statusFilter} 
           onChange={(e) => setStatusFilter(e.target.value)} 
-          className="p-2 border border-gray-300 rounded"
-        >
+          className="p-2 border border-gray-300 rounded mr-3"
+          >
           <option value="ALL">All Users</option>
           <option value="ACTIVE">Active Users</option>
           <option value="SUSPENDED">Suspended Users</option>
@@ -40,15 +42,16 @@ export const Users: React.FC<usersProps> = ({ users }) => {
 
         {(user&&user.role==="ADMIN")&&
         <select 
-          value={roleFilter} 
-          onChange={(e) => setRoleFilter(e.target.value)} 
-          className="p-2 border border-gray-300 rounded"
+        value={roleFilter} 
+        onChange={(e) => setRoleFilter(e.target.value)} 
+        className="p-2 border border-gray-300 rounded"
         >
           <option value="ALL">All Roles</option>
           <option value="MODRATOR">Modrator</option>
           <option value="USER">User</option>
-          {/* Add more roles as needed */}
         </select>}
+          </div>
+          <input type="text" placeholder="Search user by Email or Name" value={search} onChange={(e)=>setSearch(e.target.value)} className="py-2 max-w-[60%] w-[500px] px-4 rounded" />
       </div>
       <div className="space-y-4">
         {filteredUsers.map((user) => (

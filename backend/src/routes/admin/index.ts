@@ -1,8 +1,8 @@
 import express from "express";
 import { authenticateJWT,authorizeAdmin, authorizeAdminModrator } from "../../middlewares/auth";
 import { createAdmin, getGames,getGame, GetTransaction, GetTransactions, getUser, getUsers, adminLogin, getAllReports } from "../../controllers/admin";
-import { BannedUserAccount, MarkIssueCompleted, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount, UpdateGameResult } from "../../controllers/admin/updateuser";
-import { BussinesProfits, DailyGames, UserProfits, UsersWinLoss } from "../../controllers/admin/stats";
+import { BannedUserAccount, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount, UpdateGameResult } from "../../controllers/admin/updateuser";
+import { DashboardStats, UserProfits,} from "../../controllers/admin/stats";
 import { createModrator } from "../../controllers/admin/modrators";
 
 const router = express.Router();
@@ -33,13 +33,9 @@ router.put("/users/:id/balance", authenticateJWT, authorizeAdmin, UpdateUserBala
 router.put("/users/:id/suspend", authenticateJWT, authorizeAdmin, SuspendUserAccount);
 router.put("/users/:id/active", authenticateJWT, authorizeAdmin, ActiveUserAccount);
 router.delete("/users/:id", authenticateJWT, authorizeAdmin, BannedUserAccount);
-router.put("/reports/:id/complete", authenticateJWT, authorizeAdmin, MarkIssueCompleted);
 router.put("/game/:id/result", authenticateJWT, authorizeAdmin, UpdateGameResult);
 
 //stats
-router.get("/stats/daily-games", authenticateJWT, authorizeAdmin, DailyGames);
 router.get("/users/:userId/profits", authenticateJWT, authorizeAdmin, UserProfits);
-router.get("/stats/business-profits", authenticateJWT, authorizeAdmin, BussinesProfits);
-router.get("/stats/users-won-lost", authenticateJWT, authorizeAdmin, UsersWinLoss);
-
+router.get("/stats", authenticateJWT, authorizeAdmin, DashboardStats )
 export default router;

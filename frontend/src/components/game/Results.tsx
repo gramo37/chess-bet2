@@ -1,5 +1,6 @@
 import { ACCEPT_DRAW, DRAW } from "../../constants";
 import { useGameStore } from "../../contexts/game.context";
+import PopUp from "../popup";
 
 export default function Results(props: { loading: boolean }) {
   const { loading } = props;
@@ -8,11 +9,11 @@ export default function Results(props: { loading: boolean }) {
     <div>
       <p className="text-center text-gray-400">
         {[DRAW, ACCEPT_DRAW].includes(result?.gameResult ?? "") &&
-          "Game is Drawn"}
+           <PopUp  title="Game is Drawn"/>}
       </p>
       {![DRAW, ACCEPT_DRAW].includes(result?.gameResult ?? "") && result && (
         <p className="text-center text-gray-400">
-          {result.winner === color ? "You Won" : "You Lose"}
+          {result.winner === color ?  <PopUp  title="You Won"/> : <PopUp title="You lose"/>}
         </p>
       )}
       <div className="hidden">{loading}</div>

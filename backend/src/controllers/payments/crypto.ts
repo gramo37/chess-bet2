@@ -21,11 +21,23 @@ import { generateUniqueId, getFinalAmountInUSD } from "../../utils";
 import axios from "axios";
 import { db } from "../../db";
 import { BACKEND_ROUTE } from "../..";
+import { cloneDeep } from "lodash";
 
 // Function to get the USD price of a cryptocurrency (BTC, ETH)
 async function convertCryptoToUSD(symbol: string, amount: number) {
   try {
     // Get the latest price for the symbol (e.g., BTCUSDT, ETHUSDT)
+    console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");
+
+    if (NODE_ENV === "development")
+      console.log("Secret Token", BINANCE_API_KEY, BINANCE_SECRET_KEY);
+
+    const Binance = require("binance-api-node").default;
+    const client = Binance({
+      apiKey: BINANCE_API_KEY,
+      apiSecret: BINANCE_SECRET_KEY,
+    });
+
     const prices = await client.prices();
 
     // Symbol example: 'BTCUSDT' for Bitcoin to USD, 'ETHUSDT' for Ethereum to USD
@@ -50,12 +62,32 @@ async function convertCryptoToUSD(symbol: string, amount: number) {
   }
 }
 
-const Binance = require("binance-api-node").default;
+function matchTransactions(dbTransactions: any[], transactions: any[]) {
+  // Create a copy of transactions array to keep track of used transactions
+  const availableTransactions = cloneDeep(transactions); // [...transactions];
 
-const client = Binance({
-  apiKey: BINANCE_API_KEY,
-  apiSecret: BINANCE_SECRET_KEY,
-});
+  // Iterate over each dbTransaction
+  dbTransactions.forEach((dbTransaction) => {
+    // Find the first matching transaction
+    const matchingIndex = availableTransactions.findIndex(
+      (transaction) =>
+        transaction.address === dbTransaction.wallet_address &&
+        transaction.amount === dbTransaction.amount &&
+        transaction.coin === dbTransaction.currency
+    );
+
+    // If a matching transaction is found
+    if (matchingIndex !== -1) {
+      // Assign the txId to the dbTransaction
+      dbTransaction.txId = availableTransactions[matchingIndex].txId;
+
+      // Remove the used transaction from the availableTransactions array
+      availableTransactions.splice(matchingIndex, 1);
+    }
+  });
+
+  return dbTransactions;
+}
 
 export const checkTransactionStatus = async () => {
   try {
@@ -63,6 +95,15 @@ export const checkTransactionStatus = async () => {
     const currentTime = Date.now();
     // Set the start time to 15 minutes ago
     const fifteenMinutesAgo = currentTime - 15 * 60 * 1000;
+
+    if (NODE_ENV === "development")
+      console.log("Secret Token", BINANCE_API_KEY, BINANCE_SECRET_KEY);
+
+    const Binance = require("binance-api-node").default;
+    const client = Binance({
+      apiKey: BINANCE_API_KEY,
+      apiSecret: BINANCE_SECRET_KEY,
+    });
     const transactions = await client.depositHistory({
       status: 1,
       startTime: fifteenMinutesAgo,
@@ -76,7 +117,7 @@ export const checkTransactionStatus = async () => {
     console.log(transactions);
     console.log("Transaction Count: ", transactions.length);
 
-    if(!transactions || transactions.length === 0) {
+    if (!transactions || transactions.length === 0) {
       return;
     }
 
@@ -90,7 +131,7 @@ export const checkTransactionStatus = async () => {
       };
     });
 
-    const dbTransactions = await db.transaction.findMany({
+    let dbTransactions = await db.transaction.findMany({
       where: {
         OR: conditions,
       },
@@ -101,7 +142,10 @@ export const checkTransactionStatus = async () => {
       return;
     }
 
-    // Example: Search for specific user and amount in the transaction history
+    dbTransactions = matchTransactions(dbTransactions, transactions);
+
+    console.log("Combined Transactions", dbTransactions);
+
     for (let i = 0; i < dbTransactions.length; i++) {
       const dbTransaction = transactions[i];
       console.log(dbTransaction);
@@ -113,6 +157,7 @@ export const checkTransactionStatus = async () => {
           },
           data: {
             status: "COMPLETED",
+            api_ref: dbTransaction.txId,
           },
         }),
         db.user.update({
@@ -149,10 +194,19 @@ export const getId = async (req: Request, res: Response) => {
 
     amount = Number(amount);
 
-    if (!amount || !currency)
+    if (NODE_ENV === "development")
+      console.log("Secret Token", BINANCE_API_KEY, BINANCE_SECRET_KEY);
+
+    const Binance = require("binance-api-node").default;
+    const client = Binance({
+      apiKey: BINANCE_API_KEY,
+      apiSecret: BINANCE_SECRET_KEY,
+    });
+
+    if (!amount || !currency || !address)
       return res.status(404).json({
         status: "error",
-        message: "Please provide amount currency, network",
+        message: "Please provide amount, currency, address",
       });
 
     const finalamountInUSD = await convertCryptoToUSD(currency, amount);
@@ -161,6 +215,19 @@ export const getId = async (req: Request, res: Response) => {
       return res
         .status(500)
         .json({ message: "Invalid currency", status: "error" });
+
+    const depositCheck = await depositChecks(
+      amount,
+      currency,
+      finalamountInUSD
+    );
+
+    if (!depositCheck.status) {
+      return res.status(400).json({
+        status: false,
+        message: depositCheck.message,
+      });
+    }
 
     await db.transaction.create({
       data: {
@@ -193,6 +260,114 @@ export const getId = async (req: Request, res: Response) => {
       message: "success",
       wallet_address: depositAddress.address,
     });
+  } catch (error) {
+    console.error("Error Sending Crypto Payment URL2:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const withdrawCrypto = async (req: Request, res: Response) => {
+  try {
+    let { amount, address, currency } = req.body;
+    amount = Number(amount);
+    const user: any = (req?.user as any)?.user;
+    const currentBalance = user?.balance;
+
+    if (!amount || !currency || !address)
+      return res.status(404).json({
+        status: "error",
+        message: "Please provide amount, currency, address",
+      });
+
+    const finalamountInUSD = await convertCryptoToUSD(currency, amount);
+
+    if (!finalamountInUSD)
+      return res
+        .status(500)
+        .json({ message: "Invalid currency", status: "error" });
+
+    const withdrawalCheck = await withdrawalChecks(
+      amount,
+      finalamountInUSD,
+      address,
+      currentBalance,
+      user
+    );
+
+    if (!withdrawalCheck.status) {
+      return res.status(400).json({
+        status: false,
+        message: withdrawalCheck.message,
+      });
+    }
+
+    const platform_charges = finalamountInUSD * 0.03;
+    const transaction = await db.transaction.create({
+      data: {
+        userId: user.id,
+        amount: amount,
+        type: "WITHDRAWAL",
+        status: "PENDING",
+        // TODO: Temporary change
+        signature: "",
+        checkout_id: "",
+        finalamountInUSD: finalamountInUSD - platform_charges,
+        platform_charges,
+        mode: "crypto",
+      },
+    });
+
+    try {
+      if (NODE_ENV === "development")
+        console.log("Secret Token", BINANCE_API_KEY, BINANCE_SECRET_KEY);
+
+      const Binance = require("binance-api-node").default;
+      const client = Binance({
+        apiKey: BINANCE_API_KEY,
+        apiSecret: BINANCE_SECRET_KEY,
+      });
+      const result = await client.withdraw({
+        asset: currency, // e.g., BTC, ETH, USDT
+        address: address,
+        amount: amount,
+      });
+      // TODO: Store the result in txn id column
+      const txn_id = result.id;
+
+      await db.$transaction([
+        db.user.update({
+          where: {
+            id: transaction.userId,
+          },
+          data: {
+            balance: currentBalance - finalamountInUSD,
+          },
+        }),
+        db.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            status: "COMPLETED",
+            api_ref: txn_id,
+          },
+        }),
+      ]);
+      res.status(200).json({
+        message: "Money withdrawal successfull!",
+        transaction, // Return the transaction object
+      });
+    } catch (error) {
+      console.log(error);
+      await db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "CANCELLED",
+        },
+      });
+      return res.status(500).json({
+        message:
+          "Something went wrong when sending money to the user's account",
+      });
+    }
   } catch (error) {
     console.error("Error Sending Crypto Payment URL2:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

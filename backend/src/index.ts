@@ -55,7 +55,7 @@ cron.schedule("*/10 * * * * *", async function () {
   await sendMovesToDB();
 });
 
-cron.schedule('*/10 * * * * *', async () => {
+cron.schedule('* * * * *', async () => {
   await checkTransactionStatus();
 });
 

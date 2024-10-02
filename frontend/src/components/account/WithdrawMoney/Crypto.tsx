@@ -6,7 +6,7 @@ import usePersonStore from "../../../contexts/auth";
 const Crypto = () => {
   const [amount, setAmount] = useState("");
   const [walletId, setWalletId] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("BTC");
   const user = usePersonStore((state) => state.user);
 
   const handleCryptoWithdrawal = async () => {
@@ -17,9 +17,8 @@ const Crypto = () => {
         url,
         {
           amount: Number(amount),
-          account: walletId, // Wallet Address
+          address: walletId, // Wallet Address
           currency,
-          mode: "crypto",
         },
         {
           headers: {
@@ -58,11 +57,11 @@ const Crypto = () => {
           <select
             name="currency"
             value={currency}
-            disabled
             onChange={(e) => setCurrency(e.target.value)}
             className="px-4 rounded bg-gray-700 text-white"
           >
-            <option value="USD">USD</option>
+            <option value="BTC">BTC</option>
+            <option value="ETH">ETH</option>
           </select>
         </div>
         <button

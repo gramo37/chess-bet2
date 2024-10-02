@@ -7,7 +7,7 @@ export const Users: React.FC<usersProps> = ({ users }) => {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [roleFilter, setRoleFilter] = useState<string>("ALL"); 
   const [search,setSearch]=useState("");
-  const [filterUsers,setFilterUsers]=useState(users);
+  // const [filterUsers,setFilterUsers]=useState(users);
   const user = usePersonStore((state) => state.user);
   
   // Function to handle user profile view

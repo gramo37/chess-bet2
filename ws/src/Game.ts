@@ -52,7 +52,8 @@ export class Game {
     isFriendly: boolean = false,
     stake: string,
     gameId?: string,
-    status?: TGameStatus
+    status?: TGameStatus,
+    gameTime?: number 
   ) {
     this.player1 = player1;
     this.player2 = player2;
@@ -64,8 +65,8 @@ export class Game {
     this.gameId = gameId ?? randomUUID();
     this.status = status ?? NOT_YET_STARTED;
     this.chess = new Chess();
-    this.player1TimeLeft = INITIAL_TIME;
-    this.player2TimeLeft = INITIAL_TIME;
+    this.player1TimeLeft = (!gameTime || Number.isNaN(gameTime)) ? INITIAL_TIME : gameTime;
+    this.player2TimeLeft = (!gameTime || Number.isNaN(gameTime)) ? INITIAL_TIME : gameTime;
     this.isFriendly = isFriendly;
     this.stake = stake;
   }

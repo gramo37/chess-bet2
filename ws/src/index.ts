@@ -40,10 +40,13 @@ wss.on("connection", async function connection(ws, req) {
   let gameId = req?.url ? url.parse(req.url, true).query.gameId : null;
   let type = req?.url ? url.parse(req.url, true).query.type : null;
   let stake = req?.url ? url.parse(req.url, true).query.stake : null;
+  let gameTime = req?.url ? url.parse(req.url, true).query.gameTime : null;
+
   if (gameId && typeof gameId !== "string") gameId = null;
   if (type && typeof type !== "string") type = null;
   if (stake && typeof stake !== "string") stake = null;
   if (token && typeof token !== "string") token = null;
+  if (gameTime && typeof gameTime !== "string") gameTime = null;
 
   let isAuthorizedUser = await extractUser(token)
   if (!isAuthorizedUser) return ws.send(JSON.stringify({ "message": "Unauthorized user!" }))
@@ -52,7 +55,7 @@ wss.on("connection", async function connection(ws, req) {
   console.log(token, stake, type, gameId);
 
   if (token && stake && type)
-    await gameManager.addUser({ socket: ws, token, type, stake, gameId });
+    await gameManager.addUser({ socket: ws, token, type, stake, gameId, gameTime });
 
   ws.on("close", () => {
     gameManager.removeUser(ws);

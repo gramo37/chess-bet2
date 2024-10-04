@@ -41,6 +41,7 @@ export class GameManager {
     type: string;
     stake: string;
     gameId?: string | null;
+    gameTime?: string | null;
   }) {
     this.addHandlers(data);
   }
@@ -55,14 +56,15 @@ export class GameManager {
     type: string;
     stake: string;
     gameId?: string | null;
+    gameTime?: string | null;
   }) {
     const self = this;
-    const { socket, token, type, stake, gameId } = data;
+    const { socket, token, type, stake, gameId, gameTime } = data;
     socket.on("message", async function connection(data) {
       const message = JSON.parse(data.toString());
       switch (message?.type) {
         case INIT_GAME:
-          await self.initGame(socket, token, stake, type, gameId);
+          await self.initGame(socket, token, stake, type, gameId, gameTime);
           break;
         case MOVE:
           await self.makeMove(socket, message.move);
@@ -241,7 +243,8 @@ export class GameManager {
     token: string,
     stake: string,
     type?: string | null,
-    gameId?: string | null
+    gameId?: string | null,
+    gameTime?: string | null
   ) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return;
@@ -343,7 +346,7 @@ export class GameManager {
           user.rating
         );
         const player2 = new Player(null, BLACK, null, "", "", 0);
-        const game = new Game(player1, player2, true, stake);
+        const game = new Game(player1, player2, true, stake, undefined, undefined, Number(gameTime));
         console.log("Creating a friendly match -> ", game.getGameId());
         this.games.push(game);
         // Send this game id to frontend

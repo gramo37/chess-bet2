@@ -17,7 +17,7 @@ const Crypto = () => {
       const response = await axios.post(
         url,
         {
-          address: "", // Create a state variable for this
+          address: address, // Create a state variable for this
           amount: Number(amount),
           currency,
         },

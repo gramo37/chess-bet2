@@ -18,6 +18,8 @@ const FriendlyMatch = () => {
     setIsGameStarted,
     setResult,
     setColor,
+    gameTime,
+    setGameTime
   } = useGameStore([
     "setGameId",
     "gameId",
@@ -27,6 +29,8 @@ const FriendlyMatch = () => {
     "setIsGameStarted",
     "setResult",
     "setColor",
+    "gameTime",
+    "setGameTime"
   ]);
 
   const handleFriendlyOptionChange = (option: FriendlyOption) => {
@@ -44,10 +48,7 @@ const FriendlyMatch = () => {
         type: INIT_GAME,
       })
     );
-
   };
-
-  
 
   return (
     <>
@@ -91,14 +92,28 @@ const FriendlyMatch = () => {
         )}
 
         {friendlyOption === "Create Game" && (
-          <div>
-            <label className="text-white">Enter Stake</label>
-            <input
-              type="number"
-              className="p-2"
-              value={stake}
-              onChange={(e) => setStake(Number(e.target.value))}
-            />
+          <div className="flex flex-col gap-2">
+            <div>
+              <label className="text-white mr-2">Enter Stake</label>
+              <input
+                type="number"
+                className="p-2"
+                value={stake}
+                onChange={(e) => setStake(Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <label className="text-white mr-2">Enter Time</label>
+              <select
+                name="currency"
+                value={gameTime}
+                onChange={(e) => setGameTime(Number(e.target.value))}
+                className="px-4 py-2 rounded outline-none"
+              >
+                <option value={300}>5 min</option>
+                <option value={600}>10 min</option>
+              </select>
+            </div>
           </div>
         )}
       </div>

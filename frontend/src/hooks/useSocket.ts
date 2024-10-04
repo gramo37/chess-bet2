@@ -22,16 +22,17 @@ import useTimer from "./useTimer";
 
 export const useInitSocket = () => {
   const user = usePersonStore((state) => state.user);
-  const { setSocket, stake, type, gameId } = useGameStore([
+  const { setSocket, stake, type, gameId, gameTime } = useGameStore([
     "setSocket",
     "stake",
     "type",
     "gameId",
+    "gameTime"
   ]);
 
   useEffect(() => {
     const ws = new WebSocket(
-      `${WS_URL}?token=${user?.token}&type=${type}&stake=${stake}&gameId=${gameId}`
+      `${WS_URL}?token=${user?.token}&type=${type}&stake=${stake}&gameId=${gameId}&gameTime=${gameTime}`
     );
     ws.onopen = () => {
       setSocket(ws);
@@ -44,7 +45,7 @@ export const useInitSocket = () => {
     return () => {
       ws.close();
     };
-  }, [gameId, setSocket, stake, type, user?.token]);
+  }, [gameId, gameTime, setSocket, stake, type, user?.token]);
 };
 
 export const useSocketHandler = () => {

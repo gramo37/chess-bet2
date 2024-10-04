@@ -16,6 +16,7 @@ type TGame = {
   stake: number;
   type: string;
   gameId: string | null;
+  gameTime: number;
 };
 
 type Move = TMove & {
@@ -39,6 +40,7 @@ type TAction = {
   setStake: (stake: number) => void;
   setType: (type: string) => void;
   setGameId: (gameId: string | null) => void;
+  setGameTime: (gameTime: number) => void;
 };
 
 type TGameState = TAction & TGame;
@@ -56,6 +58,7 @@ const INITIAL_STATE = {
   stake: 10,
   type: "random",
   gameId: "",
+  gameTime: 300
 };
 
 // Create your store, which includes both state and (optionally) actions
@@ -97,6 +100,9 @@ export const useStore = create<TGameState>((set) => ({
   setGameId: (gameId: string | null) => {
     set({ gameId });
   },
+  setGameTime: (gameTime: number) => {
+    set({gameTime})
+  }
 }));
 
 export const useGameStore = (value?: Array<keyof TGameState>) => {

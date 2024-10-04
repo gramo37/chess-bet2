@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { INITIAL_TIME } from "../constants";
+import { useGameStore } from "../contexts/game.context";
 
 const useTimer = () => {
-  const [timeLeft, setTimeLeft] = useState<number>(INITIAL_TIME);
+  const { gameTime } = useGameStore(["gameTime"]);
+  const [timeLeft, setTimeLeft] = useState<number>(gameTime);
   const [isActive, setIsActive] = useState<boolean>(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 

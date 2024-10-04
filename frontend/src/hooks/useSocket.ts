@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { WS_URL } from "../constants/routes";
-import usePersonStore  from "../contexts/auth";
+import usePersonStore from "../contexts/auth";
 import { useGameStore } from "../contexts/game.context";
 import {
   ACCEPT_DRAW,
@@ -16,9 +16,11 @@ import {
   OFFER_DRAW,
   REJECT_DRAW,
   SEND_MESSAGE,
+  SHOW_ERROR,
 } from "../constants";
 import { Chess } from "chess.js";
 import useTimer from "./useTimer";
+import { useGlobalStore } from "../contexts/global.context";
 
 export const useInitSocket = () => {
   const user = usePersonStore((state) => state.user);
@@ -80,6 +82,7 @@ export const useSocketHandler = () => {
   const [message, setMessage] = useState("");
   const [localGameId, setGameIdLocally] = useState("");
   const [loading, setLoading] = useState(false);
+  const { alertPopUp } = useGlobalStore(["alertPopUp"])
   const {
     timeLeft: player1timeLeft,
     start: startPlayer1Timer,
@@ -180,6 +183,12 @@ export const useSocketHandler = () => {
       } else if (message.type === SEND_MESSAGE) {
         console.log(message.payload.message);
         setMessage(message.payload.message);
+      } else if (message.type === SHOW_ERROR) {
+        alertPopUp({
+          message: message.payload.message ?? "Something went wrong",
+          type: "info",
+          showPopUp: true
+        })
       }
     };
     return () => {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
+import { useGlobalStore } from "../contexts/global.context";
 
 type props = {
   admin: boolean;
@@ -10,10 +11,16 @@ export default function SignUP({ admin }: props) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
 
   async function onclick() {
     if (!email || !name || !password) {
-      alert("Enter All details");
+      alertPopUp({
+        message: "Error",
+        type: "Error",
+        showPopUp: true,
+        body: <div className="p-2">Please enter all details</div>,
+      });
       return;
     }
     const url = !admin
@@ -42,11 +49,16 @@ export default function SignUP({ admin }: props) {
       setPassword("");
 
       console.log(data, response);
-      alert(data.message);
+      // alert(data.message);
       window.location.href = admin ? "/dashboard" : "/game";
     } catch (error) {
       console.error("Error:", error);
-      alert("Registration failed. Please try again.");
+      alertPopUp({
+        message: "Error",
+        type: "Error",
+        showPopUp: true,
+        body: <div className="p-2">Registration failed. Please try again.</div>
+      })
     }
   }
 

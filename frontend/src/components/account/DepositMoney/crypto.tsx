@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BACKEND_URL } from "../../../constants/routes";
 import usePersonStore from "../../../contexts/auth";
 import axios from "axios";
+import { useGlobalStore } from "../../../contexts/global.context";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
@@ -9,6 +10,7 @@ const Crypto = () => {
   const [currency, setCurrency] = useState("BTC");
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const user = usePersonStore((state) => state.user);
+  const {alertPopUp} = useGlobalStore(["alertPopUp"])
 
   const handleCryptoDeposit = async () => {
     const url = `${BACKEND_URL}/payments/crypto/get-wallet-address`;
@@ -31,9 +33,15 @@ const Crypto = () => {
       const data = response.data;
       setWalletAddress(data.wallet_address);
       // window.location.href = data.paymentDetails;
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error during Deposit:", error);
-      alert("Something went wrong. Please try again.");
+      alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
+      })
     }
   };
 

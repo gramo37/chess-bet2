@@ -32,6 +32,13 @@ export const getURL = async (req: Request, res: Response) => {
     const mode = "mpesa";
     amount = Number(amount);
 
+    if (!amount) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide a valid amount to be deposited",
+      });
+    }
+
     const finalamountInUSD = await getFinalAmountInUSD(amount, currency);
 
     if (!finalamountInUSD)

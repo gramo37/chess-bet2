@@ -15,6 +15,7 @@ import Dashboard from "./screens/dashboard";
 import AccountPage from "./screens/account";
 import GameProfile from "./components/admin/component/gameprofile";
 import ResetPassword from "./screens/resetPassword";
+import PopUp from "./components/popup";
 
 // Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="bg-slate-900 min-h-screen w-screen">
+        <PopUp />
         <BrowserRouter>
           <Routes>
             {/* Private Routes */}

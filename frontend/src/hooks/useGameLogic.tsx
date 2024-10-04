@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { GET_TIME, RESIGN } from "../constants";
+import { CHECKMATE, GET_TIME, RESIGN } from "../constants";
 import { useGameStore } from "../contexts/game.context";
+import { useGlobalStore } from "../contexts/global.context";
 
 export const useGameLogic = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -11,12 +12,33 @@ export const useGameLogic = () => {
     "result",
     "socket",
   ]);
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
 
   useEffect(() => {
-    if (result?.gameResult === RESIGN && result.winner === color) {
-      alert("Congrats. You Won. Opponent has resigned");
+    if (result?.gameResult === CHECKMATE) {
+      alertPopUp({
+        message:
+          result.winner === color
+            ? "Congrats. You Won by checkmate"
+            : "You lose by Checkmate",
+        type: "success",
+        showPopUp: true,
+      });
+    } else if (result?.gameResult === RESIGN) {
+      alertPopUp({
+        message:
+          result.winner === color
+            ? "Congrats. You Won! Opponent has resigned"
+            : "You Lose by resignation",
+        type: "success",
+        showPopUp: true,
+      });
     } else if (["DRAW", "ACCEPT_DRAW"].includes(result?.gameResult ?? "")) {
-      alert("Game is Drawn!");
+      alertPopUp({
+        message: "Game is Drawn",
+        type: "success",
+        showPopUp: true,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGameStarted, result]);

@@ -2,12 +2,14 @@ import { useState } from "react";
 import { BACKEND_URL } from "../../../constants/routes";
 import axios from "axios";
 import usePersonStore from "../../../contexts/auth";
+import { useGlobalStore } from "../../../contexts/global.context";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
   const [walletId, setWalletId] = useState("");
   const [currency, setCurrency] = useState("BTC");
   const user = usePersonStore((state) => state.user);
+  const {alertPopUp} = useGlobalStore(["alertPopUp"])
 
   const handleCryptoWithdrawal = async () => {
     try {
@@ -28,10 +30,21 @@ const Crypto = () => {
         }
       );
       const data = response.data;
-      alert(data.message);
-    } catch (error) {
+      alertPopUp({
+        message: "Withdrawal Successfull",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{data.message ?? ""}</div>
+      })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error during Withdrawal:", error);
-      alert("Something went wrong. Please try again.");
+      alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
+      })
     }
   };
 

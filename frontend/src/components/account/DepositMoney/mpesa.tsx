@@ -2,10 +2,12 @@ import axios from "axios";
 import { BACKEND_URL } from "../../../constants/routes";
 import usePersonStore from "../../../contexts/auth";
 import { useState } from "react";
+import { useGlobalStore } from "../../../contexts/global.context";
 
 const Mpesa = () => {
   const user = usePersonStore((state) => state.user);
   const [amount, setAmount] = useState("");
+  const {alertPopUp} = useGlobalStore(["alertPopUp"]);
 
   const handleMpesaDeposit = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/get-url`;
@@ -25,9 +27,15 @@ const Mpesa = () => {
       );
       const data = response.data;
       window.location.href = data.paymentDetails;
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error during Deposit:", error);
-      alert("Something went wrong. Please try again.");
+      alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
+      })
     }
   };
 

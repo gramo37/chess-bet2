@@ -5,8 +5,15 @@ export default function PopUp() {
     "popUpDetails",
     "alertPopUp",
   ]);
-//   const [show, setShow] = useState(true);
-  if (!popUpDetails.showPopUp) return null; // Don't render the modal if it's not shown
+  if (!popUpDetails.showPopUp) return null;
+
+  const closeModal = () => {
+    alertPopUp({
+      message: "",
+      type: "info",
+      showPopUp: false,
+    });
+  }
 
   return (
     <div
@@ -15,9 +22,9 @@ export default function PopUp() {
       aria-modal="true"
       role="dialog"
       aria-labelledby="modal-title"
-    //   aria-hidden={!popUpDetails.showPopUp}
+      //   aria-hidden={!popUpDetails.showPopUp}
     >
-      <div className="relative w-full max-w-[250px] p-4">
+      <div className="relative w-full max-w-[450px] p-4">
         <section className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <header className="flex justify-between items-center p-4 border-b dark:border-gray-600">
             <h3
@@ -28,16 +35,7 @@ export default function PopUp() {
             </h3>
             <button
               type="button"
-              onClick={() => {
-                // setShow(false);
-                console.log("Closing Modal")
-                alertPopUp({
-                    message: "",
-                    type: "info",
-                    showPopUp: false
-                })
-                window.location.reload();
-              }}
+              onClick={closeModal}
               className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white"
               aria-label="Close modal"
             >
@@ -58,6 +56,17 @@ export default function PopUp() {
               </svg>
             </button>
           </header>
+          {popUpDetails.body && <main>{popUpDetails.body}</main>}
+          {popUpDetails.type === "confirm" && <div className="flex gap-2">
+            <button className="px-4 m-2 py-1 text-white bg-blue-500 rounded-md" onClick={() => {
+              popUpDetails.success()
+              closeModal()
+            }}>Yes</button>  
+            <button className="px-4 m-2 py-1 text-white bg-blue-500 rounded-md" onClick={() => {
+              popUpDetails.failure()
+              closeModal()
+            }}>No</button>  
+          </div>}
         </section>
       </div>
     </div>

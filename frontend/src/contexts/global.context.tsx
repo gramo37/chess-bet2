@@ -1,11 +1,17 @@
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { pick } from "lodash";
+import { ReactNode } from "react";
 
 type TPopup = {
     message: string,
     type: string,
     showPopUp: boolean;
+    body?: ReactNode;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    success?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    failure?: any;
 }
 
 type TState = {
@@ -20,7 +26,7 @@ const INITIAL_STATE = {
     popUpDetails: {
         message: "",
         type: "info",
-        showPopUp: false
+        showPopUp: false,
     }
 };
 

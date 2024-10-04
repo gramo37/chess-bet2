@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BACKEND_URL } from "../constants/routes";
+import { useGlobalStore } from "../contexts/global.context";
 
 type props = {
   admin: boolean;
@@ -8,10 +9,16 @@ type props = {
 export default function Login({ admin }: props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const {alertPopUp} = useGlobalStore(["alertPopUp"])
 
   async function onclick() {
     if (!email || !password) {
-      alert("Enter all details");
+      alertPopUp({
+        message: "Error",
+        type: "Error",
+        showPopUp: true,
+        body: <div className="p-2">Please enter all details</div>
+      })
       return;
     }
 
@@ -43,11 +50,24 @@ export default function Login({ admin }: props) {
 
       localStorage.setItem("token", data.token);
 
-      alert("Login successful");
+      // alertPopUp({
+      //   message: "Suucess",
+      //   type: "Error",
+      //   showPopUp: true,
+      //   body: <div className="p-2">Login successful</div>
+      // })
+
+      // alert("Login successful");
       window.location.href = admin ? "/dashboard" : "/game";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(error.message);
       console.error("Error:", error);
+      alertPopUp({
+        message: "Error",
+        type: "Error",
+        showPopUp: true,
+        body: <div className="p-2">{error.message ?? "Something went wrong"}</div>
+      })
     }
 
     setEmail("");

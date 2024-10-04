@@ -164,13 +164,21 @@ export const useSocketHandler = () => {
           startPlayer2Timer(message.payload.player2TimeLeft);
         }
       } else if (message.type === OFFER_DRAW) {
-        if (confirm("Opponents was a draw. Do you want to draw ?")) {
-          acceptDraw();
-        } else {
-          rejectDraw();
-        }
+        alertPopUp({
+          message: "Draw Request",
+          type: "confirm",
+          showPopUp: true,
+          body: <div className="p-2">Opponent wants a draw. Do you want to draw ?</div>,
+          success: acceptDraw,
+          failure: rejectDraw
+        })
       } else if (message.type === REJECT_DRAW) {
-        alert("Opponent rejected the offer of draw");
+        alertPopUp({
+          message: "Draw Rejected",
+          type: "info",
+          showPopUp: true,
+          body: <div className="p-2">Opponent rejected the offer of draw</div>
+        })
       } else if (message.type === INVALID_MOVE) {
         setLoading(false);
       } else if (message.type === GAMEABORTED) {
@@ -186,7 +194,7 @@ export const useSocketHandler = () => {
       } else if (message.type === SHOW_ERROR) {
         alertPopUp({
           message: message.payload.message ?? "Something went wrong",
-          type: "info",
+          type: "error",
           showPopUp: true
         })
       }

@@ -16,7 +16,6 @@ export const useGameLogic = () => {
 
   useEffect(() => {
     if (result?.gameResult === CHECKMATE) {
-      // alert("Congrats. You Won. Opponent has resigned");
       alertPopUp({
         message:
           result.winner === color
@@ -26,19 +25,17 @@ export const useGameLogic = () => {
         showPopUp: true,
       });
     } else if (result?.gameResult === RESIGN) {
-      // alert("Congrats. You Won. Opponent has resigned");
       alertPopUp({
         message:
           result.winner === color
-            ? "Congrats. You Won. Opponent has resigned"
+            ? "Congrats. You Won! Opponent has resigned"
             : "You Lose by resignation",
         type: "success",
         showPopUp: true,
       });
     } else if (["DRAW", "ACCEPT_DRAW"].includes(result?.gameResult ?? "")) {
-      // alert("Game is Drawn!");
       alertPopUp({
-        message: "Game is Drawn!",
+        message: "Game is Drawn",
         type: "success",
         showPopUp: true,
       });

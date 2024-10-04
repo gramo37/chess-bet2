@@ -2,11 +2,13 @@ import { useState } from "react";
 import usePersonStore from "../../../contexts/auth";
 import axios from "axios";
 import { BACKEND_URL } from "../../../constants/routes";
+import { useGlobalStore } from "../../../contexts/global.context";
 
 const Mpesa = () => {
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const user = usePersonStore((state) => state.user);
+  const {alertPopUp} = useGlobalStore(["alertPopUp"])
 
   const handleMpesaWithdrawal = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/withdraw`;
@@ -28,10 +30,21 @@ const Mpesa = () => {
         }
       );
       const data = response.data;
-      alert(data.message);
-    } catch (error) {
+      alertPopUp({
+        message: "Withdrawal Successfull",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{data.message ?? ""}</div>
+      })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error during Withdrawal:", error);
-      alert("Something went wrong. Please try again.");
+      alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
+      })
     }
   };
 

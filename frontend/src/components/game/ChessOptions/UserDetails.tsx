@@ -10,7 +10,10 @@ const UserDetails = () => {
       </h2>
       <div className="flex text-white gap-3 justify-around items-center">
         <h2 className="text-white text-xl font-bold">
-          Balance: ${user?.balance ?? 0} 
+          Balance: $
+          {user?.balance && !Number.isNaN(Number(user?.balance))
+            ? Number(user?.balance).toFixed(2)
+            : 0}
         </h2>
         <Refresh />
       </div>

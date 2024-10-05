@@ -49,13 +49,17 @@ export default function Account() {
       <h3 className="mb-2">Balance: $ {user?.balance}</h3> */}
       <div className="flex text-white gap-3 justify-center items-center mb-2">
         <h2 className="text-white">
-          Total Earnings: ${user?.totalEarnings ?? 0}
+          Total Earnings: ${user?.totalEarnings && !Number.isNaN(Number(user?.totalEarnings))
+            ? Number(user?.totalEarnings).toFixed(2)
+            : 0}
         </h2>
         <Refresh />
       </div>
       <div className="flex text-white gap-3 justify-center items-center mb-2">
         <h2 className="text-white">
-          Balance: ${user?.balance ?? 0}
+          Balance: ${user?.balance && !Number.isNaN(Number(user?.balance))
+            ? Number(user?.balance).toFixed(2)
+            : 0}
         </h2>
         <Refresh />
       </div>

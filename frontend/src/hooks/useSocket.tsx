@@ -198,7 +198,6 @@ export const useSocketHandler = () => {
         console.log(message.payload.message);
         setMessage(message.payload.message);
       } else if (message.type === SHOW_ERROR) {
-        setIsGameStarted(false);
         alertPopUp({
           message: message.payload.message ?? "Something went wrong",
           type: "error",

@@ -135,6 +135,7 @@ enum GameOutCome {
   DRAW
   TIMER_EXPIRED
   ADMIN
+  ABANDON
 }
 
 enum TransactionType {

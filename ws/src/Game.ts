@@ -18,6 +18,8 @@ import {
   ACCEPT_DRAW,
   INITIAL_TIME,
   GET_TIME,
+  ABANDON,
+  ABONDON_TIME,
 } from "./constants";
 import { db } from "./db";
 import { randomUUID } from "crypto";
@@ -42,6 +44,7 @@ export class Game {
   private player2TimeLeft: number;
   public isFriendly: boolean;
   public stake: string;
+  public gameTime: number;
 
   private timer1: any;
   private timer2: any;
@@ -53,7 +56,7 @@ export class Game {
     stake: string,
     gameId?: string,
     status?: TGameStatus,
-    gameTime?: number 
+    gameTime?: number
   ) {
     this.player1 = player1;
     this.player2 = player2;
@@ -65,10 +68,14 @@ export class Game {
     this.gameId = gameId ?? randomUUID();
     this.status = status ?? NOT_YET_STARTED;
     this.chess = new Chess();
-    this.player1TimeLeft = (!gameTime || Number.isNaN(gameTime)) ? INITIAL_TIME : gameTime;
-    this.player2TimeLeft = (!gameTime || Number.isNaN(gameTime)) ? INITIAL_TIME : gameTime;
+    this.player1TimeLeft =
+      !gameTime || Number.isNaN(gameTime) ? INITIAL_TIME : gameTime;
+    this.player2TimeLeft =
+      !gameTime || Number.isNaN(gameTime) ? INITIAL_TIME : gameTime;
     this.isFriendly = isFriendly;
     this.stake = stake;
+    this.gameTime =
+      !gameTime || Number.isNaN(gameTime) ? INITIAL_TIME : gameTime;
   }
 
   getPlayer1() {
@@ -113,6 +120,14 @@ export class Game {
     // Start reducing player1 TimeLeft by 1 every sec
     this.timer1 = setInterval(() => {
       this.player1TimeLeft -= 1;
+      if (this.player1TimeLeft <= this.gameTime - ABONDON_TIME) {
+        // If player has not made any moves for past 30 sec
+        // end the game with status "ABONDENDED"
+        if (this.moves.length === 0) {
+          this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
+          clearInterval(this.timer1);
+        }
+      }
       if (this.player1TimeLeft <= 0) {
         if (this.status !== COMPLETED)
           this.endGame(this.player1.getPlayer(), { status: "TIMER_EXPIRED" });
@@ -125,6 +140,14 @@ export class Game {
     // Start reducing player2 TimeLeft by 1 every sec
     this.timer2 = setInterval(() => {
       this.player2TimeLeft -= 1;
+      if (this.player2TimeLeft <= this.gameTime - ABONDON_TIME) {
+        // If player has not made any moves for past 30 sec
+        // end the game with status "ABONDENDED"
+        if (this.moves.length === 1) {
+          this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
+          clearInterval(this.timer2);
+        }
+      }
       if (this.player2TimeLeft <= 0) {
         if (this.status !== COMPLETED)
           this.endGame(this.player2.getPlayer(), { status: "TIMER_EXPIRED" });
@@ -406,6 +429,7 @@ export class Game {
       payload.status
     );
     if (payload.status === ACCEPT_DRAW) result = DRAW;
+    if (payload.status === ABANDON) result = DRAW;
     if (result) {
       console.log(`Game is ended. Result: ${result}.`);
       // const areBalancesUpdated = await this.updateBalances(winner, loser);

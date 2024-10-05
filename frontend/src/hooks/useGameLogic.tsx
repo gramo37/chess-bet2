@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { CHECKMATE, GET_TIME, RESIGN } from "../constants";
+import { ABANDON, CHECKMATE, GET_TIME, RESIGN } from "../constants";
 import { useGameStore } from "../contexts/game.context";
 import { useGlobalStore } from "../contexts/global.context";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,6 +40,17 @@ export const useGameLogic = () => {
             {result.winner === color
               ? "Congrats. You Won! Opponent has resigned"
               : "You Lose by resignation"}
+          </div>
+        ),
+      });
+    } else if(result?.gameResult === ABANDON) {
+      alertPopUp({
+        message: "Game Abondoned",
+        type: "success",
+        showPopUp: true,
+        body: (
+          <div className="p-2">
+            Game has been Abondoned because of no activity
           </div>
         ),
       });

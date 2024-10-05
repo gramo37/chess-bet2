@@ -26,4 +26,5 @@ export const GAMEABORTED = "GAMEABORTED";
 export const GET_TIME = "GET_TIME";
 export const GETFRIENDLYMATCHID = "GETFRIENDLYMATCHID";
 export const SEND_MESSAGE = "SEND_MESSAGE";
-export const SHOW_ERROR = "SHOW_ERROR"
+export const SHOW_ERROR = "SHOW_ERROR";
+export const ABANDON = "ABANDON";

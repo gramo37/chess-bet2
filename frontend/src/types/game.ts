@@ -7,7 +7,7 @@ export type TMove = {
 export type TGameResult = null | {
   winner: string;
   loser: string;
-  gameResult: "RESIGN" | "ACCEPT_DRAW" | "CHECKMATE" | "DRAW"
+  gameResult: "RESIGN" | "ACCEPT_DRAW" | "CHECKMATE" | "DRAW" | "ABANDON"
 };
 
 export type TColor = null | "white" | "black";

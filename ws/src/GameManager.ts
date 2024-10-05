@@ -272,29 +272,40 @@ export class GameManager {
         return sendMessage(socket, {
           type: SHOW_ERROR,
           payload: {
-            message: "You have a pending game. Kindly complete it!"
-          }
-        });;
+            message: "You have a pending game. Kindly complete it!",
+          },
+        });
       }
       return;
     }
 
     // Check for balance and stake here
     // Don't proceed if balance is less than stake
-    if (Number(stake) > user.balance)
-      return sendMessage(socket, {
+    if (Number(stake) > user.balance) {
+      sendMessage(socket, {
+        type: GAMEABORTED,
+      });
+      sendMessage(socket, {
         type: SHOW_ERROR,
         payload: {
-          message: "Insufficient balance"
-        }
+          message: "Insufficient balance",
+        },
       });
-    
-    if(Number(stake) <= 5) return sendMessage(socket, {
-      type: SHOW_ERROR,
-      payload: {
-        message: "Minimum allowed stake is $5"
-      }
-    });
+      return;
+    }
+
+    if (Number(stake) <= 5) {
+      sendMessage(socket, {
+        type: GAMEABORTED,
+      });
+      sendMessage(socket, {
+        type: SHOW_ERROR,
+        payload: {
+          message: "Minimum allowed stake is $5",
+        },
+      });
+      return;
+    }
 
     // Avoid single user to create multiple games
     const game = this.games.find((game) => {
@@ -330,7 +341,11 @@ export class GameManager {
           // Avoid creating game between the same player.
           if (player1?.getPlayerId() !== user.id) {
             // Check if the balance of the player 2 is greater than stake
-            console.log("User balance and game stake comparison", user.balance, Number(game.stake))
+            console.log(
+              "User balance and game stake comparison",
+              user.balance,
+              Number(game.stake)
+            );
             if (user.balance > Number(game.stake)) {
               const player2 = game?.getPlayer2();
               player2?.setPlayerToken(token);
@@ -362,7 +377,15 @@ export class GameManager {
           user.rating
         );
         const player2 = new Player(null, BLACK, null, "", "", 0);
-        const game = new Game(player1, player2, true, stake, undefined, undefined, Number(gameTime));
+        const game = new Game(
+          player1,
+          player2,
+          true,
+          stake,
+          undefined,
+          undefined,
+          Number(gameTime)
+        );
         console.log("Creating a friendly match -> ", game.getGameId());
         this.games.push(game);
         // Send this game id to frontend
@@ -404,7 +427,7 @@ export class GameManager {
         const game = new Game(player1, player2, false, stake);
         console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
-        SendRandomPlayNotificationToAdmin(game.getGameId());//sends notification to the admin that player has created random play
+        SendRandomPlayNotificationToAdmin(game.getGameId()); //sends notification to the admin that player has created random play
       } else {
         // match the opponent and start the game
 

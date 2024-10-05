@@ -17,27 +17,40 @@ export const useGameLogic = () => {
   useEffect(() => {
     if (result?.gameResult === CHECKMATE) {
       alertPopUp({
-        message:
-          result.winner === color
-            ? "Congrats. You Won by checkmate"
-            : "You lose by Checkmate",
+        message: "Game Over!",
         type: "success",
         showPopUp: true,
+        body: (
+          <div className="p-2">
+            {result.winner === color
+              ? "Congrats. You Won by checkmate"
+              : "You lose by Checkmate"}
+          </div>
+        ),
       });
     } else if (result?.gameResult === RESIGN) {
       alertPopUp({
-        message:
-          result.winner === color
-            ? "Congrats. You Won! Opponent has resigned"
-            : "You Lose by resignation",
+        message: "Game Over!",
         type: "success",
         showPopUp: true,
+        body: (
+          <div className="p-2">
+            {result.winner === color
+              ? "Congrats. You Won! Opponent has resigned"
+              : "You Lose by resignation"}
+          </div>
+        ),
       });
     } else if (["DRAW", "ACCEPT_DRAW"].includes(result?.gameResult ?? "")) {
       alertPopUp({
-        message: "Game is Drawn",
+        message: "Thats a Tie",
         type: "success",
         showPopUp: true,
+        body: (
+          <div className="p-2">
+            Game is Drawn
+          </div>
+        ),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

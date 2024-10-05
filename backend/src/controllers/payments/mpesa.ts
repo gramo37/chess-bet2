@@ -15,6 +15,7 @@ import {
   REDIRECT_URL,
   NODE_ENV,
   INSTASEND_CHALLENGE,
+  PLATFORM_FEES,
 } from "../../constants";
 import {
   compareHash,
@@ -59,9 +60,7 @@ export const getURL = async (req: Request, res: Response) => {
       });
     }
 
-    const platform_charges = parseFloat(
-      (finalamountInUSD * INSTASEND_DEPOSIT_PERCENT).toFixed(2)
-    );
+    const platform_charges = parseFloat((finalamountInUSD * PLATFORM_FEES).toFixed(2));
 
     const IntaSend = require("intasend-node");
     const user: any = (req?.user as any)?.user;
@@ -270,7 +269,8 @@ export const withdraw = async (req: Request, res: Response) => {
 
     // Initiate the transaction and set its status to 'PENDING'
     // const platform_charges = INSTASEND_WITHDRAWAL_CHARGE;
-    const platform_charges = finalamountInUSD * 0.1;
+    const platform_charges = finalamountInUSD * PLATFORM_FEES;
+    parseFloat((finalamountInUSD * PLATFORM_FEES).toFixed(2));
     const checkout_id = generateUniqueId();
     const transaction = await db.transaction.create({
       data: {
@@ -373,18 +373,18 @@ export const validateTransaction = async (req: Request, res: Response) => {
   try {
     const { api_ref, challenge, state } = req.body;
     // Check for challenge and match it
-    if(challenge !== INSTASEND_CHALLENGE) {
+    if (challenge !== INSTASEND_CHALLENGE) {
       return res.status(400).json({
         status: "error",
-        message: "User is unauthorized"
-      })
+        message: "User is unauthorized",
+      });
     }
 
     // Check for api_ref and match it
     const transaction = await db.transaction.findFirst({
       where: {
         api_ref,
-        type: "DEPOSIT"
+        type: "DEPOSIT",
       },
       select: {
         id: true,
@@ -407,7 +407,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
         data: {
           status: ["PROCESSING", "PENDING"].includes(state)
             ? "PENDING"
-            : "CANCELLED", 
+            : "CANCELLED",
         },
       });
 

@@ -7,17 +7,17 @@ import { useGlobalStore } from "../../../contexts/global.context";
 const Mpesa = () => {
   const user = usePersonStore((state) => state.user);
   const [amount, setAmount] = useState("");
-  const {alertPopUp} = useGlobalStore(["alertPopUp"]);
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
   const [loading, setLoading] = useState(false);
 
-  const handleMpesaDeposit = async () => {
+  const successPayment = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/get-url`;
     setLoading(true);
     try {
       const response = await axios.post(
         url,
         {
-          amount: Number(amount),
+          amount: 1.03 * Number(amount),
         },
         {
           headers: {
@@ -26,20 +26,75 @@ const Mpesa = () => {
           },
         }
       );
-      setLoading(false)
+      setLoading(false);
       const data = response.data;
       window.location.href = data.paymentDetails;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Deposit:", error);
-      setLoading(false)
-      alertPopUp({
+      setLoading(false);
+      alert(
+        error?.response?.data.message ??
+          "Something went wrong. Please try again."
+      );
+      // alertPopUp({
+      //   message: "Error",
+      //   type: "error",
+      //   showPopUp: true,
+      //   body: (
+      //     <div className="p-2">
+      //       {error?.response?.data.message ??
+      //         "Something went wrong. Please try again."}
+      //     </div>
+      //   ),
+      // });
+    }
+  };
+
+  const handleMpesaDeposit = async () => {
+    if (!amount)
+      return alertPopUp({
         message: "Error",
         type: "error",
         showPopUp: true,
-        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
-      })
-    }
+        body: <div className="p-2">{"Please provide a amount"}</div>,
+      });
+
+    if (Number(amount) < 700)
+      return alertPopUp({
+        message: "Final amount less than the required limit.",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">The amount should be above KES 700.</div>,
+      });
+
+    const url = `${BACKEND_URL}/payments/get-amount-in-USD`;
+    const finalamountInUSD = await axios.post(url, {
+      currency: "KES",
+      amount: 1.03 * Number(amount),
+    });
+
+    const amtInUSD = finalamountInUSD.data.finalamountInUSD;
+    let finalBalance = amtInUSD - 0.03 * amtInUSD;
+    finalBalance = Number(finalBalance.toFixed(2));
+
+    alertPopUp({
+      message: "Final Amount",
+      type: "confirm",
+      showPopUp: true,
+      body: (
+        <div className="p-2">
+          <p>
+            Kindly note that KES {0.03 * Number(amount)} will be considered as
+            platform fees. Therefore the final amount will be KES{" "}
+            {1.03 * Number(amount)}. Your balance will be updated by ${finalBalance}.
+          </p>
+          <p>Do you want to proceed ?</p>
+        </div>
+      ),
+      success: successPayment,
+      failure: () => {},
+    });
   };
 
   return (

@@ -11,20 +11,8 @@ const Mpesa = () => {
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
   const [loading, setLoading] = useState(false);
 
-  const handleMpesaWithdrawal = async () => {
+  const successPayment = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/withdraw`;
-
-    if (phoneNumber.length !== 9)
-      return alertPopUp({
-        message: "Error",
-        type: "error",
-        showPopUp: true,
-        body: (
-          <div className="p-2">
-            {"Kindly enter a 12 digit number starting with 254."}
-          </div>
-        ),
-      });
     setLoading(true);
     try {
       const response = await axios.post(
@@ -44,28 +32,75 @@ const Mpesa = () => {
       );
       setLoading(false);
       const data = response.data;
-      alertPopUp({
-        message: "Withdrawal Successfull",
-        type: "error",
-        showPopUp: true,
-        body: <div className="p-2">{data.message ?? ""}</div>,
-      });
+      alert(data.message ?? "Withdrawal Successful");
+      // alertPopUp({
+      //   message: "Withdrawal Successful",
+      //   type: "success",
+      //   showPopUp: true,
+      //   body: <div className="p-2">{data.message ?? ""}</div>,
+      // });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Withdrawal:", error);
       setLoading(false);
-      alertPopUp({
+      alert(
+        error?.response?.data.message ??
+          "Something went wrong. Please try again."
+      );
+      // alertPopUp({
+      //   message: "Error",
+      //   type: "error",
+      //   showPopUp: true,
+      //   body: (
+      //     <div className="p-2">
+      //       {error?.response?.data.message ??
+      //         "Something went wrong. Please try again."}
+      //     </div>
+      //   ),
+      // });
+    }
+  };
+
+  const handleMpesaWithdrawal = async () => {
+    if (phoneNumber.length !== 9)
+      return alertPopUp({
         message: "Error",
         type: "error",
         showPopUp: true,
         body: (
           <div className="p-2">
-            {error?.response?.data.message ??
-              "Something went wrong. Please try again."}
+            {"Kindly enter a 12 digit number starting with 254."}
           </div>
         ),
       });
-    }
+
+    const url = `${BACKEND_URL}/payments/get-amount-in-USD`;
+    const finalamountInUSD = await axios.post(url, {
+      currency: "KES",
+      amount: Number(amount),
+    });
+
+    const amtInUSD = finalamountInUSD.data.finalamountInUSD;
+    let finalBalance = amtInUSD;
+    finalBalance = Number(finalBalance.toFixed(2));
+
+    alertPopUp({
+      message: "Final Amount",
+      type: "confirm",
+      showPopUp: true,
+      body: (
+        <div className="p-2">
+          <p>
+            Kindly note that KES {0.03 * Number(amount)} will be considered as
+            platform fees. Therefore yo will receive KES {0.97 * Number(amount)}
+            . Your balance will be reduced by ${finalBalance}.
+          </p>
+          <p>Do you want to proceed ?</p>
+        </div>
+      ),
+      success: successPayment,
+      failure: () => {},
+    });
   };
 
   return (

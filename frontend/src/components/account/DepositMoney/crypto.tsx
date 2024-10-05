@@ -10,11 +10,12 @@ const Crypto = () => {
   const [currency, setCurrency] = useState("BTC");
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const user = usePersonStore((state) => state.user);
-  const {alertPopUp} = useGlobalStore(["alertPopUp"])
+  const {alertPopUp} = useGlobalStore(["alertPopUp"]);
+  const [loading, setLoading] = useState(false);
 
   const handleCryptoDeposit = async () => {
     const url = `${BACKEND_URL}/payments/crypto/get-wallet-address`;
-
+    setLoading(true);
     try {
       const response = await axios.post(
         url,
@@ -30,12 +31,14 @@ const Crypto = () => {
           },
         }
       );
+      setLoading(false)
       const data = response.data;
       setWalletAddress(data.wallet_address);
       // window.location.href = data.paymentDetails;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Deposit:", error);
+      setLoading(false)
       alertPopUp({
         message: "Error",
         type: "error",
@@ -77,7 +80,7 @@ const Crypto = () => {
         onClick={handleCryptoDeposit}
         className="px-4 py-2 bg-green-600 text-white rounded"
       >
-        Deposit
+        {loading ? "Loading..." : "Deposit"}
       </button>
       {walletAddress && (
         <div className="mt-5">

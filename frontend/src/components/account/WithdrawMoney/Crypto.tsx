@@ -10,11 +10,12 @@ const Crypto = () => {
   const [currency, setCurrency] = useState("BTC");
   const user = usePersonStore((state) => state.user);
   const {alertPopUp} = useGlobalStore(["alertPopUp"])
+  const [loading, setLoading] = useState(false);
 
   const handleCryptoWithdrawal = async () => {
     try {
       const url = `${BACKEND_URL}/payments/crypto/withdraw`;
-
+      setLoading(true);
       const response = await axios.post(
         url,
         {
@@ -29,6 +30,7 @@ const Crypto = () => {
           },
         }
       );
+      setLoading(false)
       const data = response.data;
       alertPopUp({
         message: "Withdrawal Successfull",
@@ -39,6 +41,7 @@ const Crypto = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Withdrawal:", error);
+      setLoading(false)
       alertPopUp({
         message: "Error",
         type: "error",
@@ -81,7 +84,7 @@ const Crypto = () => {
           onClick={handleCryptoWithdrawal}
           className="px-4 py-2 bg-red-600 text-white rounded"
         >
-          Withdraw
+          {loading ? "Loading..." : "Withdraw"}Withdraw
         </button>
       </div>
     </>

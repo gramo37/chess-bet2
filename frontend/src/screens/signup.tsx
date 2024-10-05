@@ -51,13 +51,14 @@ export default function SignUP({ admin }: props) {
       console.log(data, response);
       // alert(data.message);
       window.location.href = admin ? "/dashboard" : "/game";
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Error:", error);
       alertPopUp({
         message: "Error",
         type: "Error",
         showPopUp: true,
-        body: <div className="p-2">Registration failed. Please try again.</div>
+        body: <div className="p-2">{error?.response?.data?.message ?? "Registration failed. Please try again."}</div>
       })
     }
   }

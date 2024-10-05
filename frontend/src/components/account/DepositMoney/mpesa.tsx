@@ -8,10 +8,11 @@ const Mpesa = () => {
   const user = usePersonStore((state) => state.user);
   const [amount, setAmount] = useState("");
   const {alertPopUp} = useGlobalStore(["alertPopUp"]);
+  const [loading, setLoading] = useState(false);
 
   const handleMpesaDeposit = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/get-url`;
-
+    setLoading(true);
     try {
       const response = await axios.post(
         url,
@@ -25,11 +26,13 @@ const Mpesa = () => {
           },
         }
       );
+      setLoading(false)
       const data = response.data;
       window.location.href = data.paymentDetails;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Deposit:", error);
+      setLoading(false)
       alertPopUp({
         message: "Error",
         type: "error",
@@ -63,7 +66,7 @@ const Mpesa = () => {
         onClick={handleMpesaDeposit}
         className="px-4 py-2 bg-green-600 text-white rounded"
       >
-        Deposit
+        {loading ? "Loading..." : "Deposit"}
       </button>
     </div>
   );

@@ -8,11 +8,24 @@ const Mpesa = () => {
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const user = usePersonStore((state) => state.user);
-  const {alertPopUp} = useGlobalStore(["alertPopUp"])
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
+  const [loading, setLoading] = useState(false);
 
   const handleMpesaWithdrawal = async () => {
     const url = `${BACKEND_URL}/payments/mpesa/withdraw`;
 
+    if (phoneNumber.length !== 9)
+      return alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: (
+          <div className="p-2">
+            {"Kindly enter a 12 digit number starting with 254."}
+          </div>
+        ),
+      });
+    setLoading(true);
     try {
       const response = await axios.post(
         url,
@@ -20,7 +33,7 @@ const Mpesa = () => {
           amount: Number(amount),
           account: phoneNumber,
           currency: "KES",
-          mode: "mpesa"
+          mode: "mpesa",
         },
         {
           headers: {
@@ -29,22 +42,29 @@ const Mpesa = () => {
           },
         }
       );
+      setLoading(false);
       const data = response.data;
       alertPopUp({
         message: "Withdrawal Successfull",
         type: "error",
         showPopUp: true,
-        body: <div className="p-2">{data.message ?? ""}</div>
-      })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        body: <div className="p-2">{data.message ?? ""}</div>,
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Withdrawal:", error);
+      setLoading(false);
       alertPopUp({
         message: "Error",
         type: "error",
         showPopUp: true,
-        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
-      })
+        body: (
+          <div className="p-2">
+            {error?.response?.data.message ??
+              "Something went wrong. Please try again."}
+          </div>
+        ),
+      });
     }
   };
 
@@ -60,13 +80,17 @@ const Mpesa = () => {
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Enter amount"
           />
-          <input
-            type="number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white"
-            placeholder="Enter phone number"
-          />
+          <div className="flex items-center pl-2 rounded bg-gray-700 text-white">
+            <span className="pr-0">254</span>
+            <input
+              type="tel"
+              value={phoneNumber}
+              maxLength={9}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="w-full p-2 pl-1 rounded bg-gray-700 text-white outline-none"
+              placeholder="Phone number"
+            />
+          </div>
           <select
             name="currency"
             value="KES"
@@ -79,9 +103,8 @@ const Mpesa = () => {
         <button
           onClick={handleMpesaWithdrawal}
           className="px-4 py-2 bg-red-600 text-white rounded"
-          disabled={phoneNumber.length !== 12}
         >
-          Withdraw
+          {loading ? "Loading..." : "Withdraw"}
         </button>
       </div>
     </>

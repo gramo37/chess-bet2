@@ -24,7 +24,7 @@ import { BACKEND_ROUTE } from "../..";
 import { cloneDeep } from "lodash";
 
 // Function to get the USD price of a cryptocurrency (BTC, ETH)
-async function convertCryptoToUSD(symbol: string, amount: number) {
+export async function convertCryptoToUSD(symbol: string, amount: number) {
   try {
     // Get the latest price for the symbol (e.g., BTCUSDT, ETHUSDT)
     console.log("NODE_ENV", NODE_ENV, NODE_ENV === "development");

@@ -13,7 +13,7 @@ const Crypto = () => {
   const {alertPopUp} = useGlobalStore(["alertPopUp"]);
   const [loading, setLoading] = useState(false);
 
-  const handleCryptoDeposit = async () => {
+  const successPayment = async () => {
     const url = `${BACKEND_URL}/payments/crypto/get-wallet-address`;
     setLoading(true);
     try {
@@ -38,14 +38,45 @@ const Crypto = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Deposit:", error);
-      setLoading(false)
-      alertPopUp({
-        message: "Error",
-        type: "error",
-        showPopUp: true,
-        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
-      })
+      setLoading(false);
+      alert(error?.response?.data.message ?? "Something went wrong. Please try again.")
+      // alertPopUp({
+      //   message: "Error",
+      //   type: "error",
+      //   showPopUp: true,
+      //   body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
+      // })
     }
+  }
+
+  const handleCryptoDeposit = async () => {
+    const url = `${BACKEND_URL}/payments/get-crypto-in-USD`;
+    const finalamountInUSD = await axios.post(url, {
+      currency,
+      amount: 1.03 * Number(amount),
+    });
+
+    const amtInUSD = finalamountInUSD.data.finalamountInUSD;
+    let finalBalance = amtInUSD - 0.03 * amtInUSD;
+    finalBalance = Number(finalBalance.toFixed(2));
+
+    alertPopUp({
+      message: "Final Amount",
+      type: "confirm",
+      showPopUp: true,
+      body: (
+        <div className="p-2">
+          <p>
+            Kindly note that {currency} {0.03 * Number(amount)} will be considered as
+            platform fees. Therefore the final amount will be {currency}{" "}
+            {1.03 * Number(amount)}. Your balance will be updated by ${finalBalance}.
+          </p>
+          <p>Do you want to proceed ?</p>
+        </div>
+      ),
+      success: successPayment,
+      failure: () => {},
+    });
   };
 
   return (

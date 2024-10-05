@@ -92,7 +92,7 @@ const Mpesa = () => {
         <div className="p-2">
           <p>
             Kindly note that KES {0.03 * Number(amount)} will be considered as
-            platform fees. Therefore yo will receive KES {0.97 * Number(amount)}
+            platform fees. Therefore you will receive KES {0.97 * Number(amount)}
             . Your balance will be reduced by ${finalBalance}.
           </p>
           <p>Do you want to proceed ?</p>

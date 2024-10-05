@@ -9,10 +9,10 @@ const Crypto = () => {
   const [walletId, setWalletId] = useState("");
   const [currency, setCurrency] = useState("BTC");
   const user = usePersonStore((state) => state.user);
-  const {alertPopUp} = useGlobalStore(["alertPopUp"])
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
   const [loading, setLoading] = useState(false);
 
-  const handleCryptoWithdrawal = async () => {
+  const successPayment = async () => {
     try {
       const url = `${BACKEND_URL}/payments/crypto/withdraw`;
       setLoading(true);
@@ -30,25 +30,66 @@ const Crypto = () => {
           },
         }
       );
-      setLoading(false)
+      setLoading(false);
       const data = response.data;
-      alertPopUp({
-        message: "Withdrawal Successfull",
-        type: "error",
-        showPopUp: true,
-        body: <div className="p-2">{data.message ?? ""}</div>
-      })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      alert(data.message ?? "Withdrawal Successful");
+      // alertPopUp({
+      //   message: "Withdrawal Successfull",
+      //   type: "error",
+      //   showPopUp: true,
+      //   body: <div className="p-2">{data.message ?? ""}</div>,
+      // });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Withdrawal:", error);
-      setLoading(false)
-      alertPopUp({
-        message: "Error",
-        type: "error",
-        showPopUp: true,
-        body: <div className="p-2">{error?.response?.data.message ?? "Something went wrong. Please try again."}</div>
-      })
+      setLoading(false);
+      alert(
+        error?.response?.data.message ??
+          "Something went wrong. Please try again."
+      );
+      // alertPopUp({
+      //   message: "Error",
+      //   type: "error",
+      //   showPopUp: true,
+      //   body: (
+      //     <div className="p-2">
+      //       {error?.response?.data.message ??
+      //         "Something went wrong. Please try again."}
+      //     </div>
+      //   ),
+      // });
     }
+  };
+
+  const handleCryptoWithdrawal = async () => {
+    const url = `${BACKEND_URL}/payments/get-crypto-in-USD`;
+    const finalamountInUSD = await axios.post(url, {
+      currency,
+      amount: Number(amount),
+    });
+
+    const amtInUSD = finalamountInUSD.data.finalamountInUSD;
+    let finalBalance = amtInUSD;
+    finalBalance = Number(finalBalance.toFixed(2));
+
+    alertPopUp({
+      message: "Final Amount",
+      type: "confirm",
+      showPopUp: true,
+      body: (
+        <div className="p-2">
+          <p>
+            Kindly note that {currency} {0.03 * Number(amount)} will be
+            considered as platform fees. Therefore you will receive {currency}{" "}
+            {0.97 * Number(amount)}. Your balance will be reduced by $
+            {finalBalance}.
+          </p>
+          <p>Do you want to proceed ?</p>
+        </div>
+      ),
+      success: successPayment,
+      failure: () => {},
+    });
   };
 
   return (

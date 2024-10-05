@@ -21,14 +21,12 @@ export default function Account() {
       action === "Deposit"
         ? `${BACKEND_URL}/payments/get-payment-url`
         : `${BACKEND_URL}/payments/withdraw-money`;
-        console.log(url);
-        
 
     try {
       const response = await axios.post(
         url,
         {
-          amount: amount,
+          amount,
           account: action !== "Deposit" ? phoneNumber : undefined,
           currency: action === "Deposit" ? currency : undefined,
         },
@@ -41,9 +39,6 @@ export default function Account() {
       );
 
       const data = response.data;
-
-      console.log(data, data.url);
-
       if (action === "Deposit") window.location.href = data.paymentDetails;
       else alert(data.message);
     } catch (error) {
@@ -53,19 +48,21 @@ export default function Account() {
   };
 
   return (
-    <div className="text-white text-center max-w-full w-[900px] m-auto">
-      <a className="absolute top-10 left-10" href="/">
+    <div className="text-white text-center max-w-full w-[900px] m-auto p-6 bg-gray-800 rounded-lg shadow-lg">
+      <a className="absolute top-10 left-10 text-2xl" href="/">
         <IoMdArrowBack />
       </a>
       <Report token={user?.token || ""} />
 
-      <h1 className="text-3xl mb-4">Account</h1>
+      <h1 className="text-3xl mb-4 font-bold">Account</h1>
 
-      <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
-      <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
+      <h3 className="mb-2 text-lg">Username: {user?.email || "Guest"}</h3>
+      <h3 className="mb-2 text-lg">Name: {user?.name || "Anonymous"}</h3>
 
       <div className="flex justify-between items-center my-4">
-        <p>Balance: {user?.balance ? `${"$ " + Number(user.balance).toFixed(2)}` : "$ 0"}</p>
+        <p className="text-xl font-semibold">
+          Balance: {user?.balance ? `$${Number(user.balance).toFixed(2)}` : "$0"}
+        </p>
 
         <select
           name="transactionType"
@@ -81,7 +78,7 @@ export default function Account() {
 
       {transactionType !== "choose" && (
         <div className="my-4">
-          <label className="block mb-2 text-left">Amount:</label>
+          <label className="block mb-2 text-left text-sm">Amount:</label>
           <input
             type="number"
             value={amount}
@@ -103,11 +100,9 @@ export default function Account() {
                 <option value="Paypal">Paypal</option>
               </select>
               <select
-                name="transactionType"
+                name="currency"
                 value={currency}
-                onChange={(e) => {
-                  setCurrency(e.target.value)
-                }}
+                onChange={(e) => setCurrency(e.target.value)}
                 className="px-4 py-2 rounded bg-gray-700 text-white"
               >
                 <option value="USD">USD</option>
@@ -133,7 +128,7 @@ export default function Account() {
           {transactionType === "Withdrawal" && (
             <>
               <input
-                type="number"
+                type="text"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="w-full p-2 mb-4 rounded bg-gray-700 text-white"
@@ -144,18 +139,19 @@ export default function Account() {
                 className="px-4 py-2 bg-red-600 text-white rounded disabled:bg-red-800"
                 disabled={phoneNumber.length !== 12}
               >
-                Withdrawal
+                Withdraw
               </button>
-              <p className="mt-4">Minimum amount: 5$</p>
-              <p className="">Withdrawal Charges - 10$</p>
+              <p className="mt-4">Minimum amount: $5</p>
+              <p className="">Withdrawal Charges - $10</p>
             </>
           )}
         </div>
       )}
-      <div className="flex space-x-3 w-full">
+
+      <div className="flex space-x-3 w-full mt-6">
         <div
           className={`py-2 border-b-4 transition-colors cursor-pointer w-[48%] duration-300 ${
-            "transactions" === activeTab
+            activeTab === "transactions"
               ? "border-teal-500"
               : "border-transparent hover:border-gray-200"
           }`}
@@ -166,7 +162,7 @@ export default function Account() {
 
         <div
           className={`py-2 border-b-4 transition-colors cursor-pointer w-[48%] duration-300 ${
-            "gamesplayed" === activeTab
+            activeTab === "gamesplayed"
               ? "border-teal-500"
               : "border-transparent hover:border-gray-200"
           }`}
@@ -177,7 +173,7 @@ export default function Account() {
       </div>
 
       <div className="mt-4">
-        {"gamesplayed" === activeTab ? <GameHistory /> : <TransactionHistory />}
+        {activeTab === "gamesplayed" ? <GameHistory /> : <TransactionHistory />}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { CHECKMATE, GET_TIME, RESIGN } from "../constants";
 import { useGameStore } from "../contexts/game.context";
 import { useGlobalStore } from "../contexts/global.context";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useGameLogic = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -13,6 +14,7 @@ export const useGameLogic = () => {
     "socket",
   ]);
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
+  const qc = useQueryClient();
 
   useEffect(() => {
     if (result?.gameResult === CHECKMATE) {
@@ -53,6 +55,9 @@ export const useGameLogic = () => {
         ),
       });
     }
+    qc.invalidateQueries({
+      queryKey: ["UserDetails"]
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGameStarted, result]);
 

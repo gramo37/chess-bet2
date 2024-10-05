@@ -15,6 +15,7 @@ import {
   NOT_YET_STARTED,
   GETFRIENDLYMATCHID,
   SEND_MESSAGE,
+  SHOW_ERROR,
 } from "./constants";
 import { Game } from "./Game";
 import { Player } from "./Player";
@@ -268,17 +269,32 @@ export class GameManager {
             : game.getPlayer2();
         restartedPlayer.setPlayerSocket(socket);
         await game.createGame();
-        return;
+        return sendMessage(socket, {
+          type: SHOW_ERROR,
+          payload: {
+            message: "You have a pending game. Kindly complete it!"
+          }
+        });;
       }
       return;
     }
 
     // Check for balance and stake here
     // Don't proceed if balance is less than stake
-    if (Number(stake) > user.balance || Number(stake) <= 0)
+    if (Number(stake) > user.balance)
       return sendMessage(socket, {
-        type: GAMEABORTED,
+        type: SHOW_ERROR,
+        payload: {
+          message: "Insufficient balance"
+        }
       });
+    
+    if(Number(stake) <= 5) return sendMessage(socket, {
+      type: SHOW_ERROR,
+      payload: {
+        message: "Minimum allowed stake is $5"
+      }
+    });
 
     // Avoid single user to create multiple games
     const game = this.games.find((game) => {

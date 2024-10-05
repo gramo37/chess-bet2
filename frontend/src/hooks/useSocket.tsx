@@ -180,7 +180,13 @@ export const useSocketHandler = () => {
           body: <div className="p-2">Opponent rejected the offer of draw</div>
         })
       } else if (message.type === INVALID_MOVE) {
+        console.log("Invalid move")
         setLoading(false);
+        alertPopUp({
+          message: message.payload.message ?? "Something went wrong",
+          type: "error",
+          showPopUp: true
+        })
       } else if (message.type === GAMEABORTED) {
         setIsGameStarted(false);
       } else if (message.type === GET_TIME) {
@@ -192,6 +198,7 @@ export const useSocketHandler = () => {
         console.log(message.payload.message);
         setMessage(message.payload.message);
       } else if (message.type === SHOW_ERROR) {
+        setIsGameStarted(false);
         alertPopUp({
           message: message.payload.message ?? "Something went wrong",
           type: "error",

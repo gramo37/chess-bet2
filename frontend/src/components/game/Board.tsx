@@ -1,5 +1,8 @@
 import { Chessboard } from "react-chessboard";
-import { IHighlightedSquares, useBoardStore } from "../../contexts/board.context";
+import {
+  IHighlightedSquares,
+  useBoardStore,
+} from "../../contexts/board.context";
 import { useGameStore } from "../../contexts/game.context";
 import { isPromotion } from "../../types/utils/game";
 import {
@@ -9,6 +12,7 @@ import {
 import { MOVE } from "../../constants";
 import { Chess, Square } from "chess.js";
 import { TMove } from "../../types/game";
+import { useGlobalStore } from "../../contexts/global.context";
 
 export default function Board(props: {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,6 +48,7 @@ export default function Board(props: {
     "setPromotionSquare",
   ]);
   const { setLoading } = props;
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
 
   const sendMove = (move: TMove) => {
     try {
@@ -51,8 +56,14 @@ export default function Board(props: {
       if (
         (chess.turn() === "w" && color === "black") ||
         (chess.turn() === "b" && color === "white")
-      )
+      ) {
+        alertPopUp({
+          message: "Kindly wait for your turn",
+          type: "error",
+          showPopUp: true,
+        });
         return;
+      }
       chess.move(move);
       setBoard(chess.fen());
       if (isGameStarted) setLoading(true);
@@ -62,8 +73,14 @@ export default function Board(props: {
           move,
         })
       );
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.log(error);
+      alertPopUp({
+        message: "Invalid move",
+        type: "error",
+        showPopUp: true,
+      });
       return;
     }
   };

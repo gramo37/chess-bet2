@@ -3,6 +3,7 @@ import { BACKEND_URL } from "../../../constants/routes";
 import axios from "axios";
 import usePersonStore from "../../../contexts/auth";
 import { useGlobalStore } from "../../../contexts/global.context";
+import CurrencyConverter from "../../CryptoCurrencyConverter";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
@@ -128,6 +129,7 @@ const Crypto = () => {
           {loading ? "Loading..." : "Withdraw"}Withdraw
         </button>
       </div>
+      <CurrencyConverter />
     </>
   );
 };

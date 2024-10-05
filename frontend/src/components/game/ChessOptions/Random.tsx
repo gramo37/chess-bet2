@@ -2,21 +2,15 @@ import { INIT_GAME } from "../../../constants";
 import { useGameStore } from "../../../contexts/game.context";
 
 const Random = () => {
-  const {
-    setIsGameStarted,
-    setResult,
-    socket,
-    setColor,
-    stake,
-    setStake
-  } = useGameStore([
-    "setIsGameStarted",
-    "setResult",
-    "socket",
-    "setColor",
-    "stake",
-    "setStake",
-  ]);
+  const { setIsGameStarted, setResult, socket, setColor, stake, setStake } =
+    useGameStore([
+      "setIsGameStarted",
+      "setResult",
+      "socket",
+      "setColor",
+      "stake",
+      "setStake",
+    ]);
   const startGame = () => {
     if (!socket) return;
     setIsGameStarted(true);
@@ -31,12 +25,15 @@ const Random = () => {
   return (
     <>
       <label className="text-white">Enter Stake</label>
-      <input
-        type="number"
-        className="p-2"
-        value={stake}
-        onChange={(e) => setStake(Number(e.target.value))}
-      />
+      <div className="flex items-center">
+        <span className="bg-white p-[0.5rem] pr-0 text-black">$</span>
+        <input
+          type="number"
+          className="p-2 outline-none pl-0"
+          value={stake}
+          onChange={(e) => setStake(Number(e.target.value))}
+        />
+      </div>
       <button
         disabled={socket === null}
         onClick={startGame}

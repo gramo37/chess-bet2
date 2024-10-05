@@ -95,9 +95,10 @@ const FriendlyMatch = () => {
           <div className="flex flex-col gap-2">
             <div>
               <label className="text-white mr-2">Enter Stake</label>
+              <span className="bg-white p-[0.57rem] pr-0 text-black">$</span>
               <input
                 type="number"
-                className="p-2"
+                className="p-2 outline-none pl-0"
                 value={stake}
                 onChange={(e) => setStake(Number(e.target.value))}
               />

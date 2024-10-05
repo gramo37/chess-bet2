@@ -8,7 +8,7 @@ type TUser = {
   name?: string | undefined;
   email?: string | undefined;
   role?: string | undefined;
-  totalEarnings?:string |undefined
+  totalEarnings?: string | undefined;
 };
 
 type Transaction = {

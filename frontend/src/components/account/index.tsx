@@ -7,12 +7,13 @@ import { Report } from "./report";
 import DepositMoney from "./DepositMoney";
 import WithdrawMoney from "./WithdrawMoney";
 import { useNavigate } from "react-router-dom";
-import {ReportHistory} from "./reporthistory"
+import { ReportHistory } from "./reporthistory";
+import Refresh from "../Refresh";
 
 export default function Account() {
   const user = usePersonStore((state) => state.user);
   const [activeTab, setActiveTab] = useState("transactions");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const renderActiveTab = () => {
     switch (activeTab) {
       case "transactions":
@@ -30,9 +31,12 @@ export default function Account() {
 
   return (
     <div className="text-white text-center max-w-full w-[900px] m-auto">
-      <button className="absolute top-10 left-10" onClick={() => {
-        navigate("/")
-      }}>
+      <button
+        className="absolute top-10 left-10"
+        onClick={() => {
+          navigate("/");
+        }}
+      >
         <IoMdArrowBack />
       </button>
       <Report token={user?.token || ""} />
@@ -41,9 +45,20 @@ export default function Account() {
 
       <h3 className="mb-2">Username: {user?.email || "Guest"}</h3>
       <h3 className="mb-2">Name: {user?.name || "Anonymous"}</h3>
-      <h3 className="mb-2">Total Earnings: $ {user?.totalEarnings}</h3>
-      <h3 className="mb-2">Balance: $ {user?.balance}</h3>
-       
+      {/* <h3 className="mb-2">Total Earnings: $ {user?.totalEarnings}</h3>
+      <h3 className="mb-2">Balance: $ {user?.balance}</h3> */}
+      <div className="flex text-white gap-3 justify-center items-center mb-2">
+        <h2 className="text-white">
+          Total Earnings: ${user?.totalEarnings ?? 0}
+        </h2>
+        <Refresh />
+      </div>
+      <div className="flex text-white gap-3 justify-center items-center mb-2">
+        <h2 className="text-white">
+          Balance: ${user?.balance ?? 0}
+        </h2>
+        <Refresh />
+      </div>
 
       <div className="flex space-x-3 w-full my-4">
         <TabButton
@@ -69,12 +84,13 @@ export default function Account() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           tabKey="withdraw"
-        /><TabButton
-        title="Reports"
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabKey="reports"
-      />
+        />
+        <TabButton
+          title="Reports"
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="reports"
+        />
       </div>
 
       <div className="mt-4">{renderActiveTab()}</div>

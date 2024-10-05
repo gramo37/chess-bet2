@@ -19,9 +19,9 @@ export const useGetUser = () => {
         });
 
         const user = data?.user?.user;
-       const totalEarnings = data?.user?.totalEarnings
+        const totalEarnings = data?.user?.totalEarnings;
         if (user) {
-          updateUser({ ...user, token ,totalEarnings}); // Update user state with token and user data
+          updateUser({ ...user, token, totalEarnings }); // Update user state with token and user data
         } else {
           updateUser(null); // Clear user if no valid data is returned
           localStorage.removeItem("token");

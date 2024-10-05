@@ -16,6 +16,7 @@ import {
   FRONTEND_URL,
   BINANCE_API_KEY,
   BINANCE_SECRET_KEY,
+  PLATFORM_FEES,
 } from "../../constants";
 import { generateUniqueId, getFinalAmountInUSD } from "../../utils";
 import axios from "axios";
@@ -243,7 +244,7 @@ export const getId = async (req: Request, res: Response) => {
         checkout_id: "",
         mode,
         currency,
-        platform_charges: finalamountInUSD * 0.03,
+        platform_charges: finalamountInUSD * PLATFORM_FEES,
         finalamountInUSD,
         wallet_address: address,
       },
@@ -301,7 +302,7 @@ export const withdrawCrypto = async (req: Request, res: Response) => {
       });
     }
 
-    const platform_charges = finalamountInUSD * 0.03;
+    const platform_charges = finalamountInUSD * PLATFORM_FEES;
     const transaction = await db.transaction.create({
       data: {
         userId: user.id,
@@ -403,7 +404,7 @@ export const getURL = async (req: Request, res: Response) => {
     }
 
     const platform_charges = parseFloat(
-      (finalamountInUSD * CRYPTO_DEPOSIT_PERCENT).toFixed(2)
+      (finalamountInUSD * PLATFORM_FEES).toFixed(2)
     );
 
     // Main Crypto related coding
@@ -601,7 +602,7 @@ export const withdraw = async (req: Request, res: Response) => {
     }
 
     // Initiate the transaction and set its status to 'PENDING'
-    const platform_charges = finalamountInUSD * 0.1;
+    const platform_charges = finalamountInUSD * PLATFORM_FEES;
     const checkout_id = generateUniqueId();
     const transaction = await db.transaction.create({
       data: {

@@ -30,8 +30,8 @@ async function onclick() {
   }
   
 
-return  (  <div className="p-6 space-y-4 md:space-y-6 sm:p-8 pt-5  bg-white rounded-lg shadow dark:border w-[400px] m-auto xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <h1 className="text-xl font-bold leading-tight  tracking-tight text-gray-900 md:text-2xl dark:text-white">
+return  (  <div className="p-6 space-y-4 md:space-y-6 sm:p-8 pt-5 rounded-lg shadow mt-4  w-[400px] m-auto xl:p-0">
+            <h1 className="text-xl font-bold leading-tight  tracking-tight text-white md:text-2xl">
             Forgot password
             </h1>
          <div>
@@ -52,7 +52,7 @@ return  (  <div className="p-6 space-y-4 md:space-y-6 sm:p-8 pt-5  bg-white roun
                 />
                 <button
                 type="submit"
-                className="w-full text-white bg-blue-600 mt-4 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                className="w-full text-white bg-yellow-600 mt-4 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
                 onClick={onclick}
               >
                 Log In

@@ -28,7 +28,7 @@ function Logout(){
 
 
 return <div className="w-[90%] m-auto">
-      <button className="m-4 text-white px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-400" onClick={Logout}>Logout</button>
+      <button className="m-4 text-white px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400" onClick={Logout}>Logout</button>
 <div className="flex space-x-8 border-b border-gray-300 mb-6">
   <button
     className={`text-xl font-bold pb-2 ${activeTab === "reports"

@@ -31,7 +31,7 @@ export default function Account() {
   };
 
   return (
-    <div className="text-white  max-w-[1000px] w-full  m-auto px-4">
+    <div className="text-white bg-black max-w-[1000px] min-h-[600px] w-full  m-auto px-4">
       <div className="flex justify-between mx-2 my-3">
         <button
           className=" p-2 bg-yellow-500 text-white rounded-full shadow-lg"

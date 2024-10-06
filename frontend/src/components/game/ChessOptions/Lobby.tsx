@@ -64,7 +64,7 @@ const Lobby = () => {
   return (
     <>
       <button
-        className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+        className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
           socket === null && "bg-gray-500"
         }`}
         onClick={getOpponents}
@@ -119,7 +119,7 @@ const Lobby = () => {
         <button
           disabled={socket === null}
           onClick={startGame}
-          className={`w-full bg-blue-700 text-gray-300 py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${
+          className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
             socket === null && "bg-gray-500"
           }`}
         >

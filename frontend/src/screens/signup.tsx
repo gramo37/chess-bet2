@@ -64,52 +64,52 @@ export default function SignUP({ admin }: props) {
   }
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+    <section className="w-full bg-black text-black mx-auto">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[500px] lg:py-0">
+          <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
               {admin ? "Admin Signup" : "Sign up to your account"}
             </h1>
             <div className="space-y-4 md:space-y-6">
-              <div>
+              <div className="mb-3">
                 <label
                   htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block text-white text-sm font-bold mb-2"
                 >
                   Your email
                 </label>
                 <input
                   type="email"
                   name="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   placeholder="name@company.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div>
+              <div className="mb-3">
                 <label
                   htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block text-white text-sm font-bold mb-2"
                 >
                   Your name
                 </label>
                 <input
                   type="text"
                   name="username"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   placeholder="Full name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              <div>
+              <div className="mb-3">
                 <label
                   htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block text-white text-sm font-bold mb-2"
                 >
                   Password
                 </label>
@@ -117,7 +117,7 @@ export default function SignUP({ admin }: props) {
                   type="password"
                   name="password"
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -126,7 +126,7 @@ export default function SignUP({ admin }: props) {
 
               <button
                 type="submit"
-                className="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                className="w-full mb-2 bg-yellow-500 font-semibold text-black py-2 rounded hover:bg-yellow-600 hover:text-white transition-colors"
                 onClick={onclick}
               >
                 Sign Up
@@ -143,7 +143,7 @@ export default function SignUP({ admin }: props) {
             </div>
           </div>
         </div>
-      </div>
+        </div>
     </section>
   );
 }

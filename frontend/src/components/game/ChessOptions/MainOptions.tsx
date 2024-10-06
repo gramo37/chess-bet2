@@ -12,7 +12,7 @@ const MainOptions = () => {
         <button
           onClick={() => setType("friend")}
           className={`btn m-2 p-2 ${
-            type === "friend" ? "bg-blue-500 text-white" : "bg-gray-200"
+            type === "friend" ? "bg-yellow-500 text-white" : "bg-gray-200"
           }`}
         >
           Friendly Match
@@ -23,7 +23,7 @@ const MainOptions = () => {
             setGameId("");
           }}
           className={`btn m-2 p-2 ${
-            type === "random" ? "bg-blue-500 text-white" : "bg-gray-200"
+            type === "random" ? "bg-yellow-500 text-white" : "bg-gray-200"
           }`}
         >
           Play Random
@@ -34,7 +34,7 @@ const MainOptions = () => {
             setGameId("");
           }}
           className={`btn m-2 p-2 ${
-            type === "lobby" ? "bg-blue-500 text-white" : "bg-gray-200"
+            type === "lobby" ? "bg-yellow-500 text-white" : "bg-gray-200"
           }`}
         >
           Choose your opponent

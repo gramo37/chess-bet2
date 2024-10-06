@@ -21,14 +21,14 @@ export function ReportHistory() {
 
   useEffect(() => {
     const fetchReports = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        setError("Login again");
+        setError("Please login again.");
         setLoading(false);
         return;
       }
 
-      const url = `${BACKEND_URL}/report/user-reports`; // Adjust this URL as needed
+      const url = `${BACKEND_URL}/report/user-reports`;
 
       try {
         const response = await axios.get(url, {
@@ -51,81 +51,17 @@ export function ReportHistory() {
   if (loading) return <Spinner />;
   if (error) return <p>{error}</p>;
 
-  async function Completed(id: string) {
-    const url = `${BACKEND_URL}/report/${id}/complete`;
-  
-    try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Failed to mark report ${id} as completed`);
-      }
-  
-      const data = await response.json();
-      console.log("Report marked as completed:", data);
-    } catch (error) {
-      console.error("Error completing the report:", error);
-    }
-  }
-
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="overflow-x-auto">
-        <div className="bg-white border border-gray-200 shadow-md">
+        <div className="bg-white border border-gray-200 shadow-md rounded-lg">
           {reports.length === 0 ? (
-            <div className="p-4 text-left text-gray-500">No reports found.</div>
+            <div className="p-4 text-center text-gray-500">No reports found.</div>
           ) : (
             <div className="divide-y divide-gray-200">
               {reports.map((report) => (
-                <div
-                  key={report.id}
-                  className="p-4 hover:bg-gray-50 text-left transition-colors flex capitalize justify-between"
-                >
-                  <div>
-                    <h3 className="font-bold mb-1 text-gray-800">{report.title}</h3>
-                    <p className="text-gray-600 mb-1">{report.description}</p>
-                    {report.status === "PENDING" && (
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() =>
-                          setOpenMessageReportId(openMessageReportId === report.id ? null : report.id)
-                        }
-                      >
-                        {openMessageReportId === report.id ? "Close message tab" : "Open message tab"}
-                      </button>
-                    )}
-                    {openMessageReportId === report.id && (
-                      <MessageContainerReport setOpenMessageReportId={setOpenMessageReportId} openMessageReportId={openMessageReportId} />
-                    )}
-                  </div>
-                  <div className="text-gray-500 text-sm text-right">
-                    <p className="mb-2">
-                      <span>Status: </span>
-                      <span className="font-medium">{report.status}</span>
-                    </p>
-                    <p className="mb-2">
-                      <span>Created at: </span>
-                      <span className="font-medium">
-                        {new Date(report.createdAt).toLocaleString()}
-                      </span>
-                    </p>
-                    {report.status === "PENDING" && (
-                      <button
-                        onClick={() => Completed(report.id)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg mb-2 hover:bg-blue-400 transition duration-200"
-                      >
-                        Mark as completed
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <Report report={report} openMessageReportId={openMessageReportId ?? ""} setOpenMessageReportId={setOpenMessageReportId} />
               ))}
             </div>
           )}
@@ -135,3 +71,87 @@ export function ReportHistory() {
   );
 }
 
+type ReportProps = {
+  report: any,
+  openMessageReportId: string,
+  setOpenMessageReportId: (arg: any) => void
+}
+
+
+const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportProps) => {
+  async function Completed(id: string) {
+    const url = `${BACKEND_URL}/report/${id}/complete`;
+
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark report ${id} as completed`);
+      }
+
+      const data = await response.json();
+      console.log("Report marked as completed:", data);
+    } catch (error) {
+      console.error("Error completing the report:", error);
+    }
+  }
+
+
+  return <div
+    key={report.id}
+    className="p-4 hover:bg-yellow-50 text-left transition-colors"
+  >
+    <div className="flex justify-between">
+      <div>
+      <h3 className="font-bold text-sm text-gray-900 mb-2">{report.title}</h3>
+      <p className="text-gray-500 mb-1 text-xs">
+          <span>Created at: </span>
+          <span className="">
+            {new Date(report.createdAt).toDateString()}
+          </span>
+        </p>
+      </div>
+
+      <div className="text-right text-sm">
+        <p className="text-gray-500 mb-1">
+    Status: {report.status}</p>
+        {report.status === "PENDING" && (
+          <button
+            onClick={() => Completed(report.id)}
+            className="px-2 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+          >
+            Resolved
+          </button>
+        )}
+      </div>
+    </div>
+
+    <div>
+      <p className="text-gray-700 mb-2">{report.description}</p>
+      {report.status === "PENDING" && (
+        <button
+          className="text-yellow-600 hover:underline"
+          onClick={() =>
+            setOpenMessageReportId(openMessageReportId === report.id ? null : report.id)
+          }
+        >
+          {openMessageReportId === report.id
+            ? "Close message tab"
+            : "Open message tab"}
+        </button>
+      )}
+      {openMessageReportId === report.id && (
+        <MessageContainerReport
+          setOpenMessageReportId={setOpenMessageReportId}
+          openMessageReportId={openMessageReportId}
+        />
+      )}
+    </div>
+  </div>
+}

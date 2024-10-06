@@ -17,7 +17,7 @@ import { MessageContainerReport } from "../../account/messageContanier";
           <p className="text-gray-700">{report.description}</p>
           {report.status === "PENDING" && (
                       <button
-                        className="text-blue-500 hover:underline"
+                        className="text-yellow-600 hover:underline"
                         onClick={() =>
                           setOpenMessageReportId(openMessageReportId === report.id ? null : report.id)
                         }

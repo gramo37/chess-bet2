@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { fetchedStatsData } from "../fetch/fetchstats";
+import { calculateStartDate } from "../../../types/utils/utils";
 type User = {
   id: string;
   name: string;
@@ -26,7 +27,7 @@ getStats();
 },[users])
 
 async function getStats(){
-    const date = calculateStartDate()
+    const date = calculateStartDate(timeRange);
     const fetchedStats = await fetchedStatsData(date);
 
     setStatsGamePlayed(fetchedStats.totalGamesPlayed);
@@ -40,42 +41,11 @@ async function getStats(){
 
 }
 
-
-  const calculateStartDate = () => {
-    const range = timeRange;
-    const currentDate = new Date();
-
-    if (range === "today") {
-      const startDate = new Date(currentDate);
-      startDate.setHours(0, 0, 0, 0); // Set the time to the start of the day (00:00:00)
-      return startDate;
-    }
-
-    if (range === "7days") {
-      const startDate = new Date(currentDate);
-      startDate.setDate(currentDate.getDate() - 7);
-      return startDate;
-    }
-
-    if (range === "1month") {
-      const startDate = new Date(currentDate);
-      startDate.setMonth(currentDate.getMonth() - 1);
-      return startDate;
-    }
-
-    if (range === "1year") {
-      const startDate = new Date(currentDate);
-      startDate.setFullYear(currentDate.getFullYear() - 1);
-      return startDate;
-    }
-
-    return null;
-  };
     return <div>
         <div className="mb-4">
             <div className="flex gap-4">
           <h3 className="text-lg font-semibold">Select Time Range</h3>
-               <button onClick={getStats} className="px-2 rounded-lg py-1 text-white bg-blue-500">GET</button>   
+               <button onClick={getStats} className="px-2 rounded-lg py-1 text-white bg-yellow-600">GET</button>   
             </div>
           <select
             value={timeRange}

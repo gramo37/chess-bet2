@@ -6,10 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const TransactionHistory: React.FC = () => {
   const { user, transactions, setTransactions } = usePersonStore();
-  const [tooltip, setTooltip] = useState<{ id: string | null; visible: boolean }>({
-    id: null,
-    visible: false,
-  });
+
 
   const fetchTransactions = async () => {
     try {
@@ -33,16 +30,7 @@ const TransactionHistory: React.FC = () => {
     queryFn: fetchTransactions,
   });
 
-  const copyTransactionId = async (id: string) => {
-    try {
-      await navigator.clipboard.writeText(id);
-      setTooltip({ id, visible: true });
-      setTimeout(() => setTooltip({ id: null, visible: false }), 2000); // Hide after 2 seconds
-    } catch (err) {
-      console.error("Failed to copy transaction ID:", err);
-    }
-  };
-
+  
   if (isLoading) {
     return <div className="text-center py-6">Loading...</div>;
   }
@@ -69,47 +57,7 @@ const TransactionHistory: React.FC = () => {
             </thead>
             <tbody>
               {transactions.map((transaction) => (
-                <tr key={transaction.id} className="border-t hover:bg-gray-50 transition duration-200">
-                  <td 
-                    className="py-3 px-4 text-sm text-gray-600 cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis relative" 
-                    onClick={() => copyTransactionId(transaction.id)}
-                    title={transaction.id} // Optional: Show the full ID on hover
-                  >
-                    <span className="text-gray-400">Click to copy ID</span>
-                    {tooltip.visible && tooltip.id === transaction.id && (
-                      <span className="absolute left-1/2 transform -translate-x-1/3 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-1">
-                        Copied!
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600">
-                    {transaction.amount.toFixed(2)}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600">
-                    {transaction.currency}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600">
-                    {transaction.finalamountInUSD.toFixed(2)} $
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600">{transaction.type}</td>
-                  <td className="py-3 px-4 text-sm text-gray-600">
-                    <span
-                      className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                        transaction.status === "COMPLETED"
-                          ? "bg-green-100 text-green-700"
-                          : transaction.status === "PENDING"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {transaction.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
-                    {new Date(transaction.createdAt).toLocaleDateString()}{" "}
-                    {new Date(transaction.createdAt).toLocaleTimeString()}
-                  </td>
-                </tr>
+                <TransactionComponent transaction={transaction}/>
               ))}
             </tbody>
           </table>
@@ -122,3 +70,66 @@ const TransactionHistory: React.FC = () => {
 };
 
 export default TransactionHistory;
+type TransactionProps = {
+  transaction:any;
+}
+
+
+const TransactionComponent = ({transaction}:TransactionProps)=>{
+  const [tooltip, setTooltip] = useState<{ id: string | null; visible: boolean }>({
+    id: null,
+    visible: false,
+  });
+  const copyTransactionId = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      setTooltip({ id, visible: true });
+      setTimeout(() => setTooltip({ id: null, visible: false }), 2000); // Hide after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy transaction ID:", err);
+    }
+  };
+
+
+  return <tr key={transaction.id} className="border-t hover:bg-gray-50 transition duration-200">
+  <td 
+    className="py-3 px-4 text-sm text-gray-600 cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis relative" 
+    onClick={() => copyTransactionId(transaction.id)}
+    title={transaction.id} // Optional: Show the full ID on hover
+  >
+    <span className="text-gray-400">Click to copy ID</span>
+    {tooltip.visible && tooltip.id === transaction.id && (
+      <span className="absolute left-1/2 transform -translate-x-1/3 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-1">
+        Copied!
+      </span>
+    )}
+  </td>
+  <td className="py-3 px-4 text-sm text-gray-600">
+    {transaction.amount.toFixed(2)}
+  </td>
+  <td className="py-3 px-4 text-sm text-gray-600">
+    {transaction.currency}
+  </td>
+  <td className="py-3 px-4 text-sm text-gray-600">
+    {transaction.finalamountInUSD.toFixed(2)} $
+  </td>
+  <td className="py-3 px-4 text-sm text-gray-600">{transaction.type}</td>
+  <td className="py-3 px-4 text-sm text-gray-600">
+    <span
+      className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+        transaction.status === "COMPLETED"
+          ? "bg-green-100 text-green-700"
+          : transaction.status === "PENDING"
+          ? "bg-yellow-100 text-yellow-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {transaction.status}
+    </span>
+  </td>
+  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+    {new Date(transaction.createdAt).toLocaleDateString()}{" "}
+    {new Date(transaction.createdAt).toLocaleTimeString()}
+  </td>
+</tr>
+}

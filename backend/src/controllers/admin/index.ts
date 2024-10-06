@@ -137,6 +137,7 @@ if(role === 'MODRATOR') {
   const users = await db.user.findMany({
     where: { role: 'USER' },
     select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
+    take: 10,
   });
   res.status(200).json(users);
 }else{
@@ -147,6 +148,7 @@ if(role === 'MODRATOR') {
         { role: 'USER' }
       ]
     },
+    take: 10, 
     select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
   });
   res.status(200).json(users);
@@ -194,7 +196,45 @@ if(role === 'MODRATOR') {
     }
   };
   
+  export const getUserByEmail = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.params;
+      
+      const user = await db.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          balance:true,
+          rating:true,
+          status:true,
+          gamesAsWhite: { select: { id: true, status: true ,result:true,stake:true} },
+          gamesAsBlack: { select: { id: true, status: true ,result:true ,stake:true} },
+          transactions: { select: { id: true, amount: true, status: true , currency:true} },
+        },
+      });
+     
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const whiteWins = user.gamesAsWhite.filter((game:any)=>game.status==='COMPLETED'&&game.result==="WHITE_WINS");
+      const blackWins = user.gamesAsBlack.filter((game:any)=>game.status==='COMPLETED'&&game.result==='BLACK_WINS');
+      const totalEarnings =
+        [...whiteWins, ...blackWins]
+          .map(game => parseFloat(game.stake))
+          .reduce((acc, stake) => acc + stake * 0.85, 0);
+  console.log(whiteWins,blackWins);
+  
+      res.status(200).json({...user,totalEarnings});
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
   export const getGames = async (req: Request, res: Response) => {
+    
     try {
       const games = await db.game.findMany({
         select: {
@@ -208,6 +248,10 @@ if(role === 'MODRATOR') {
           whitePlayer: { select: { id: true, name: true } },
           blackPlayer: { select: { id: true, name: true } },
         },
+        orderBy: {
+          startTime: "desc",
+        },
+        take: 10, 
       });
       res.status(200).json(games);
     } catch (error) {

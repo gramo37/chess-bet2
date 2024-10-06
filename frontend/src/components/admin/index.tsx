@@ -6,6 +6,7 @@ import { TransactionsList } from "./component/transaction"
 import { Users } from "./component/users";
 import { Stats } from "./component/dashboardstats";
 import { Modrator } from "./component/modrator";
+import { IoIosLogOut } from "react-icons/io";
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
@@ -37,59 +38,46 @@ function Logout(){
 
   return (
     <div className="container mx-auto relative py-8">
-      <button className="absolute top-10 right-20 text-white px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-400" onClick={Logout}>Logout</button>
-      <div className="w-[90%]  rounded-lg p-3 mb-2 m-auto  bg-amber-50">
+      <div className="w-[90%]  rounded-lg p-3 mb-2 m-auto relative bg-amber-50">
+      <button className="absolute top-2 right-2 text-white p-2 text-2xl rounded-lg bg-yellow-600 hover:bg-yellow-500" onClick={Logout}>
+        <IoIosLogOut/>
+      </button>
         <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
         <Stats users={users}/>
       </div>
       <div className="w-[90%] m-auto">
         {/* Tabs Header */}
-        <div className="flex space-x-8 border-b border-gray-300 mb-6">
-          <button
-            className={`text-xl font-bold pb-2 ${activeTab === "reports"
-                ? "text-blue-500 border-b-2 border-blue-500"
-                : "text-white"
-              }`}
-            onClick={() => setActiveTab("reports")}
-          >
-            User Reports
-          </button>
-          <button
-            className={`text-xl font-bold pb-2 ${activeTab === "transactions"
-                ? "text-blue-500 border-b-2 border-blue-500"
-                : "text-white"
-              }`}
-            onClick={() => setActiveTab("transactions")}
-          >
-            Transactions
-          </button>
-          <button
-            className={`text-xl font-bold pb-2 ${activeTab === "games"
-                ? "text-blue-500 border-b-2 border-blue-500"
-                : "text-white"
-              }`}
-            onClick={() => setActiveTab("games")}
-          >
-            Games
-          </button>
-          <button
-            className={`text-xl font-bold pb-2 ${activeTab === "users"
-                ? "text-blue-500 border-b-2 border-blue-500"
-                : "text-white"
-              }`}
-            onClick={() => setActiveTab("users")}
-          >
-            Users
-          </button>
-          <button
-            className={`text-xl font-bold pb-2 ${activeTab === "modrator"
-                ? "text-blue-500 border-b-2 border-blue-500"
-                : "text-white"
-              }`}
-            onClick={() => setActiveTab("modrator")}
-          >
-            Manage Modrators
-          </button>
+        <div className="flex space-x-3 w-full my-4 overflow-x-auto scrollbar-hide">
+        <TabButton
+          title={'Reports'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="reports"
+          />
+          <TabButton
+          title={'Transactions'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="transactions"
+          />
+          <TabButton
+          title={'Games'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="games"
+          />
+          <TabButton
+          title={'Users'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="users"
+          />
+          <TabButton
+          title={'Manage Modrators'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          tabKey="modrator"
+          />
         </div>
 
         {/* Tabs Content */}
@@ -106,5 +94,29 @@ function Logout(){
     </div>
   );
 };
+
+function TabButton({
+  title,
+  activeTab,
+  setActiveTab,
+  tabKey,
+}: {
+  title: string;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  tabKey: string;
+}) {
+  return (
+    <div
+      className={`py-2 px-4 border-b-4 transition-colors whitespace-nowrap cursor-pointer text-sm md:text-base w-full md:w-[48%] text-center duration-300 ${tabKey === activeTab
+          ? "border-yellow-500 text-yellow-500"
+          : "border-transparent hover:border-gray-200 text-gray-400 hover:text-white"
+        }`}
+      onClick={() => setActiveTab(tabKey)}
+    >
+      {title}
+    </div>
+  );
+}
 
 export default Dashboard;

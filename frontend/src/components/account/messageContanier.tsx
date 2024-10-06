@@ -17,16 +17,16 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
             if (!openMessageReportId) return;
             try {
                 const url = `${BACKEND_URL}/report/get-report-messages/${openMessageReportId}`;
-                console.log(openMessageReportId)
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${localStorage.getItem('token')}`, 
-                        },
-                      });
-                  
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+
                 const data = await response.json();
+                console.log(data)
                 if (response.ok) {
                     setMessages(data.messages);
                 } else {
@@ -47,11 +47,11 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
 
         try {
             const url = `${BACKEND_URL}/report/send-report-message/${openMessageReportId}`;
-            const response = await fetch(url,{
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({ content: input }),
             });
@@ -59,10 +59,10 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
 
             if (response.ok) {
                 console.log([...messages, data.messageData]);
-                
+                console.log(data);
                 setMessages((prevMessages) => {
                     return [...prevMessages, data.messageData];
-                }); 
+                });
                 setInput(""); // Clear the input field
                 alert(data.message || "Message Sent");
 
@@ -75,46 +75,78 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
         }
     };
 
+    if(error) return <p className="text-red-500">{error}</p>
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="relative rounded-lg max-w-[500px] w-full border-2 p-1 shadow-lg">
-                <div id="message-container" className="h-[300px] overflow-y-auto relative bg-gray-100 text-black rounded-lg mb-4">
-                    {error ? (
-                        <p className="text-red-500">{error}</p>
-                    ) : (
-                        messages.map((msg, index) => (
-                            <div key={index} className={`p-2 ${msg.sender === "ADMIN" ? "bg-gray-400" : "bg-gray-100"}`}>
-                                {msg.message}
-                            </div>
-                        ))
-                    )}
-                </div>
-
-                <form id="send-container" className="flex justify-between" onSubmit={sendMessage}>
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 rounded-l-lg"
-                        placeholder="Type your message"
-                    />
-                    <button
-                        type="submit"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
-                    >
-                        Send
-                    </button>
-                </form>
-
-                <button
-                    className="absolute top-0 right-1 text-black text-2xl hover:text-gray-800"
-                    onClick={() => {
-                        setOpenMessageReportId(null); // Close the message tab
-                    }}
+            <div >
+            <div className="relative rounded-lg max-w-[500px] w-[500px] h-auto   p-1 ">
+                {/* Message Container */}
+                <div
+                    id="message-container"
+                    className="h-[400px] overflow-y-auto relative bg-gray-100 text-black rounded-lg mb-4 p-4"
                 >
-                    &times;
-                </button>
+                    {/* Existing Chat Messages */}
+                    <div className="w-full grid pb-11">
+                        <div className="grid">
+                                {
+                                    messages.map((msg, index) => (
+                                        (msg.sender === 'USER') ? (<div
+                                            key={index}
+                                            className={`className="px-3.5 py-2 bg-gray-300  mb-3 whitespace-nowrap p-2 rounded`}
+                                        >
+                                            <h5 className="text-yellow-900 text-sm font-semibold leading-snug capitalize pb-1">{msg.sender.toLowerCase()}</h5>
+                                            <h5 className="text-gray-900 text-sm font-normal leading-snug"> {msg.message}</h5>
+                                        </div>) : ""))}
+                        </div>
+
+
+
+                        {/* Another message */}
+                        <div className="grid w-full ml-auto">
+                                {
+                                    messages.map((msg, index) => (
+                                        (msg.sender === 'ADMIN') ? (<div
+                                            key={index}
+                                            className={`className="px-3.5 py-2  bg-gray-300  mb-3 whitespace-nowrap p-2 rounded`}
+                                        >
+                                            <h5 className="text-yellow-900 text-sm  font-semibold leading-snug capitalize pb-1">{msg.sender}</h5>
+                                            <h5 className="text-gray-900 text-sm font-normal leading-snug"> {msg.message}</h5>
+                                        </div>) : ""))}
+                        </div>
+
+                    </div>
+                </div>
+                <button
+                className="absolute top-0 right-2 text-black text-2xl hover:text-gray-800"
+                onClick={() => {
+                    setOpenMessageReportId(null); // Close the message tab
+                }}
+            >
+                &times;
+            </button>
             </div>
+
+
+            {/* Input Form */}
+            <form id="send-container" className="flex" onSubmit={sendMessage}>
+                <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 rounded-l-lg"
+                    placeholder="Type your message"
+                />
+                <button
+                    type="submit"
+                    className="bg-yellow-500 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-r-lg"
+                >
+                    Send
+                </button>
+            </form>
+
+           
+        </div>
         </div>
     );
 };

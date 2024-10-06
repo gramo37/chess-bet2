@@ -48,8 +48,8 @@ export default function ChatContainer({ message }: ChatContainerProps) {
         id="message-container"
         className="h-[85%] max-w-[1200px] overflow-y-auto"
       >
-        <div className="bg-gray-300 p-1">Sample message 1</div>
-        <div className="bg-white p-1">Sample message 2</div>
+        <div className="bg-gray-300 p-1"></div>
+        <div className="bg-white p-1"></div>
       </div>
 
       <form

@@ -124,7 +124,8 @@ export class Game {
         // If player has not made any moves for past 30 sec
         // end the game with status "ABONDENDED"
         if (this.moves.length === 0) {
-          this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
+          if (this.status !== COMPLETED)
+            this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
           clearInterval(this.timer1);
         }
       }
@@ -144,7 +145,8 @@ export class Game {
         // If player has not made any moves for past 30 sec
         // end the game with status "ABONDENDED"
         if (this.moves.length === 1) {
-          this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
+          if (this.status !== COMPLETED)
+            this.endGame(this.player1.getPlayer(), { status: "ABANDON" });
           clearInterval(this.timer2);
         }
       }
@@ -415,7 +417,7 @@ export class Game {
         player2TimeLeft: this.player2TimeLeft,
       },
     });
-    this.startPlayer1Timer();
+    // this.startPlayer1Timer();
   }
 
   async endGame(socket: WebSocket | null, payload: TEndGamePayload) {

@@ -11,12 +11,15 @@ import Board from "../components/game/Board";
 import { CiSettings } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { IoIosLogOut } from "react-icons/io";
+import Abondon from "../components/abondon";
+import { ABONDON_TIME } from "../constants";
 
 export default function Game() {
-  const { color, opponent, player } = useGameStore([
+  const { color, opponent, player, gameTime } = useGameStore([
     "color",
     "opponent",
     "player",
+    "gameTime"
   ]);
   useInitSocket();
   const {
@@ -73,6 +76,7 @@ export default function Game() {
                 : formatTime(player2timeLeft)
             }
           />
+          <Abondon timeLeft={color === "white" ? ABONDON_TIME - (gameTime - player1timeLeft) : ABONDON_TIME - (gameTime - player2timeLeft)}/>
         </div>
         <div className="w-full lg:w-1/2 flex flex-col items-center">
           <Results loading={loading} />

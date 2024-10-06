@@ -375,6 +375,7 @@ export const withdrawCrypto = async (req: Request, res: Response) => {
   }
 };
 
+// Not used
 export const getURL = async (req: Request, res: Response) => {
   try {
     let { amount, currency } = req.body;
@@ -485,6 +486,7 @@ export const getURL = async (req: Request, res: Response) => {
   }
 };
 
+// Not used
 export const successTransaction = async (req: any, res: Response) => {
   try {
     const { order_id, sign } = req.body;
@@ -572,6 +574,7 @@ export const successTransaction = async (req: any, res: Response) => {
   }
 };
 
+// Not used
 export const withdraw = async (req: Request, res: Response) => {
   try {
     let { amount, account, currency } = req.body;
@@ -672,6 +675,7 @@ export const withdraw = async (req: Request, res: Response) => {
 
 // Callback for approving crypto withdrawals
 // Update the status of transaction to COMPLETED
+// Not used
 export const approveWithdrawal = async (req: any, res: Response) => {
   try {
     const { order_id, sign } = req.body;

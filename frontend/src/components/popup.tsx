@@ -58,11 +58,11 @@ export default function PopUp() {
           </header>
           {popUpDetails.body && <main>{popUpDetails.body}</main>}
           {popUpDetails.type === "confirm" && <div className="flex gap-2">
-            <button className="px-4 m-2 py-1 text-white bg-blue-500 rounded-md" onClick={async () => {
+            <button className="px-4 m-2 py-1 text-white bg-yellow-500 rounded-md" onClick={async () => {
               await popUpDetails.success()
               closeModal()
             }}>Yes</button>  
-            <button className="px-4 m-2 py-1 text-white bg-blue-500 rounded-md" onClick={() => {
+            <button className="px-4 m-2 py-1 text-white bg-yellow-500 rounded-md" onClick={() => {
               popUpDetails.failure()
               closeModal()
             }}>No</button>  

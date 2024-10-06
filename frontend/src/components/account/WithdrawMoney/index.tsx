@@ -14,7 +14,7 @@ export default function WithdrawMoney() {
               onClick={() => setPaymentMethod("mpesa")}
               className={`btn m-2 p-2 ${
                 paymentMethod === "mpesa"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-yellow-500 text-white"
                   : "bg-gray-200 text-blue-800"
               }`}
             >
@@ -24,7 +24,7 @@ export default function WithdrawMoney() {
               onClick={() => setPaymentMethod("crypto")}
               className={`btn m-2 p-2 ${
                 paymentMethod === "crypto"
-                  ? "bg-blue-500 text-white"
+                  ? "bg-yellow-500 text-white"
                   : "bg-gray-200 text-blue-800"
               }`}
             >

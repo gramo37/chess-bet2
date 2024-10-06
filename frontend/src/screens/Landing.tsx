@@ -30,8 +30,8 @@ export default function Landing() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="flex bg-gray-800 rounded-lg shadow-lg overflow-hidden w-auto lg:w-[50vw]">
+    <div className="min-h-screen flex items-center justify-center black">
+      <div className="flexbg-black rounded-lg shadow-lg overflow-hidden w-auto lg:w-[50vw]">
         <div
           className="hidden lg:block lg:w-1/2 bg-cover"
           style={{ backgroundImage: "url('/chess.jpg')" }}

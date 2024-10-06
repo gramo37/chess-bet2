@@ -48,7 +48,7 @@ export default function Account() {
   };
 
   return (
-    <div className="text-white text-center max-w-full w-[900px] m-auto p-6 bg-gray-800 rounded-lg shadow-lg">
+    <div className="text-white text-center max-w-full w-[900px]  m-auto p-6 bg-black rounded-lg shadow-lg">
       <a className="absolute top-10 left-10 text-2xl" href="/">
         <IoMdArrowBack />
       </a>

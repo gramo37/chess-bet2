@@ -18,10 +18,6 @@ import { TransactionsListProps } from "../schema";
       return statusMatch && typeMatch;
     });
   
-    function onViewProfile(id:string): void {
-  console.log(id);
-  window.location.href = `/player/${id}`
-    }
   
     return (
       <div>
@@ -70,47 +66,7 @@ import { TransactionsListProps } from "../schema";
           {filteredTransactions.length > 0 ? (
             <ul className="space-y-4">
               {filteredTransactions.map((transaction) => (
-                <li
-                  key={transaction.id}
-                  className={`p-4 rounded-md shadow-md ${
-                    transaction.status === "completed"
-                      ? "bg-green-100"
-                      : "bg-gray-100"
-                  }`}
-                >
-                  <div className="flex justify-between">
-                    <div>
-                      <p className="font-semibold">
-                        Amount:{" "}
-                        {new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: transaction.currency,
-                        }).format(transaction.amount)}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Status: {transaction.status}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Type: {transaction.type}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        {format(new Date(transaction.createdAt), "PPpp")}
-                      </p>
-                      <div>
-                        <p className="text-sm text-gray-800 font-semibold">
-                          User: {transaction.user.name}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Email: {transaction.user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                <p className="font-semibold text-blue-500 cursor-pointer hover:underline" onClick={() => onViewProfile(transaction.user.id)}>View User</p>
-  
-                </li>
+                <TransactionsComponent transaction={transaction}/>
               ))}
             </ul>
           ) : (
@@ -123,5 +79,55 @@ import { TransactionsListProps } from "../schema";
     );
   };
   
-  
-  
+  type TransactionsProps = {
+    transaction:any;
+  }
+  const TransactionsComponent = ({transaction}:TransactionsProps)=>{
+
+    function onViewProfile(id:string): void {
+      console.log(id);
+      window.location.href = `/player/${id}`
+        }
+      
+    return <li
+    key={transaction.id}
+    className={`p-4 rounded-md shadow-md ${
+      transaction.status === "completed"
+        ? "bg-green-100"
+        : "bg-gray-100"
+    }`}
+  >
+    <div className="flex justify-between">
+      <div>
+        <p className="font-semibold">
+          Amount:{" "}
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: transaction.currency,
+          }).format(transaction.amount)}
+        </p>
+        <p className="text-sm text-gray-600">
+          Status: {transaction.status}
+        </p>
+        <p className="text-sm text-gray-600">
+          Type: {transaction.type}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-600">
+          {format(new Date(transaction.createdAt), "PPpp")}
+        </p>
+        <div>
+          <p className="text-sm text-gray-800 font-semibold">
+            User: {transaction.user.name}
+          </p>
+          <p className="text-sm text-gray-600">
+            Email: {transaction.user.email}
+          </p>
+        </div>
+      </div>
+    </div>
+  <p className="font-semibold text-yellow-600 cursor-pointer hover:underline" onClick={() => onViewProfile(transaction.user.id)}>View User</p>
+
+  </li>
+  }

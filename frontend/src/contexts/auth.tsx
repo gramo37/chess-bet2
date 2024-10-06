@@ -11,7 +11,7 @@ type TUser = {
   totalEarnings?: string | undefined;
 };
 
-type Transaction = {
+export type Transaction = {
   id: string;
   amount: number;
   currency: number;

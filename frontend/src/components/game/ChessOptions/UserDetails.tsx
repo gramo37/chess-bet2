@@ -8,7 +8,7 @@ const UserDetails = () => {
       <h2 className="text-white text-2xl font-bold">
         Choose how to play chess:
       </h2>
-      <div className="flex text-white gap-3 justify-around items-center">
+      <div className="inline-flex text-white gap-3 ">
         <h2 className="text-white text-xl font-bold">
           Balance: $
           {user?.balance && !Number.isNaN(Number(user?.balance))
@@ -17,7 +17,7 @@ const UserDetails = () => {
         </h2>
         <Refresh />
       </div>
-      <div className="flex text-white gap-2 justify-around items-center mb-4">
+      <div className="inline-flex text-white gap-2  mb-4">
         <h2 className="text-white text-lg font-bold">
           Your Rating: {user?.rating ?? 0}
         </h2>

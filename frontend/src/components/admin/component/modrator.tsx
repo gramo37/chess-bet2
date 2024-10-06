@@ -55,7 +55,7 @@ export function Modrator() {
         </div>
         <button
           type="submit"
-          className=" min-h-[40px] w-[200px] self-center text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+          className=" min-h-[40px] w-[200px] self-center text-white bg-yellow-600 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
           onClick={(e) => onclick(e)}
         >
           Create Modrator

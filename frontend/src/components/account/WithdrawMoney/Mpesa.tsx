@@ -74,6 +74,22 @@ const Mpesa = () => {
         ),
       });
 
+    if (!amount)
+      return alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{"Please provide a amount"}</div>,
+      });
+
+    if (Number(amount) < 700)
+      return alertPopUp({
+        message: "Final amount less than the required limit.",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">The amount should be above KES 700.</div>,
+      });
+
     const url = `${BACKEND_URL}/payments/get-amount-in-USD`;
     const finalamountInUSD = await axios.post(url, {
       currency: "KES",
@@ -92,8 +108,9 @@ const Mpesa = () => {
         <div className="p-2">
           <p>
             Kindly note that KES {0.03 * Number(amount)} will be considered as
-            platform fees. Therefore you will receive KES {0.97 * Number(amount)}
-            . Your balance will be reduced by ${finalBalance}.
+            platform fees. Therefore you will receive KES{" "}
+            {0.97 * Number(amount)}. Your balance will be reduced by $
+            {finalBalance}.
           </p>
           <p>Do you want to proceed ?</p>
         </div>

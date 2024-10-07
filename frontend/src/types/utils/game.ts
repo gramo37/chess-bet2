@@ -25,3 +25,6 @@ export const formatTime = (seconds: number): string => {
   return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
 };
 
+export function roundTo8Decimals(num: number) {
+  return Number(num.toFixed(8));
+}

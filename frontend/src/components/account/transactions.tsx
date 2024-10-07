@@ -105,13 +105,13 @@ const TransactionComponent = ({transaction}:TransactionProps)=>{
     )}
   </td>
   <td className="py-3 px-4 text-sm text-gray-600">
-    {transaction.amount.toFixed(2)}
+    {transaction.mode === "crypto" ? transaction.amount : transaction.amount.toFixed(2)}
   </td>
   <td className="py-3 px-4 text-sm text-gray-600">
     {transaction.currency}
   </td>
   <td className="py-3 px-4 text-sm text-gray-600">
-    {transaction.finalamountInUSD.toFixed(2)} $
+    ${transaction.finalamountInUSD.toFixed(2)}
   </td>
   <td className="py-3 px-4 text-sm text-gray-600">{transaction.type}</td>
   <td className="py-3 px-4 text-sm text-gray-600">

@@ -11,7 +11,7 @@ import { MessageContainerReport } from "../../account/messageContanier";
       <div className="space-y-4">
       {reports.map((report) => (
         <div key={report.id} className="bg-white p-3 rounded-md shadow-md">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between flex-wrap items-center">
             <div>
           <h3 className="font-semibold text-lg text-gray-800">{report.title}</h3>
           <p className="text-gray-700">{report.description}</p>

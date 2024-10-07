@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { generateToken } from "../../utils";
 import { db } from "../../db";
+import { BACKEND_URL } from "../../constants";
+import { BACKEND_ROUTE } from "../..";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -27,7 +29,7 @@ export async function EmailVerification(email: string) {
       html: `<p>Hi! There, You have recently visited 
            our website and entered your email.
            Please follow the given link to verify your email:</p>
-           <a href="http://localhost:5000/api/auth/verify/${token}">Verify</a>
+           <a href="${BACKEND_URL}/${BACKEND_ROUTE}/auth/verify/${token}">Verify</a>
            Thanks`,
     };
 

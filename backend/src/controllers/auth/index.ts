@@ -102,7 +102,24 @@ export const refresh = async (req: Request, res: Response) => {
   }
 };
 
- 
+export const verifiyEmail = async (req:Request,res:Response)=>{
+  try{
+    const user: any = (req?.user as any)?.user;
+    console.log('reacnkls');
+    
+    if(user.emailVerified){
+     return res.status(400).json({message:"Already verified"});
+    }
+    const email = user.email
+    EmailVerification(email);
+    return res.status(200).json({message:"Email has been sent"});
+  }catch(e){
+    return res
+    .status(500)
+    .json({ message: "An error occurred while sending the email" });
+  }
+  
+} 
 
 export const verifyToken = async (req: Request, res: Response) => {
   console.log("verify");

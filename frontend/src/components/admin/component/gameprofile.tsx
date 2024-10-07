@@ -92,7 +92,7 @@ export default function GameProfile() {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-6 p-4 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl relative mx-auto mt-6 p-4 bg-white rounded-lg shadow-lg">
   <a className="absolute top-10 left-10 text-white" href="/dashboard">
     <IoMdArrowBack />
   </a>

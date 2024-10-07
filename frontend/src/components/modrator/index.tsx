@@ -20,19 +20,12 @@ export default function ModratorDashboard(){
     getdata();
   }, []);
 
-function Logout(){
-  localStorage.removeItem('token')
-  window.location.reload();
-}
-
-
 
 return <div className="w-[90%] m-auto">
-      <button className="m-4 text-white px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400" onClick={Logout}>Logout</button>
-<div className="flex space-x-8 border-b border-gray-300 mb-6">
+<div className="flex space-x-8 border-b border-gray-300 my-6">
   <button
     className={`text-xl font-bold pb-2 ${activeTab === "reports"
-        ? "text-blue-500 border-b-2 border-blue-500"
+        ? "text-yellow-600 border-b-2 border-yellow-600"
         : "text-white"
       }`}
     onClick={() => setActiveTab("reports")}
@@ -42,7 +35,7 @@ return <div className="w-[90%] m-auto">
  
   <button
     className={`text-xl font-bold pb-2 ${activeTab === "users"
-        ? "text-blue-500 border-b-2 border-blue-500"
+        ? "text-yellow-600 border-b-2 border-yellow-600"
         : "text-white"
       }`}
     onClick={() => setActiveTab("users")}

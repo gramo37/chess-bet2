@@ -85,7 +85,6 @@ import { TransactionsListProps } from "../schema";
   const TransactionsComponent = ({transaction}:TransactionsProps)=>{
 
     function onViewProfile(id:string): void {
-      console.log(id);
       window.location.href = `/player/${id}`
         }
       

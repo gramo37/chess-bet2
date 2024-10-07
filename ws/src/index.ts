@@ -21,14 +21,13 @@ const allowedHosts = process.env.ALLOWED_HOSTS
 
 console.log(allowedHosts);
 
-
 app.use(
   cors({
     origin: allowedHosts,
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
-);
+)
 
 
 const wss = new WebSocketServer({ server });

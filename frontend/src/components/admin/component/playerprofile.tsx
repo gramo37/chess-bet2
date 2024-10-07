@@ -81,7 +81,7 @@ data();
   
 
   return (
-    <div className="flex flex-col w-full items-center p-8 min-h-screen ">
+    <div className="flex flex-col relative w-full items-center p-8 min-h-screen ">
       <a className="absolute top-10 left-10 text-white" href="/dashboard">
         <IoMdArrowBack />
       </a>

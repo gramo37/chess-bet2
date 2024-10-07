@@ -24,7 +24,6 @@ async function SearchGameById(){
         throw new Error("Game not found");
       }
       const data = await response.json();
-      console.log(data);
       SetFilterGames([data]);
     } catch (err) {
       alert((err as Error).message)??"invalid Id";

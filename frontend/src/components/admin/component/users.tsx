@@ -50,63 +50,67 @@ alert(e.message??"Something Happenend");
 
   return (
     <div className="w-full">
-      <div className="mb-4 flex w-full gap-2 flex-wrap items-center justify-between">
-        <div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="p-2 border border-gray-300 rounded mr-3"
-          >
-            <option value="ALL">All Users</option>
-            <option value="ACTIVE">Active Users</option>
-            <option value="SUSPENDED">Suspended Users</option>
-            <option value="BANNED">Banned Users</option>
-          </select>
+      <div className="mb-4 flex w-full gap-4 flex-wrap items-center justify-between">
+  {/* Filters Section */}
+  <div className="w-full md:w-auto flex flex-col gap-2 md:flex-row">
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      className="p-2 border border-gray-300 rounded w-full md:w-auto"
+    >
+      <option value="ALL">All Users</option>
+      <option value="ACTIVE">Active Users</option>
+      <option value="SUSPENDED">Suspended Users</option>
+      <option value="BANNED">Banned Users</option>
+    </select>
 
-          {loggedInUser && loggedInUser.role === "ADMIN" && (
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="p-2 border border-gray-300 rounded"
-            >
-              <option value="ALL">All Roles</option>
-              <option value="MODRATOR">Moderator</option>
-              <option value="USER">User</option>
-            </select>
-          )}
-        </div>
+    {loggedInUser && loggedInUser.role === "ADMIN" && (
+      <select
+        value={roleFilter}
+        onChange={(e) => setRoleFilter(e.target.value)}
+        className="p-2 border border-gray-300 rounded w-full md:w-auto"
+      >
+        <option value="ALL">All Roles</option>
+        <option value="MODERATOR">Moderator</option>
+        <option value="USER">User</option>
+      </select>
+    )}
+  </div>
 
-        <div className="flex items-center flex-wrap md:justify-end justify-start">
-          <input
-            type="text"
-            placeholder="Search by Email"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="py-2 max-w-[60%] w-[500px] px-4 rounded"
-          />
-          <button
-            onClick={() => {
-              if (!search) {
-                alert("Enter player ID or email");
-                return;
-              }
-              data();
-            }}
-            className="bg-yellow-600 py-3 px-4 text-white hover:bg-yellow-500 rounded ml-2"
-          >
-            <FaSearch />
-          </button>
-          <button
-            onClick={() => {
-              setFilterSearchUsers(users);
-              setSearch("");
-            }}
-            className="bg-yellow-600 py-3 px-4 text-white hover:bg-yellow-500 rounded ml-2"
-          >
-            <IoMdRefresh />
-          </button>
-        </div>
-      </div>
+  {/* Search Section */}
+  <div className="w-full md:w-auto flex items-center justify-start md:justify-end gap-2">
+    <input
+      type="text"
+      placeholder="Search by Email"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="py-2 px-4 border border-gray-300 rounded w-full md:w-[300px]"
+    />
+    
+    <button
+      onClick={() => {
+        if (!search) {
+          alert("Enter player ID or email");
+          return;
+        }
+        data();
+      }}
+      className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
+    >
+      <FaSearch />
+    </button>
+    
+    <button
+      onClick={() => {
+        setFilterSearchUsers(users);
+        setSearch("");
+      }}
+      className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
+    >
+      <IoMdRefresh />
+    </button>
+  </div>
+</div>
 
       <div className="space-y-4">
         {filterSearchUsers.map((user) => (
@@ -130,8 +134,8 @@ const UserComponent = ({ user }: UserProps) => {
 
   return (
     <div className="bg-white p-4 rounded-md shadow-md">
-      <div className="flex justify-between">
-        <div>
+      <div className="flex justify-between flex-wrap-reverse">
+        <div className="">
           <h3 className="font-semibold text-lg text-gray-800">{user.name}</h3>
           <p className="text-gray-700">
             Email:

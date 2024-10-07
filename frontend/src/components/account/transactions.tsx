@@ -99,7 +99,7 @@ const TransactionComponent = ({transaction}:TransactionProps)=>{
   >
     <span className="text-gray-400">Click to copy ID</span>
     {tooltip.visible && tooltip.id === transaction.id && (
-      <span className="absolute left-1/2 transform -translate-x-1/3 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-1">
+      <span className="absolute left-1/2 transform -translate-x-1/3bg-black text-white text-xs rounded py-1 px-2 mt-1">
         Copied!
       </span>
     )}

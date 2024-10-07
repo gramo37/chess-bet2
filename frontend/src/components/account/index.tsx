@@ -9,6 +9,7 @@ import WithdrawMoney from "./WithdrawMoney";
 import { useNavigate } from "react-router-dom";
 import { ReportHistory } from "./reporthistory";
 import Refresh from "../Refresh";
+import { BACKEND_URL } from "../../constants/routes";
 
 export default function Account() {
   const user = usePersonStore((state) => state.user);
@@ -30,8 +31,36 @@ export default function Account() {
     }
   };
 
+  async function VerifiedEmail() {
+    const url = `${BACKEND_URL}/auth/verifyemail`;
+   
+    try {
+  const token = localStorage.getItem("token");
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Something went wrong");
+      }
+  
+      const data = await response.json();
+      alert(data.message); 
+      console.log(data); 
+    } catch (error:any) {
+      alert(error.message || "An error occurred. Please try again.");
+      console.error(error); 
+    }
+  }
+  
+
   return (
-    <div className="text-white  max-w-[1000px] w-full  m-auto px-4">
+    <div className="text-white bg-black max-w-[1000px] min-h-[600px] w-full  m-auto px-4">
       <div className="flex justify-between mx-2 my-3">
         <button
           className=" p-2 bg-yellow-500 text-white rounded-full shadow-lg"
@@ -39,9 +68,12 @@ export default function Account() {
             navigate("/");
           }}
         >
-          <IoMdArrowBack size={24} />
+          <IoMdArrowBack size={24} /> 
         </button>
+          <div className="flex gap-2 items-center">
+        {user&&!user.emailVerified&&<button onClick={VerifiedEmail} className="text-yellow-500 hover:text-yellow-400 hover:underline">Verify Email</button>}
         <Report token={user?.token || ""} />
+          </div>
       </div>
 
       <h1 className="text-2xl text-left mb-6 font-bold">Account</h1>

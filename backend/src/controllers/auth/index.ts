@@ -5,21 +5,23 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateToken, verifyToken as jwtVerify } from "../../utils";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email validation
 
 export const signup = async (req: Request, res: Response) => {
   try {
     const { username, name, password } = req.body;
 
-    const deletedUser = await db.user.findUnique({
-      where: {
-        email:username
-      },
-    });
 
-    if (deletedUser) {
-      return res.status(403).json({ message: "This email is not allowed to sign up." });
+    if (!emailRegex.test(username)) {
+      return res.status(400).json({ message: 'Invalid email format.' });
     }
+  console.log(password);
+  
+    if (password.length <= 6) {
+  console.log(password,"anlaks");
 
+      return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+    }
     const existingUser = await db.user.findFirst({
       where: {
         email: username,
@@ -53,6 +55,12 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
+
+ 
+    if (!emailRegex.test(username)) {
+      return res.status(400).json({ message: 'Invalid email format.' });
+    }
+  
 
     const user = await db.user.findFirst({
       where: {

@@ -26,7 +26,6 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
                 });
 
                 const data = await response.json();
-                console.log(data)
                 if (response.ok) {
                     setMessages(data.messages);
                 } else {
@@ -58,8 +57,6 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
             const data = await response.json();
 
             if (response.ok) {
-                console.log([...messages, data.messageData]);
-                console.log(data);
                 setMessages((prevMessages) => {
                     return [...prevMessages, data.messageData];
                 });
@@ -79,8 +76,8 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div >
-            <div className="relative rounded-lg max-w-[500px] w-[500px] h-auto   p-1 ">
+            <div className="max-w-[97%] w-[500px]">
+            <div className="relative rounded-lg  h-auto   p-1 ">
                 {/* Message Container */}
                 <div
                     id="message-container"
@@ -97,24 +94,16 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
                                         >
                                             <h5 className="text-yellow-900 text-sm font-semibold leading-snug capitalize pb-1">{msg.sender.toLowerCase()}</h5>
                                             <h5 className="text-gray-900 text-sm font-normal leading-snug"> {msg.message}</h5>
-                                        </div>) : ""))}
-                        </div>
-
-
-
-                        {/* Another message */}
-                        <div className="grid w-full ml-auto">
-                                {
-                                    messages.map((msg, index) => (
-                                        (msg.sender === 'ADMIN') ? (<div
+                                        </div>) : <div
                                             key={index}
-                                            className={`className="px-3.5 py-2  bg-gray-300  mb-3 whitespace-nowrap p-2 rounded`}
+                                            className={`className="px-3.5 py-2 bg-gray-300  mb-3 whitespace-nowrap p-2 rounded`}
                                         >
-                                            <h5 className="text-yellow-900 text-sm  font-semibold leading-snug capitalize pb-1">{msg.sender}</h5>
+                                            <h5 className="text-yellow-900 text-sm font-semibold leading-snug capitalize pb-1">{msg.sender.toLowerCase()}</h5>
                                             <h5 className="text-gray-900 text-sm font-normal leading-snug"> {msg.message}</h5>
-                                        </div>) : ""))}
+                                        </div>)
+                                    
+                                    )}
                         </div>
-
                     </div>
                 </div>
                 <button

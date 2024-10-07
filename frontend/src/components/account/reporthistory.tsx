@@ -55,7 +55,7 @@ export function ReportHistory() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="overflow-x-auto">
-        <div className="bg-white border border-gray-200 shadow-md rounded-lg">
+        <div className=" shadow-md rounded-lg">
           {reports.length === 0 ? (
             <div className="p-4 text-center text-gray-500">No reports found.</div>
           ) : (
@@ -96,7 +96,6 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
       }
 
       const data = await response.json();
-      console.log("Report marked as completed:", data);
     } catch (error) {
       console.error("Error completing the report:", error);
     }
@@ -104,54 +103,71 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
 
 
   return <div
-    key={report.id}
-    className="p-4 hover:bg-yellow-50 text-left transition-colors"
-  >
-    <div className="flex justify-between">
-      <div>
-      <h3 className="font-bold text-sm text-gray-900 mb-2">{report.title}</h3>
-      <p className="text-gray-500 mb-1 text-xs">
-          <span>Created at: </span>
-          <span className="">
-            {new Date(report.createdAt).toDateString()}
-          </span>
-        </p>
-      </div>
-
-      <div className="text-right text-sm">
-        <p className="text-gray-500 mb-1">
-    Status: {report.status}</p>
-        {report.status === "PENDING" && (
-          <button
-            onClick={() => Completed(report.id)}
-            className="px-2 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
-          >
-            Resolved
-          </button>
-        )}
-      </div>
+  key={report.id}
+  className="p-2 md:p-4 bg-white mb-2 hover:bg-yellow-50 transition-colors rounded-lg shadow-sm border border-gray-200 "
+>
+  {/* Top section: Title and Reporter info */}
+  <div className="flex justify-between items-start md:items-center">
+    <div className="flex-1">
+      <h3 className="font-semibold capitalize text-base md:text-lg text-gray-900 mb-2 break-words">
+        {report.title}
+      </h3>
     </div>
 
-    <div>
-      <p className="text-gray-700 mb-2">{report.description}</p>
-      {report.status === "PENDING" && (
-        <button
-          className="text-yellow-600 hover:underline"
-          onClick={() =>
-            setOpenMessageReportId(openMessageReportId === report.id ? null : report.id)
-          }
-        >
-          {openMessageReportId === report.id
-            ? "Close message tab"
-            : "Open message tab"}
-        </button>
-      )}
-      {openMessageReportId === report.id && (
-        <MessageContainerReport
-          setOpenMessageReportId={setOpenMessageReportId}
-          openMessageReportId={openMessageReportId}
-        />
-      )}
+    <div className="ml-4 text-right text-sm md:text-base">
+      <p className="text-gray-500 mb-1">
+        Status:{" "}
+        <span className={report.status === "PENDING" ? "text-red-500" : "text-green-500"}>
+          {report.status}
+        </span>
+      </p>
+      <p className="text-gray-500 text-xs md:text-sm">
+        Created At: {new Date(report.createdAt).toLocaleString()}
+      </p>
     </div>
   </div>
+
+  {/* Description and Buttons */}
+  <div className="mt-1">
+    <p className="text-gray-700 text-sm md:text-base break-words">
+      {report.description}
+    </p>
+    
+    {/* Conditional Message Tab */}
+    {report.status === "PENDING" && (
+      <button
+        className="mt-3 text-yellow-600 text-sm hover:underline"
+        onClick={() =>
+          setOpenMessageReportId(
+            openMessageReportId === report.id ? null : report.id
+          )
+        }
+      >
+        {openMessageReportId === report.id
+          ? "Close message tab"
+          : "Open message tab"}
+      </button>
+    )}
+
+    {openMessageReportId === report.id && (
+      <MessageContainerReport
+        setOpenMessageReportId={setOpenMessageReportId}
+        openMessageReportId={openMessageReportId}
+      />
+    )}
+  </div>
+
+  {/* Action Button */}
+  {report.status === "PENDING" && (
+    <div className="mt-4">
+      <button
+        onClick={() => Completed(report.id)}
+        className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200 w-full md:w-auto"
+      >
+        Mark as Resolved
+      </button>
+    </div>
+  )}
+</div>
+
 }

@@ -28,7 +28,6 @@ export function Modrator() {
       }
 
       const data = await response.json();
-      console.log("Login successful:", data);
 
       setEmail("")
       setName("")

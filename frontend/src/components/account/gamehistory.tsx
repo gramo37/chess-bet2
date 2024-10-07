@@ -3,11 +3,11 @@ import usePersonStore from "../../contexts/auth";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
 import { useQuery } from "@tanstack/react-query";
-
+import Spinner from "../spinner"
 const GameHistory: React.FC = () => {
   const { user } = usePersonStore();
   const [page, setPage] = useState(1); // Pagination state
-  const [games, setGames] = useState<any[]>([]); // Holds the game history
+  const [games, setGames] = useState<any[] | null>(null); // Holds the game history
   const [hasMore, setHasMore] = useState(true); // To track if more games exist
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -36,7 +36,13 @@ const GameHistory: React.FC = () => {
   // Append new games to the current list when `data` changes
   useEffect(() => {
     if (data) {
-      setGames((prevGames) => [...prevGames, ...data]);
+      setGames((prevGames) => {
+        if(prevGames){
+          return [...prevGames, ...data]
+        }else{
+          return [...data]
+        }
+      });
       setHasMore(data.length > 0); // Check if more games are returned
       setIsLoadingMore(false); // End loading state
     }
@@ -56,7 +62,7 @@ const GameHistory: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="overflow-x-auto">
-        {games.length > 0 ? (
+        {games&&games.length > 0 && (
           <table className="min-w-full bg-white border whitespace-nowrap text-center border-gray-200 rounded-lg shadow-lg">
             <thead className="bg-yellow-500 text-white">
               <tr>
@@ -71,18 +77,17 @@ const GameHistory: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-4">Loading...</td>
-                </tr>
-              ) : (
-                games.map((game: any) => (
+              {games.map((game: any) => (
                   <GameComponent key={game.id} game={game} user={user} />
                 ))
-              )}
+              }
             </tbody>
           </table>
-        ) : (
+        ) }
+        {isLoading &&(
+          <Spinner/>
+        )}
+        {games!==null&&games.length===0&&(
           <div className="text-center text-gray-500">No games played yet.</div>
         )}
       </div>

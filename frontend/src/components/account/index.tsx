@@ -94,7 +94,6 @@ export default function Account() {
                 ? Number(user?.totalEarnings).toFixed(2)
                 : 0}
             </h2>
-            <Refresh />
           </div>
 
           <div className="flex text-white gap-3  items-center mb-4">

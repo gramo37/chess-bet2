@@ -51,7 +51,6 @@ export default function Account() {
   
       const data = await response.json();
       alert(data.message); 
-      console.log(data); 
     } catch (error:any) {
       alert(error.message || "An error occurred. Please try again.");
       console.error(error); 
@@ -87,15 +86,7 @@ export default function Account() {
 
         <div>
 
-          <div className="flex text-white gap-3  items-center mb-4">
-            <h2 className="text-lg text-left font-semibold">
-              Total Earnings: $
-              {user?.totalEarnings && !Number.isNaN(Number(user?.totalEarnings))
-                ? Number(user?.totalEarnings).toFixed(2)
-                : 0}
-            </h2>
-          </div>
-
+          
           <div className="flex text-white gap-3  items-center mb-4">
             <h2 className="text-lg text-left font-semibold">
               Balance: $

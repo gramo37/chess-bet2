@@ -96,6 +96,7 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
       }
 
       const data = await response.json();
+      console.log(data)
     } catch (error) {
       console.error("Error completing the report:", error);
     }

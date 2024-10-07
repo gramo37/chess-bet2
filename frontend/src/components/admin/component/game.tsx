@@ -7,7 +7,7 @@ import { FaSearch } from "react-icons/fa";
 export const GamesList: React.FC<GamesListProps> = ({ games }) => {
   const [search,setSearch]=useState("")
  const [filterGames,SetFilterGames]=useState(games);
-const [reset,setReset]=useState(games);
+// const [reset,setReset]=useState(games);
 async function SearchGameById(){
   if(!search)return
 

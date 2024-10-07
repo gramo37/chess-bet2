@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import usePersonStore from "../../../contexts/auth";
 import { usersProps, user as UserType } from "../schema";
 import { IoMdRefresh } from "react-icons/io";
 import { FaSearch } from "react-icons/fa";
-import fetchPlayer from "../fetch/fetchplayer";
 import { BACKEND_URL } from "../../../constants/routes";
 
 export const Users = ({ users }: usersProps) => {
@@ -23,6 +22,7 @@ export const Users = ({ users }: usersProps) => {
 
     return statusMatch && roleMatch && searchMatch;
   });
+  console.log(filteredUsers)
 
   // Fetch player from server based on search query
   const data = async () => {

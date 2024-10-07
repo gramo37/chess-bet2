@@ -4,6 +4,7 @@ import usePersonStore from "../../../contexts/auth";
 import axios from "axios";
 import { useGlobalStore } from "../../../contexts/global.context";
 import CurrencyConverter from "../../CryptoCurrencyConverter";
+import { roundTo8Decimals } from "../../../types/utils/game";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
@@ -22,7 +23,7 @@ const Crypto = () => {
         url,
         {
           address: address, // Create a state variable for this
-          amount: Number(amount),
+          amount: roundTo8Decimals(1.03 * Number(amount)),
           currency,
         },
         {
@@ -57,12 +58,28 @@ const Crypto = () => {
     const url = `${BACKEND_URL}/payments/get-crypto-in-USD`;
     const finalamountInUSD = await axios.post(url, {
       currency,
-      amount: 1.03 * Number(amount),
+      amount: roundTo8Decimals(1.03 * Number(amount)),
     });
 
     const amtInUSD = finalamountInUSD.data.finalamountInUSD;
     let finalBalance = amtInUSD - 0.03 * amtInUSD;
     finalBalance = Number(finalBalance.toFixed(2));
+
+    if (!amount)
+      return alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{"Please provide a amount"}</div>,
+      });
+
+    if (amtInUSD < 5)
+      return alertPopUp({
+        message: "Final amount less than the required limit.",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">The amount should be above $5.</div>,
+      });
 
     alertPopUp({
       message: "Final Amount",
@@ -73,7 +90,7 @@ const Crypto = () => {
           <p>
             Kindly note that {currency} {0.03 * Number(amount)} will be
             considered as platform fees. Therefore the final amount will be{" "}
-            {currency} {1.03 * Number(amount)}. Your balance will be updated by
+            {currency} {roundTo8Decimals(1.03 * Number(amount))}. Your balance will be updated by
             ${finalBalance}.
           </p>
           <p>Do you want to proceed ?</p>
@@ -124,11 +141,11 @@ const Crypto = () => {
             <p className="text-white">Wallet Address - {walletAddress}</p>
             <p className="text-red-500 mt-3">
               Kindly send money to the above address using your wallet address{" "}
-              {address} and select the coin as {currency}.
+              <span className="text-lg font-bold">{address}</span> and select the coin as <span className="text-lg font-bold">{currency}</span> and amount as <span className="text-lg font-bold">{roundTo8Decimals(1.03 * Number(amount))}</span>.
             </p>
             <p className="text-red-500 mt-3">
-              Please make sure the wallet address and the currency matches. Your
-              balance will be updated within 10-15 minutes
+              Please make sure the wallet address, amount and the currency match as given above. Your
+              balance will be updated within 5-10 minutes
             </p>
           </div>
         )}

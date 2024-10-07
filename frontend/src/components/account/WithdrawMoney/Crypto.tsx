@@ -4,6 +4,7 @@ import axios from "axios";
 import usePersonStore from "../../../contexts/auth";
 import { useGlobalStore } from "../../../contexts/global.context";
 import CurrencyConverter from "../../CryptoCurrencyConverter";
+import { roundTo8Decimals } from "../../../types/utils/game";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
@@ -73,6 +74,22 @@ const Crypto = () => {
     let finalBalance = amtInUSD;
     finalBalance = Number(finalBalance.toFixed(2));
 
+    if (!amount)
+      return alertPopUp({
+        message: "Error",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">{"Please provide a amount"}</div>,
+      });
+
+    if (amtInUSD < 5)
+      return alertPopUp({
+        message: "Final amount less than the required limit.",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">The amount should be above $5.</div>,
+      });
+
     alertPopUp({
       message: "Final Amount",
       type: "confirm",
@@ -80,9 +97,9 @@ const Crypto = () => {
       body: (
         <div className="p-2">
           <p>
-            Kindly note that {currency} {0.03 * Number(amount)} will be
+            Kindly note that {currency} {roundTo8Decimals(0.03 * Number(amount))} will be
             considered as platform fees. Therefore you will receive {currency}{" "}
-            {0.97 * Number(amount)}. Your balance will be reduced by $
+            {roundTo8Decimals(0.97 * Number(amount))}. Your balance will be reduced by $
             {finalBalance}.
           </p>
           <p>Do you want to proceed ?</p>
@@ -126,7 +143,7 @@ const Crypto = () => {
           onClick={handleCryptoWithdrawal}
           className="px-4 py-2 bg-red-600 text-white rounded"
         >
-          {loading ? "Loading..." : "Withdraw"}Withdraw
+          {loading ? "Loading..." : "Withdraw"}
         </button>
       </div>
       <CurrencyConverter />

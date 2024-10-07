@@ -23,6 +23,7 @@ export const transactionHistory = async (req: Request, res: Response) => {
         type: true,
         status: true,
         createdAt: true,
+        mode: true
       },
     });
 

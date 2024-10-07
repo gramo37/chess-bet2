@@ -3,7 +3,7 @@ import { BACKEND_URL } from "../../constants/routes";
 import usePersonStore from "../../contexts/auth";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
+import Spinner from "../spinner"
 const TransactionHistory: React.FC = () => {
   const { user, transactions, setTransactions } = usePersonStore();
 
@@ -32,7 +32,7 @@ const TransactionHistory: React.FC = () => {
 
   
   if (isLoading) {
-    return <div className="text-center py-6">Loading...</div>;
+    return <Spinner/>
   }
 
   if (error) {
@@ -43,7 +43,7 @@ const TransactionHistory: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="overflow-x-auto">
         {transactions && transactions.length > 0 ? (
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+          <table className="min-w-full bg-white border whitespace-nowrap text-center border-gray-200 rounded-lg shadow-md">
             <thead className="bg-yellow-500 text-white">
               <tr>
                 <th className="py-3 px-4 text-left text-sm font-medium uppercase">ID</th>

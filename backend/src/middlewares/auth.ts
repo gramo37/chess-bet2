@@ -112,6 +112,21 @@ try{
 
 next();
 }catch(e){
-  return res.status(403).json({ message: "something happened fetching your profits" });
+  return res.status(500).json({ message: "something happened fetching your profits" });
 }
+}
+
+export async function emailVerifiedMiddleware(req: Request, res: Response, next: NextFunction) {
+  const user = (req?.user as any)?.user; 
+
+  try {
+    if (user.emailVerified) {
+      next();
+    } else {
+      return res.status(403).json({ message: "Please verify your email first." });
+    }
+  } catch (error) {
+    console.error("Error in emailVerifiedMiddleware:", error);
+    return res.status(500).json({ message: "An error occurred during email verification." });
+  }
 }

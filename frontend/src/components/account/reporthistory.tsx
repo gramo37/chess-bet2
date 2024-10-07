@@ -55,7 +55,7 @@ export function ReportHistory() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="overflow-x-auto">
-        <div className="bg-white border border-gray-200 shadow-md rounded-lg">
+        <div className=" shadow-md rounded-lg">
           {reports.length === 0 ? (
             <div className="p-4 text-center text-gray-500">No reports found.</div>
           ) : (
@@ -104,18 +104,14 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
 
   return <div
   key={report.id}
-  className="p-4 md:p-6 hover:bg-yellow-50 transition-colors rounded-lg shadow-sm border border-gray-200 max-w-md md:max-w-2xl mx-auto"
+  className="p-2 md:p-4 bg-white mb-2 hover:bg-yellow-50 transition-colors rounded-lg shadow-sm border border-gray-200 "
 >
   {/* Top section: Title and Reporter info */}
-  <div className="flex justify-between flex-wrap items-start md:items-center">
+  <div className="flex justify-between items-start md:items-center">
     <div className="flex-1">
-      <h3 className="font-semibold text-base md:text-lg text-gray-900 mb-2 break-words">
+      <h3 className="font-semibold capitalize text-base md:text-lg text-gray-900 mb-2 break-words">
         {report.title}
       </h3>
-      <p className="text-sm text-gray-600">
-        <span>Reported by: </span>
-        <span className="font-semibold text-gray-900">{report.reportedBy}</span>
-      </p>
     </div>
 
     <div className="ml-4 text-right text-sm md:text-base">
@@ -132,7 +128,7 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
   </div>
 
   {/* Description and Buttons */}
-  <div className="mt-3">
+  <div className="mt-1">
     <p className="text-gray-700 text-sm md:text-base break-words">
       {report.description}
     </p>

@@ -34,7 +34,13 @@ const allowedHosts = process.env.ALLOWED_HOSTS
 
 console.log(allowedHosts);
 
-app.use(cors())
+app.use(
+  cors({
+    origin: allowedHosts,
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+)
 
 app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);

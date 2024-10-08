@@ -6,7 +6,6 @@ import { TransactionsList } from "./component/transaction"
 import { Users } from "./component/users";
 import { Stats } from "./component/dashboardstats";
 import { Modrator } from "./component/modrator";
-import { IoIosLogOut } from "react-icons/io";
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);

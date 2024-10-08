@@ -1,15 +1,15 @@
 import nodemailer from "nodemailer";
 import { generateToken } from "../../utils";
 import { db } from "../../db";
-import { BACKEND_URL } from "../../constants";
+import { BACKEND_URL, NODEMAILER_MAIL, NODEMAILER_PASS } from "../../constants";
 import { BACKEND_ROUTE } from "../..";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   auth: {
-      user: 'amansample786@gmail.com',
-      pass: 'bgwl hcnd wzjg eqix'
+      user: NODEMAILER_MAIL,
+      pass: NODEMAILER_PASS
   }
 });
 // Function to send email verification

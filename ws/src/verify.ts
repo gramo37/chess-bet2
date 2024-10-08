@@ -1,12 +1,18 @@
 import { db } from "./db";
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const NODEMAILER_MAIL = process.env.NODEMAILER_MAIL ?? "";
+const NODEMAILER_PASS = process.env.NODEMAILER_PASS ?? "";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   auth: {
-      user: 'amansample786@gmail.com',
-      pass: 'bgwl hcnd wzjg eqix'
+      user: NODEMAILER_MAIL,
+      pass: NODEMAILER_PASS
   }
 });
 

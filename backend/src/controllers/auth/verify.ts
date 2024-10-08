@@ -23,7 +23,7 @@ export async function EmailVerification(email: string) {
     );
 
     const mailConfigurations = {
-      from: `amansample786@gmail.com <no-reply@chessbet.com>`,
+      from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
       to: email,
       subject: "Email Verification",
       html: `<p>Hi! There, You have recently visited 
@@ -47,7 +47,7 @@ export const SendForgotPassword = async (email: string, token: string) => {
 console.log('Sending: ',token);
 
     const mailOptions = {
-      from: `amansample786@gmail.com <no-reply@chessbet.com>`,
+      from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
       to: email,
       subject: "Password Reset Request",
       html: `<p>You requested a password reset. Click the link below to reset your password:</p>
@@ -141,7 +141,7 @@ export async function SendUserBannedNotification(email: string,message:string) {
 export async function WithdrawalRequestNotification(amount:number,id:string) {
   const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
   const mailConfigurations = (email: string) => ({
-    from: 'amansample786@gmail.com <no-reply@chessbet.com>',
+    from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
     to: email,
     subject: 'Withdrawal Request has been made',
     html: `<p>Kindly check withdrawal request has been made with : </p>

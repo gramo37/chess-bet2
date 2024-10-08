@@ -22,7 +22,7 @@ export async function SendRandomPlayNotificationToAdmin(gameId: string) {
     const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
 
     const mailConfigurations = (email: string) => ({
-      from: 'amansample786@gmail.com <no-reply@chessbet.com>',
+      from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
       to: email,
       subject: 'New Random Play Created',
       html: `

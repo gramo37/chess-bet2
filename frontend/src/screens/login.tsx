@@ -2,11 +2,7 @@ import { useState } from "react";
 import { BACKEND_URL } from "../constants/routes";
 import { useGlobalStore } from "../contexts/global.context";
 
-type props = {
-  admin: boolean;
-};
-
-export default function Login({ admin }: props) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const {alertPopUp} = useGlobalStore(["alertPopUp"])
@@ -22,9 +18,7 @@ export default function Login({ admin }: props) {
       return;
     }
 
-    const url = !admin
-      ? `${BACKEND_URL}/auth/login`
-      : `${BACKEND_URL}/admin/login-admin`;
+    const url =  `${BACKEND_URL}/auth/login`
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -58,7 +52,7 @@ export default function Login({ admin }: props) {
       // })
 
       // alert("Login successful");
-      window.location.href = admin ? "/dashboard" : "/game";
+      window.location.href = "/game";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error);
@@ -80,7 +74,7 @@ export default function Login({ admin }: props) {
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
-              {admin ? "Admin Login" : "Login in to your account"}
+              Login in to your account
             </h1>
             <div className="space-y-4 md:space-y-6">
             <div className="mb-3">
@@ -135,7 +129,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account ?{" "}
                 <a
-                  href={admin ? "/adminsignup" : "signup"}
+                  href="/signup"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Sign Up

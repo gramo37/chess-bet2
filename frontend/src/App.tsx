@@ -68,7 +68,7 @@ function App() {
               path="/login"
               element={
                 <PublicRoute>
-                  <Login admin={false} />
+                  <Login  />
                 </PublicRoute>
               }
             />
@@ -76,7 +76,7 @@ function App() {
               path="/signup"
               element={
                 <PublicRoute>
-                  <Signup admin={false} />
+                  <Signup  />
                 </PublicRoute>
               }
             /><Route
@@ -87,22 +87,6 @@ function App() {
               </PublicRoute>
             }
           />
-            <Route
-              path="/adminsignup"
-              element={
-                <PublicRoute>
-                  <Signup admin={true} />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/adminlogin"
-              element={
-                <PublicRoute>
-                  <Login admin={true} />
-                </PublicRoute>
-              }
-            />
             <Route
               path="/dashboard"
               element={

@@ -31,17 +31,10 @@ const Dashboard = () => {
     getdata();
   }, []);
 
-function Logout(){
-  localStorage.removeItem('token')
-  window.location.reload();
-}
 
   return (
     <div className="container mx-auto relative py-8">
       <div className="w-[90%]  rounded-lg p-3 mb-2 m-auto relative bg-amber-50">
-      <button className="absolute top-2 right-2 text-white p-2 text-2xl rounded-lg bg-yellow-600 hover:bg-yellow-500" onClick={Logout}>
-        <IoIosLogOut/>
-      </button>
         <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
         <Stats users={users}/>
       </div>

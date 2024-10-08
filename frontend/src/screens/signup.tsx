@@ -3,11 +3,7 @@ import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import { useGlobalStore } from "../contexts/global.context";
 
-type props = {
-  admin: boolean;
-};
-
-export default function SignUP({ admin }: props) {
+export default function SignUP() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -23,9 +19,8 @@ export default function SignUP({ admin }: props) {
       });
       return;
     }
-    const url = !admin
-      ? `${BACKEND_URL}/auth/register`
-      : `${BACKEND_URL}/admin/create-admin`;
+    const url = `${BACKEND_URL}/auth/register`
+      
     try {
       const response = await axios.post(
         url,
@@ -50,7 +45,7 @@ export default function SignUP({ admin }: props) {
 
       console.log(data, response);
       // alert(data.message);
-      window.location.href = admin ? "/dashboard" : "/game";
+      window.location.href ="/game";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error);
@@ -69,7 +64,7 @@ export default function SignUP({ admin }: props) {
           <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
-              {admin ? "Admin Signup" : "Sign up to your account"}
+              Sign up to your account
             </h1>
             <div className="space-y-4 md:space-y-6">
               <div className="mb-3">
@@ -134,7 +129,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account ?{" "}
                 <a
-                  href={admin ? "/adminlogin" : "/login"}
+                  href= "/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Log In

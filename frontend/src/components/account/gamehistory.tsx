@@ -88,11 +88,11 @@ const GameHistory: React.FC = () => {
           <Spinner/>
         )}
         {games!==null&&games.length===0&&(
-          <div className="text-center text-gray-500">No games played yet.</div>
+          <div className="text-center text-white">No games played yet.</div>
         )}
       </div>
 
-      {isLoadingMore && <div>Loading more games...</div>}
+      {isLoadingMore && <div className="text-center text-white">Loading more games...</div>}
 
       {hasMore && !isLoadingMore && (
         <button onClick={loadMoreGames} className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded">

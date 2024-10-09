@@ -81,22 +81,3 @@ export const updateReportStatus = async (req: Request, res: Response) => {
 };
 
 
-export async function MarkIssueCompleted(req: Request, res: Response) {
-    const {id}=req.params
-
-    if (!id) {
-        return res.status(400).json({ error: "reportId is required" });
-    }
-console.log(id);
-
-    try {
-        const updatedReport = await db.userReport.update({
-            where: { id: id },
-            data: { status: "RESOLVED" },
-        });
-
-        res.status(200).json({ message: "Report marked as completed", report: updatedReport });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update report status", details: error });
-    }
-}

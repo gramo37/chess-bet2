@@ -1,141 +1,170 @@
 import { useState } from "react";
 import usePersonStore from "../../../contexts/auth";
-import { usersProps, user as UserType } from "../schema";
+import { user } from "../schema";
 import { IoMdRefresh } from "react-icons/io";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch} from "react-icons/fa";
 import { BACKEND_URL } from "../../../constants/routes";
+import axios from "axios";
+import fetchData, { fetchUsersTypeData } from "../fetch/fetchdata";
 
-export const Users = ({ users }: usersProps) => {
+type UsersProps = {
+  users: user[];
+  setUsers: (arg:any) => void;
+};
+
+export const Users = ({ users, setUsers }: UsersProps) => {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const [filterSearchUsers, setFilterSearchUsers] = useState(users);
-  const loggedInUser = usePersonStore((state) => state.user); // Renamed to loggedInUser to avoid conflict
+  const loggedInUser = usePersonStore((state) => state.user); // Use more descriptive variable
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
 
-  // Filter users based on selected status and role
-  const filteredUsers = users.filter((user) => {
-    const statusMatch = statusFilter === "ALL" || user.status === statusFilter;
-    const roleMatch = roleFilter === "ALL" || user.role === roleFilter;
-    const searchMatch =
-      user.email.toLowerCase().includes(search.toLowerCase()) ||
-      user.name.toLowerCase().includes(search.toLowerCase());
+const GetSuspendedBannedUsers = async ()=>{
+  if(statusFilter==='ALL'){
+    setFilterSearchUsers(users);
+    return;
+  }
+const data =await fetchUsersTypeData(statusFilter);
+setFilterSearchUsers(data);
+}
 
-    return statusMatch && roleMatch && searchMatch;
-  });
-  console.log(filteredUsers)
+const GetModrators = async ()=>{
+const data = await fetchUsersTypeData('modrators');
+setFilterSearchUsers(data);
+}
 
-  // Fetch player from server based on search query
-  const data = async () => {
+  // Fetch user by email
+  const fetchUserByEmail = async () => {
     const url = `${BACKEND_URL}/admin/usersemail/${search.trim()}`;
     try {
-      const response = await fetch(url, {
-        method: "GET",
+      const response = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure the token is passed
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Token for authorization
         },
       });
-      if (!response.ok) {
+
+      if (response.status !== 200) {
         throw new Error("Player not found");
       }
-      const data = await response.json();
-      console.log(data);
+
+      const data = response.data;
       setFilterSearchUsers([data]);
-    }catch(e:any){
-    console.log('error',e);
-alert(e.message??"Something Happenend");
-  }
+    } catch (error: any) {
+      console.error("Error fetching user:", error);
+      alert(error.message ?? "Something went wrong");
+    }
   };
 
+  // Load more users for pagination
+  const loadMoreUsers = async () => {
+    setIsLoadingMore(true);
+    const data = await fetchData("users", page + 1);
+    setPage((prevPage) => prevPage + 1);
+    setUsers((prevUsers: any) => [...prevUsers, ...data]);
+    setFilterSearchUsers([...users, ...data]);
+    setSearch("");
+    setStatusFilter("ALL");
+    setHasMore(data.length > 0); // If no more users, stop loading
+    setIsLoadingMore(false);
+  };
 
   return (
     <div className="w-full">
       <div className="mb-4 flex w-full gap-4 flex-wrap items-center justify-between">
-  {/* Filters Section */}
-  <div className="w-full md:w-auto flex flex-col gap-2 md:flex-row">
-    <select
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-      className="p-2 border border-gray-300 rounded w-full md:w-auto"
-    >
-      <option value="ALL">All Users</option>
-      <option value="ACTIVE">Active Users</option>
-      <option value="SUSPENDED">Suspended Users</option>
-      <option value="BANNED">Banned Users</option>
-    </select>
+        {/* Filters Section */}
+        <div className="w-full md:w-auto flex flex-col gap-2 md:flex-row">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="p-2 border border-gray-300 rounded w-full md:w-auto"
+          >
+            <option value="ALL">All Users</option>
+            <option value="suspended">Suspended Users</option>
+            <option value="banned">Banned Users</option>
+          </select>
+          <button onClick={GetSuspendedBannedUsers} className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded">
+            Get by status
+          </button>
+          {loggedInUser?.role === "ADMIN" && (
+            <button onClick={GetModrators} className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded">
+            Get Modrators
+          </button>
+          )}
+        </div>
 
-    {loggedInUser && loggedInUser.role === "ADMIN" && (
-      <select
-        value={roleFilter}
-        onChange={(e) => setRoleFilter(e.target.value)}
-        className="p-2 border border-gray-300 rounded w-full md:w-auto"
-      >
-        <option value="ALL">All Roles</option>
-        <option value="MODERATOR">Moderator</option>
-        <option value="USER">User</option>
-      </select>
-    )}
-  </div>
-
-  {/* Search Section */}
-  <div className="w-full md:w-auto flex items-center justify-start md:justify-end gap-2">
-    <input
-      type="text"
-      placeholder="Search by Email"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="py-2 px-4 border border-gray-300 rounded w-full md:w-[300px]"
-    />
-    
-    <button
-      onClick={() => {
-        if (!search) {
-          alert("Enter player ID or email");
-          return;
-        }
-        data();
-      }}
-      className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
-    >
-      <FaSearch />
-    </button>
-    
-    <button
-      onClick={() => {
-        setFilterSearchUsers(users);
-        setSearch("");
-      }}
-      className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
-    >
-      <IoMdRefresh />
-    </button>
-  </div>
-</div>
+        {/* Search Section */}
+        <div className="w-full md:w-auto flex items-center justify-start md:justify-end gap-2">
+          <input
+            type="text"
+            placeholder="Search by Email"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="py-2 px-4 border border-gray-300 rounded w-full md:w-[300px]"
+          />
+          <button
+            onClick={() => {
+              if (!search) {
+                alert("Enter player ID or email");
+                return;
+              }
+              fetchUserByEmail();
+            }}
+            className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
+          >
+            <FaSearch />
+          </button>
+          <button
+            onClick={() => {
+              setFilterSearchUsers(users);
+              setSearch("");
+            }}
+            className="bg-yellow-600 py-2 px-4 text-white hover:bg-yellow-500 rounded"
+          >
+            <IoMdRefresh />
+          </button>
+        </div>
+      </div>
 
       <div className="space-y-4">
-        {filterSearchUsers.map((user) => (
+        {users&&filterSearchUsers.map((user) => (
           <UserComponent key={user.id} user={user} />
         ))}
       </div>
+
+      {isLoadingMore && <p className="text-white text-xl m-3">Loading more games...</p>}
+
+      {hasMore && !isLoadingMore && (
+        <button
+          onClick={loadMoreUsers}
+          className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded"
+        >
+          Load More
+        </button>
+      )}
+
+      {!hasMore && <p className="text-white text-xl m-3">No more users</p>}
     </div>
   );
 };
 
 type UserProps = {
-  user: UserType;
+  user: user;
 };
 
 const UserComponent = ({ user }: UserProps) => {
-  // Function to handle user profile view
-  function onViewProfile(id: string): void {
+  // Handle user profile view
+  const onViewProfile = (id: string) => {
     console.log(id);
     window.location.href = `/player/${id}`;
-  }
+  };
 
   return (
     <div className="bg-white p-4 rounded-md shadow-md">
       <div className="flex justify-between flex-wrap-reverse">
-        <div className="">
+        <div>
           <h3 className="font-semibold text-lg text-gray-800">{user.name}</h3>
           <p className="text-gray-700">
             Email:
@@ -145,7 +174,6 @@ const UserComponent = ({ user }: UserProps) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {" "}
               {user.email}
             </a>
           </p>

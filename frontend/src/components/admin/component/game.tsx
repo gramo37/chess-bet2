@@ -1,13 +1,21 @@
-import React, { useState } from "react";
-import { GamesListProps } from "../schema";
+import  { useState } from "react";
 import { BACKEND_URL } from "../../../constants/routes";
 import { IoMdRefresh } from "react-icons/io";
 import { FaSearch } from "react-icons/fa";
+import fetchData from "../fetch/fetchdata";
 
-export const GamesList: React.FC<GamesListProps> = ({ games }) => {
+type GamesListProps = {
+  games:any[],
+  setGames:(arg:any)=>void
+}
+
+export const GamesList = ({ games,setGames }:GamesListProps) => {
   const [search,setSearch]=useState("")
  const [filterGames,SetFilterGames]=useState(games);
-// const [reset,setReset]=useState(games);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+
 async function SearchGameById(){
   if(!search)return
 
@@ -32,6 +40,17 @@ async function SearchGameById(){
 
  }
 
+ 
+ const LoadMoreGames = async ()=>{
+  setIsLoadingMore(true);
+  const data = await fetchData('games',page+1)
+  setPage(page+1);
+  setGames([...games,...data])
+  setHasMore(data.length > 0); 
+  setIsLoadingMore(false);
+  console.log('nlmklasv')
+ }
+
 
   return (
     <div className="space-y-6">
@@ -46,6 +65,19 @@ async function SearchGameById(){
       {filterGames&&filterGames.map((game) => (
         <Game game={game}/>
       ))}
+      
+      {isLoadingMore && <p className="text-white text-xl m-3">Loading more games...</p>}
+
+      {hasMore && !isLoadingMore && (
+        <button
+          onClick={LoadMoreGames}
+          className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded"
+        >
+          Load More
+        </button>
+      )}
+
+      {!hasMore && <p className="text-white text-xl m-3">No more users</p>}
     </div>
   );
 };

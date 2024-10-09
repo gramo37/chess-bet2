@@ -32,7 +32,7 @@ export const createModrator = async (req: Request, res: Response) => {
         },
       });
   
-      SendModeratorNotification(username,password)
+      SendModeratorNotification(username,name,password)
       res
         .status(200)
         .json({ message: "Modrator created successfully and mail has been sent to there email address" });

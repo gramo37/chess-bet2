@@ -8,12 +8,12 @@ const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   auth: {
-      user: NODEMAILER_MAIL,
-      pass: NODEMAILER_PASS
+    user: NODEMAILER_MAIL,
+    pass: NODEMAILER_PASS
   }
 });
 // Function to send email verification
-export async function EmailVerification(email: string) {
+export async function EmailVerification(email: string, name: string) {
   try {
     const token = generateToken(
       {
@@ -25,12 +25,16 @@ export async function EmailVerification(email: string) {
     const mailConfigurations = {
       from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
       to: email,
-      subject: "Email Verification",
-      html: `<p>Hi! There, You have recently visited 
-           our website and entered your email.
-           Please follow the given link to verify your email:</p>
-           <a href="${BACKEND_URL}/${BACKEND_ROUTE}/auth/verify/${token}">Verify</a>
-           Thanks`,
+      subject: "Email Verification for Your ProChesser Account",
+      html: `<p>Dear ${name}</p>
+      <p>Thank you for visiting ProChesser! We noticed that you recently entered your email address on our website. To ensure the security of your account and enhance your experience with us, please verify your email by clicking the link below:</p>
+      <a href="${BACKEND_URL}/${BACKEND_ROUTE}/auth/verify/${token}">Verify Your Email</a>
+      <p>If you have any questions or need assistance, feel free to reach out to our support team at support@prochessser.com<p>
+      <p>Thank you for choosing ProChesser!</p>
+      <p>Sincerely,</p>
+<p>The ProChesser Team</p>
+<a href="https://www.prochesser.com/">https://www.prochesser.com/</a>    
+      `,
     };
 
     await transporter.sendMail(mailConfigurations);
@@ -41,18 +45,25 @@ export async function EmailVerification(email: string) {
 }
 
 // Function to send the forgot password email with a reset link
-export const SendForgotPassword = async (email: string, token: string) => {
+export const SendForgotPassword = async (email: string, name: string, token: string) => {
   try {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-console.log('Sending: ',token);
+    console.log('Sending: ', token);
 
     const mailOptions = {
       from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
       to: email,
-      subject: "Password Reset Request",
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p>
+      subject: "Account Password Reset",
+      html: `<p>Dear ${name}</p>
+             <p>To reset the password to your ProChesser account, click the link below:</p>
              <a href="${resetLink}">Reset Password</a>
-             <p>This link will expire in 10 minutes.</p>`,
+             <p>This link will expire in 10 minutes.</p>
+             <p>If you have any questions or need assistance, feel free to reach out to our support team at support@prochessser.com<p>
+      <p>Thank you for choosing ProChesser!</p>
+      <p>Sincerely,</p>
+<p>The ProChesser Team</p>
+<a href="https://www.prochesser.com/">https://www.prochesser.com/</a>    
+             `,
     };
 
     await transporter.sendMail(mailOptions);
@@ -62,17 +73,21 @@ console.log('Sending: ',token);
   }
 };
 
-export async function SendModeratorNotification(email: string, password:string) {
+export async function SendModeratorNotification(email: string,name:string, password: string) {
   try {
     const mailOptions = {
       from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
       to: email,
-      subject: "Congratulations! You've been made a Moderator",
-      html: `<p>Hello,</p>
-             <p>We are excited to inform you that you have been made a moderator on our site.</p>
+      subject: "Welcome to ProChesser as a Moderator!",
+      html: `<p>Hi ${name}</p>
+             <p>You’ve been added as a moderator on ProChesser.com! Thank you for joining our team. If you have any questions, feel free to reach out.</p>
              <p>Your temporary password is: <strong>${password}</strong></p>
              <p>Please log in using this password and change it immediately.</p>
-             <p>Best regards,<br>Your Team at ChessBet</p>`,
+             <p>Welcome aboard!</p>
+             <p>Sincerely,</p>
+             <p>The ProChesser Team</p>
+             <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>
+             `,
     };
 
     await transporter.sendMail(mailOptions);
@@ -80,7 +95,7 @@ export async function SendModeratorNotification(email: string, password:string) 
 
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; 
+    throw error;
   }
 }
 
@@ -89,15 +104,20 @@ export async function SendUserSuspentionNotification(email: string) {
     const mailOptions = {
       from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
       to: email,
-      subject: "Your Account the been suspended",
-      html: `<p>Sorry to Inform you that your account has been suspended</p>`,
+      subject: "Your Prochesser Account the been suspended",
+      html: `<p>Sorry to Inform you that your account has been suspended by the admin. </p>
+              <p>If you have any questions or need assistance, please  reach out to our support team at support@prochessser.com</p>
+             <p>Sincerely,</p>
+             <p>The ProChesser Team</p>
+             <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
 
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; 
+    throw error;
   }
 }
 
@@ -106,19 +126,24 @@ export async function SendUserActivationNotification(email: string) {
     const mailOptions = {
       from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
       to: email,
-      subject: "Your Account the been Activated",
-      html: `<p>Congrats Your Account has been activated</p>`,
+      subject: "Your ProChesser Account has been Activated",
+      html: `<p>Congrats Your Account has been activated</p>
+              <p>If you have any questions or need assistance, please  reach out to our support team at support@prochessser.com</p>
+             <p>Sincerely,</p>
+             <p>The ProChesser Team</p>
+             <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
 
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; 
+    throw error;
   }
 }
 
-export async function SendUserBannedNotification(email: string,message:string) {
+export async function SendUserBannedNotification(email: string, message: string) {
   try {
     const mailOptions = {
       from: `${process.env.GMAIL_USER} <no-reply@chessbet.com>`,
@@ -126,6 +151,10 @@ export async function SendUserBannedNotification(email: string,message:string) {
       subject: "Your Account the been Banned",
       html: `<p>Sorry to Inform you that your account has been Banned Because </p>
       <p>${message}</p>        
+      <p>If you have any questions or need assistance, please  reach out to our support team at support@prochessser.com</p>
+             <p>Sincerely,</p>
+             <p>The ProChesser Team</p>
+             <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>
       `,
     };
 
@@ -134,11 +163,11 @@ export async function SendUserBannedNotification(email: string,message:string) {
 
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error; 
+    throw error;
   }
 }
 
-export async function WithdrawalRequestNotification(amount:number,id:string) {
+export async function WithdrawalRequestNotification(amount: number, id: string) {
   const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
   const mailConfigurations = (email: string) => ({
     from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,

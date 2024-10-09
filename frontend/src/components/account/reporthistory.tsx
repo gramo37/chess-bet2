@@ -79,30 +79,7 @@ type ReportProps = {
 
 
 const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportProps) => {
-  async function Completed(id: string) {
-    const url = `${BACKEND_URL}/report/${id}/complete`;
-
-    try {
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to mark report ${id} as completed`);
-      }
-
-      const data = await response.json();
-      console.log(data)
-    } catch (error) {
-      console.error("Error completing the report:", error);
-    }
-  }
-
-
+  
   return <div
   key={report.id}
   className="p-2 md:p-4 bg-white mb-2 hover:bg-yellow-50 transition-colors rounded-lg shadow-sm border border-gray-200 "
@@ -157,18 +134,6 @@ const Report = ({ report, openMessageReportId, setOpenMessageReportId }: ReportP
       />
     )}
   </div>
-
-  {/* Action Button */}
-  {report.status === "PENDING" && (
-    <div className="mt-4">
-      <button
-        onClick={() => Completed(report.id)}
-        className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200 w-full md:w-auto"
-      >
-        Mark as Resolved
-      </button>
-    </div>
-  )}
 </div>
 
 }

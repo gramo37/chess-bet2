@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { TransactionsListProps } from "../schema";
+import { Transaction } from "../schema";
+import fetchData from "../fetch/fetchdata";
 
+  type TransactionsListProps = {
+    transactions:Transaction[],
+    setTransactions:(arg:any)=>void
+  }
   export const TransactionsList: React.FC<TransactionsListProps> = ({
     transactions,
+setTransactions
   }) => {
     const [filterStatus, setFilterStatus] = useState<string>("all"); // State for status filter
     const [filterType, setFilterType] = useState<string>("all"); // State for type filter
-  
+   
     // Function to handle filtering logic based on status and type
     const filteredTransactions = transactions.filter((transaction) => {
       const statusMatch =
@@ -17,8 +23,20 @@ import { TransactionsListProps } from "../schema";
         filterType === "all" || transaction.type.toLowerCase() === filterType;
       return statusMatch && typeMatch;
     });
+    const [hasMore, setHasMore] = useState(true); // To track if more games exist
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page,setPage]=useState(1);
   
   
+ const LoadMoreTransactions = async ()=>{
+  setIsLoadingMore(true);
+  const data = await fetchData('transactions',page+1)
+  setPage(page+1);
+  setTransactions([...transactions,...data])
+  setHasMore(data.length > 0); 
+  setIsLoadingMore(false);
+ }
+
     return (
       <div>
         <div className="flex justify-between gap-2">
@@ -65,7 +83,7 @@ import { TransactionsListProps } from "../schema";
         <div className="space-y-4">
           {filteredTransactions.length > 0 ? (
             <ul className="space-y-4">
-              {filteredTransactions.map((transaction) => (
+              {transactions&&filteredTransactions.map((transaction) => (
                 <TransactionsComponent transaction={transaction}/>
               ))}
             </ul>
@@ -75,6 +93,13 @@ import { TransactionsListProps } from "../schema";
             </p>
           )}
         </div>
+        {isLoadingMore && <p className="text-white text-xl m-3">Loading more games...</p>}
+
+      {hasMore && !isLoadingMore && (
+        <button onClick={LoadMoreTransactions} className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded">
+          Load More
+        </button>
+      )}
       </div>
     );
   };

@@ -50,6 +50,29 @@ export async function UserProfits(req:Request,res:Response) {
     
   try {
     // Fetch users who won as white
+    const activeUsers = await db.user.count({
+      where:{
+        status:'ACTIVE',
+        OR:[
+          {role:'MODRATOR'},
+          {role:'USER'}
+        ]
+      }
+    })
+    
+    const suspendedUsers = await db.user.count({
+      where:{
+        status:'SUSPENDED',
+      }
+    })
+    
+    
+    const moderatorsUsers = await db.user.count({
+      where:{
+        role:"MODRATOR",
+      }
+    })
+
     const whiteWinners = await db.game.findMany({
       where: {
         result: 'WHITE_WINS',
@@ -105,7 +128,7 @@ export async function UserProfits(req:Request,res:Response) {
           .map(game => parseFloat(game.stake))
           .reduce((acc, stake) => acc + stake * 0.15, 0);
   
-    res.json({ totalWinners ,businessProfit,totalGamesPlayed});
+    res.json({ totalWinners ,businessProfit,totalGamesPlayed,activeUsers,suspendedUsers,moderatorsUsers});
   } catch (error) {
     res.status(500).json({ error: 'Error fetching total winners.' });
   }

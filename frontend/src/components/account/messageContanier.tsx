@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../constants/routes";
+import usePersonStore from "../../contexts/auth";
 
 type MessageContainerReportProps = {
     setOpenMessageReportId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -10,7 +11,7 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
     const [input, setInput] = useState("");
     const [messages, setMessages] = useState<any[]>([]); // To store the fetched messages
     const [error, setError] = useState<string | null>(null);
-
+    const user = usePersonStore((state) => state.user);
     // Fetch messages when the component is mounted
     useEffect(() => {
         const fetchMessages = async () => {
@@ -73,18 +74,48 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
     };
 
     if(error) return <p className="text-red-500">{error}</p>
+     
+    async function Completed() {
+        const id = openMessageReportId
+        const url = `${BACKEND_URL}/admin/reportscomplete/${id}`;
+    
+        try {
+          const response = await fetch(url, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+    
+          if (!response.ok) {
+            throw new Error(`Failed to mark report ${id} as completed`);
+          }
+    
+          const data = await response.json();
+          console.log(data)
+          alert(data.message??"Marked as resolved")
+          window.location.reload()
+        } catch (error) {
+          console.error("Error completing the report:", error);
+        }
+      }
+    
+    
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="max-w-[97%] w-[500px]">
             <div className="relative rounded-lg  h-auto   p-1 ">
-                {/* Message Container */}
                 <div
                     id="message-container"
-                    className="h-[400px] overflow-y-auto relative bg-gray-100 text-black rounded-lg mb-4 p-4"
+                    className="h-[400px] overflow-y-auto relative bg-gray-100 text-black rounded-lg mb-4 px-4 py-3"
                 >
-                    {/* Existing Chat Messages */}
+                    
                     <div className="w-full grid pb-11">
+                    {(user&&user.role!=='USER')&&<button className="px-3 py-1  bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200 w-full md:w-auto mb-3" onClick={Completed} >Resolved</button>}
+
                         <div className="grid">
                                 {
                                     messages.map((msg, index) => (
@@ -106,6 +137,7 @@ export const MessageContainerReport = ({ setOpenMessageReportId, openMessageRepo
                         </div>
                     </div>
                 </div>
+               
                 <button
                 className="absolute top-0 right-2 text-black text-2xl hover:text-gray-800"
                 onClick={() => {

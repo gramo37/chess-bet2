@@ -7,11 +7,17 @@ import { MessageContainerReport } from "../../account/messageContanier";
       return <p className="text-gray-600">No Reports found </p>;
     const [openMessageReportId, setOpenMessageReportId] = useState<string | null>(null);
   
+const MarkAsComplete = ( )=>{
+
+}
+
     return (
       <div className="space-y-4">
       {reports.map((report) => (
         <div key={report.id} className="bg-white p-3 rounded-md shadow-md">
+         <div>
           <div className="flex justify-between flex-wrap items-center">
+         
             <div>
           <h3 className="font-semibold text-lg text-gray-800">{report.title}</h3>
           <p className="text-gray-700">{report.description}</p>
@@ -37,6 +43,8 @@ import { MessageContainerReport } from "../../account/messageContanier";
               </p>
               <p className="text-xs text-gray-500">Created At: {new Date(report.createdAt).toLocaleString()}</p>
             </div>
+           </div>
+
           </div>
         </div>
       ))}

@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "../../../constants/routes";
 
 export default async function fetchPlayer(id:string) {
-    const url = `${BACKEND_URL}/admin/users/${id}`;
+    const url = `${BACKEND_URL}/admin/userprofile/${id}`;
     try {
       const response = await fetch(url, {
         method: "GET",

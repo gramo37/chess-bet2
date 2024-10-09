@@ -9,11 +9,8 @@ type User = {
   status: string;
 };
 
-type StatsProps = {
-  users: User[];
-};
 
-export  function Stats({users}:StatsProps) {
+export  function Stats() {
     const [statsProfits, setStatsProfits] = useState(0);
     const [statsGamePlayed, setStatsGamePlayed] = useState([]);
     const [StatsWin, setStatsWin] = useState([]);
@@ -24,7 +21,7 @@ export  function Stats({users}:StatsProps) {
 
 getStats();
 
-},[users])
+},[])
 
 async function getStats(){
     const date = calculateStartDate(timeRange);
@@ -33,11 +30,9 @@ async function getStats(){
     setStatsGamePlayed(fetchedStats.totalGamesPlayed);
     setStatsProfits(fetchedStats.businessProfit);
     setStatsWin(fetchedStats.totalWinners);
-    const activeCount = users.filter(user => user.status === 'ACTIVE').length;
-    const suspendedCount = users.filter(user => user.status === 'SUSPENDED').length;
 
-    setActiveUser(activeCount);
-    setSuspendedUser(suspendedCount);
+    setActiveUser(fetchedStats.activeUsers);
+    setSuspendedUser(fetchedStats.suspendedUsers);
 
 }
 
@@ -75,10 +70,10 @@ async function getStats(){
             <p className="text-lg">{statsGamePlayed}</p>
           </div>
           <div className="bg-white p-3 rounded shadow">
-            <h3 className="font-semibold">Active User</h3>
+            <h3 className="font-semibold">Active Users</h3>
             <p className="text-lg">{activeuser}</p>
           </div><div className="bg-white p-3 rounded shadow">
-            <h3 className="font-semibold">Suspended User</h3>
+            <h3 className="font-semibold">Suspended Users</h3>
             <p className="text-lg">{suspendeduser}</p>
           </div>
         </div>

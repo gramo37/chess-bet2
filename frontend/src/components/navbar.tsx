@@ -8,7 +8,7 @@ export default function NavBar(){
     return <nav className="bg-white w-full shadow-md">
     <div className="flex justify-between  items-center max-w-7xl mx-auto px-2 py-3">
     <a href="/" className="text-black relative hover:text-yellow-500 transition-colors duration-300">
-  <span className="text-2xl font-extrabold">Prochesser</span>
+  <span className="text-2xl font-extrabold">ProChesser</span>
   <span className="block text-sm font-medium absolute -bottom-3 -right-3 text-gray-500">Gamer</span>
 </a>
   

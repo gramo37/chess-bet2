@@ -35,7 +35,7 @@ const Dashboard = () => {
     <div className="container mx-auto relative py-8">
       <div className="w-[90%]  rounded-lg p-3 mb-2 m-auto relative bg-amber-50">
         <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
-        <Stats users={users}/>
+        <Stats />
       </div>
       <div className="w-[90%] m-auto">
         {/* Tabs Header */}
@@ -76,10 +76,10 @@ const Dashboard = () => {
         <div>
           {activeTab === "reports" && <ReportsList reports={reports} />}
           {activeTab === "transactions" && (
-            <TransactionsList transactions={transactions} />
+            <TransactionsList transactions={transactions} setTransactions={setTransactions}/>
           )}
-          {activeTab === "games" && <GamesList games={games} />}
-          {activeTab === "users" && <Users users={users} />}
+          {activeTab === "games" && <GamesList games={games} setGames={setGames}/>}
+          {activeTab === "users" && <Users users={users} setUsers={setUsers}/>}
           {activeTab==="modrator" && <Modrator/>}
         </div>
       </div>

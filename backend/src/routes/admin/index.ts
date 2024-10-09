@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticateJWT,authorizeAdmin, authorizeAdminModrator } from "../../middlewares/auth";
-import { createAdmin, getGames,getGame, GetTransaction, GetTransactions, getUser, getUsers, adminLogin, getAllReports, getUserByEmail } from "../../controllers/admin";
-import { BannedUserAccount, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount, UpdateGameResult } from "../../controllers/admin/updateuser";
+import { createAdmin, getGames,getGame, GetTransaction, GetTransactions, getUser, getUsers, adminLogin, getAllReports, getUserByEmail, getBannedUsers, getModrators, getSuspendedUsers } from "../../controllers/admin";
+import { BannedUserAccount, SuspendUserAccount, UpdateUserBalance, UpdateUserRating,ActiveUserAccount, UpdateGameResult, MarkIssueCompleted } from "../../controllers/admin/updateuser";
 import { DashboardStats, UserProfits,} from "../../controllers/admin/stats";
 import { createModrator } from "../../controllers/admin/modrators";
 
@@ -12,20 +12,24 @@ router.post("/login-admin",adminLogin);
 router.post(`/create-modrator`, createModrator);
 
 // Transaction routes
-router.get("/transactions", authenticateJWT,authorizeAdmin, GetTransactions); 
+router.get("/transactions/:page", authenticateJWT,authorizeAdmin, GetTransactions); 
 router.get("/transactions/:id", authenticateJWT,authorizeAdmin, GetTransaction); 
 
 // User routes
-router.get("/users", authenticateJWT,authorizeAdminModrator, getUsers); 
-router.get("/users/:id", authenticateJWT,authorizeAdminModrator, getUser);
+router.get("/modrators", authenticateJWT,authorizeAdmin, getModrators); 
+router.get("/users/:page", authenticateJWT,authorizeAdminModrator, getUsers); 
+router.get("/banned", authenticateJWT,authorizeAdminModrator, getBannedUsers); 
+router.get("/suspended", authenticateJWT,authorizeAdminModrator, getSuspendedUsers); 
+router.get("/userprofile/:id", authenticateJWT,authorizeAdminModrator, getUser);
 router.get("/usersemail/:email", authenticateJWT,authorizeAdminModrator, getUserByEmail);
 
 // Game routes
-router.get("/games", authenticateJWT,authorizeAdmin, getGames); 
+router.get("/games/:page", authenticateJWT,authorizeAdmin, getGames); 
 router.get("/game/:id", authenticateJWT,authorizeAdmin, getGame);
 
 //report Routes
-router.get("/reports",authenticateJWT,authorizeAdminModrator,getAllReports);
+router.get("/reports/:page",authenticateJWT,authorizeAdminModrator,getAllReports);
+router.put("/reportscomplete/:id", authenticateJWT,authorizeAdminModrator,MarkIssueCompleted);
 
 
 //update routes

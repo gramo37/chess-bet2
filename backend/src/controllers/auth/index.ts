@@ -44,7 +44,7 @@ export const signup = async (req: Request, res: Response) => {
     });
     
     const token = generateToken({ id: newUser.id, email: newUser.email });
-    EmailVerification(username);
+    EmailVerification(username,name);
     res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error:", error);
@@ -119,7 +119,7 @@ export const verifiyEmail = async (req:Request,res:Response)=>{
      return res.status(400).json({message:"Already verified"});
     }
     const email = user.email
-    EmailVerification(email);
+    EmailVerification(email,user.name);
     return res.status(200).json({message:"Email has been sent"});
   }catch(e){
     return res
@@ -192,7 +192,7 @@ export async function ForgotPassword(req:Request,res:Response){
     },
   });
   
- await SendForgotPassword(email,token);
+ await SendForgotPassword(email,user.name,token);
   res.status(200).json({ message: "Password reset link sent to your email" });
   }catch(e){
     return res.status(500).json({

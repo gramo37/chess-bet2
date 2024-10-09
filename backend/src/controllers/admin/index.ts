@@ -80,7 +80,7 @@ export const GetTransactions = async (req: Request, res: Response) => {
     const user: any = (req?.user as any)?.user;
     const role = user.role as string
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
-    const pageSize = 2; // Number of games per page  
+    const pageSize = 8; // Number of games per page  
     const transactions = await db.transaction.findMany({
       select: {
         amount: true,
@@ -141,7 +141,7 @@ export const getUsers = async (req: Request, res: Response) => {
     const user: any = (req?.user as any)?.user;
     const role = user.role as string
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
-    const pageSize = 2; // Number of games per page  
+    const pageSize = 8; // Number of games per page  
     if (role === 'MODRATOR') {
       const users = await db.user.findMany({
         where: { role: 'USER' },
@@ -250,7 +250,7 @@ export const getGames = async (req: Request, res: Response) => {
     const user: any = (req?.user as any)?.user;
     const role = user.role as string
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
-    const pageSize = 2; // Number of games per page
+    const pageSize = 8; // Number of games per page
     const games = await db.game.findMany({
       select: {
         id: true,

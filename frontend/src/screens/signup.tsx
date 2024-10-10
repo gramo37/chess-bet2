@@ -25,7 +25,7 @@ export default function SignUP() {
       const response = await axios.post(
         url,
         {
-          username: email,
+          username: email.toLowerCase(),
           name: name,
           password: password,
         },

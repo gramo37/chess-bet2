@@ -24,7 +24,7 @@ export const signup = async (req: Request, res: Response) => {
     }
     const existingUser = await db.user.findFirst({
       where: {
-        email: username,
+        email: username.toLowerCase(),
       },
     });
 
@@ -37,7 +37,7 @@ export const signup = async (req: Request, res: Response) => {
     
     const newUser = await db.user.create({
       data: {
-        email: username,
+        email: username.toLowerCase(),
         password: hashPassword,
         name: name,
       },
@@ -64,7 +64,7 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await db.user.findFirst({
       where: {
-        email: username,
+        email: username.toLowerCase(),
       },
     });
 
@@ -177,7 +177,10 @@ export async function ForgotPassword(req:Request,res:Response){
 
   // Find the user by email
   const user = await db.user.findFirst({
-    where: { email },
+    where: { email: {
+      equals: email,  
+      mode: 'insensitive', // Case-insensitive comparison
+    },},
   });
 
   if (!user) {

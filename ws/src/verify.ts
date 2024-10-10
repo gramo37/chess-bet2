@@ -7,22 +7,30 @@ dotenv.config();
 const NODEMAILER_MAIL = process.env.NODEMAILER_MAIL ?? "";
 const NODEMAILER_PASS = process.env.NODEMAILER_PASS ?? "";
 
+
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: 'mail.privateemail.com',
+  port: 465 ,
+  secure:true,
   auth: {
-      user: NODEMAILER_MAIL,
-      pass: NODEMAILER_PASS
+    user: NODEMAILER_MAIL,
+    pass: NODEMAILER_PASS
   }
 });
 
 
 export async function SendRandomPlayNotificationToAdmin(gameId: string) {
   try {
-    const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
+    const admins = await db.user.findMany({ 
+      where: { 
+ OR:[
+  {role: 'ADMIN'},
+  {role: 'MODRATOR'}
+ ]
+     } });
 
     const mailConfigurations = (email: string) => ({
-      from: `${NODEMAILER_MAIL} <no-reply@chessbet.com>`,
+      from: `${NODEMAILER_MAIL}`,
       to: email,
       subject: 'New Random Play Created',
       html: `

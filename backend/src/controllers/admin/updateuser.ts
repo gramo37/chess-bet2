@@ -1,6 +1,6 @@
 import { Request,Response } from "express";
 import { db } from "../../db";
-import { SendUserActivationNotification, SendUserBannedNotification, SendUserSuspentionNotification } from "../auth/verify";
+import { sendUserActivationNotification, sendUserBannedNotification, sendUserSuspensionNotification } from "../auth/verify";
 
 export async function UpdateUserRating(req:Request,res:Response){
     const { id } = req.params;
@@ -117,7 +117,7 @@ export async function SuspendUserAccount(req: Request, res: Response) {
             where: { id: id },
             data: { status: "SUSPENDED" }, // Change this to a dedicated SUSPENDED role if needed
         });
-        SendUserSuspentionNotification(updatedUser.email);
+        sendUserSuspensionNotification(updatedUser.email);
 
         res.status(200).json({ message: "User account suspended", user: updatedUser });
     } catch (error) {
@@ -144,9 +144,9 @@ export async function ActiveUserAccount(req: Request, res: Response) {
         }
         const updatedUser = await db.user.update({
             where: { id: id },
-            data: { status: "ACTIVE" }, // Change this to a dedicated SUSPENDED role if needed
+            data: { status: "ACTIVE" }, 
         });
-        SendUserActivationNotification(updatedUser.email);
+        sendUserActivationNotification(updatedUser.email);
         
 
         res.status(200).json({ message: "User account Activated", user: updatedUser });
@@ -180,7 +180,7 @@ export async function BannedUserAccount(req: Request, res: Response) {
             data: { status: "BANNED" }, 
         });
         
-        SendUserBannedNotification(updatedUser.email,message);
+        sendUserBannedNotification(updatedUser.email,message);
 
         res.status(200).json({ message: "User account Banned" });
     } catch (error) {

@@ -23,7 +23,7 @@ import {
   getFinalAmountInUSD,
   isValidEmail,
 } from "../../utils";
-import { WithdrawalRequestNotification } from "../auth/verify";
+import { sendWithdrawalRequestNotification } from "../auth/verify";
 
 export const getURL = async (req: Request, res: Response) => {
   try {
@@ -322,7 +322,7 @@ export const withdraw = async (req: Request, res: Response) => {
       }),
     ]);
 
-    WithdrawalRequestNotification(transaction.finalamountInUSD, transaction.id);
+    sendWithdrawalRequestNotification(transaction.finalamountInUSD, transaction.id);
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object

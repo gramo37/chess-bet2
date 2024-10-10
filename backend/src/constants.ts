@@ -35,3 +35,6 @@ export const CURRENCY_RATE_URL = "https://open.er-api.com/v6/latest"
 // Nodemailer constants
 export const NODEMAILER_MAIL = process.env.NODEMAILER_MAIL ?? "";
 export const NODEMAILER_PASS = process.env.NODEMAILER_PASS ?? "";
+export const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "admin@prochesser.com"
+export const ADMIN_PASS  = process.env.ADMIN_PASS ?? ""
+export const ADMIN_NAME = process.env.ADMIN_NAME ?? ""

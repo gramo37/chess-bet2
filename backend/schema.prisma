@@ -15,7 +15,7 @@ generator client {
 model User {
   id            String        @id @default(cuid())
   name          String
-  email         String        @unique
+  email         String        @unique  @db.Citext
   emailVerified DateTime?
   password      String
   gamesAsWhite  Game[]        @relation("GamesAsWhite")

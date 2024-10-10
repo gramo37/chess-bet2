@@ -37,7 +37,7 @@ setFilterSearchUsers(data);
 
   // Fetch user by email
   const fetchUserByEmail = async () => {
-    const url = `${BACKEND_URL}/admin/usersemail/${search.trim()}`;
+    const url = `${BACKEND_URL}/admin/usersemail/${search.toLowerCase().trim()}`;
     try {
       const response = await axios.get(url, {
         headers: {

@@ -212,7 +212,7 @@ export const getUserByEmail = async (req: Request, res: Response) => {
     const { email } = req.params;
    
     const user = await db.user.findUnique({
-      where: { email },
+      where: { email:email.toLowerCase() },
       select: {
         id: true,
         name: true,

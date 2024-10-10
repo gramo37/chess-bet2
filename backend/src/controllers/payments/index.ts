@@ -23,7 +23,13 @@ export const transactionHistory = async (req: Request, res: Response) => {
         type: true,
         status: true,
         createdAt: true,
-        mode: true
+        mode: true,
+        api_ref: true,
+        webhook: {
+          select: {
+            invoice_id: true,
+          },
+        },
       },
     });
 

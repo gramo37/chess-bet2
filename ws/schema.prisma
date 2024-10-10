@@ -2,9 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider             = "postgres"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
+  provider     = "postgres"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 generator client {
@@ -42,13 +42,43 @@ model Transaction {
   createdAt        DateTime          @default(now())
   signature        String
   checkout_id      String
-  api_ref          String            @default("")
+  api_ref          String            @unique @default(cuid())
   currency         String            @default("USD")
   secret_token     String            @default("")
   mode             String            @default("")
   wallet_address   String            @default("")
 
+  webhook Webhook?
+
   @@index([userId])
+}
+
+model Webhook {
+  id            String  @id @default(cuid())
+  job_id        String?
+  url           String?
+  invoice_id    String?
+  state         String?
+  provider      String?
+  charges       String?
+  net_amount    String?
+  currency      String?
+  account       String?
+  api_ref       String? @unique
+  host          String?
+  failed_reason String?
+  failed_code   String?
+  created_at    String?
+  updated_at    String?
+
+  transaction Transaction? @relation(fields: [api_ref], references: [api_ref])
+}
+
+model Webhook_retries {
+  id            String        @id @default(cuid())
+  status        WebhookStatus
+  error_message String?
+  job_id        String?
 }
 
 model Game {
@@ -149,6 +179,7 @@ enum TransactionStatus {
   COMPLETED
   CANCELLED
   REQUESTED
+  ERROR
 }
 
 enum Roles {
@@ -161,4 +192,9 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   BANNED
+}
+
+enum WebhookStatus {
+  SUCCESS
+  FAILURE
 }

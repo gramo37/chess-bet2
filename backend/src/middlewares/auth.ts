@@ -27,6 +27,7 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
         role:true,
         status:true,
         emailVerified:true,
+        referralId:true,
       }
     });
 

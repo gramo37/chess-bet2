@@ -26,6 +26,8 @@ export default function Account() {
         return <DepositMoney />;
       case "withdraw":
         return <WithdrawMoney />;
+        case "referrals":
+          return <h1>referrals</h1>
       default:
         return <ReportHistory />;
     }
@@ -87,15 +89,17 @@ export default function Account() {
         <div>
 
           
-          <div className="flex text-white gap-3  items-center mb-4">
+          <div className="flex text-white gap-3  items-center mb-2">
             <h2 className="text-lg text-left font-semibold">
               Balance: $
               {user?.balance && !Number.isNaN(Number(user?.balance))
                 ? Number(user?.balance).toFixed(2)
                 : 0}
             </h2>
+
             <Refresh />
           </div>
+          <h3 className="mb-2 text-lg text-left">Referral Id: {user?.referralId}</h3>
         </div>
       </div>
       <div className="flex space-x-3 w-full my-4 overflow-x-auto scrollbar-hide">
@@ -128,6 +132,12 @@ export default function Account() {
     activeTab={activeTab}
     setActiveTab={setActiveTab}
     tabKey="reports"
+  />
+  <TabButton
+    title="Referrals"
+    activeTab={activeTab}
+    setActiveTab={setActiveTab}
+    tabKey="referrals"
   />
 </div>
 

@@ -3,13 +3,13 @@ import { EmailVerification, SendForgotPassword} from "./verify";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateToken, verifyToken as jwtVerify } from "../../utils";
+import { generateReferralTokenUrlFriendly, generateToken, verifyToken as jwtVerify } from "../../utils";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email validation
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { username, name, password } = req.body;
+    const { username, name, password,referral } = req.body;
 
 
     if (!emailRegex.test(username)) {
@@ -24,7 +24,7 @@ export const signup = async (req: Request, res: Response) => {
     }
     const existingUser = await db.user.findFirst({
       where: {
-        email: username,
+        email: username.toLowerCase(),
       },
     });
 
@@ -34,15 +34,35 @@ export const signup = async (req: Request, res: Response) => {
 
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
-    
+    const referalToken = generateReferralTokenUrlFriendly(10) // generate a refral token
     const newUser = await db.user.create({
       data: {
-        email: username,
+        email: username.toLowerCase(),
         password: hashPassword,
         name: name,
+        referralId:referalToken
       },
     });
     
+    if (referral&&  typeof referral==='string') {
+      // Find the referrer by their referral ID
+      const referrer = await db.user.findUnique({
+        where: {
+          referralId: referral,
+        },
+      });
+
+      // If referrer exists, create a referral record
+      if (referrer) {
+        await db.referral.create({
+          data: {
+            referrerId: referrer.id,
+            referredUserId: newUser.id,
+          },
+        });
+      }
+    }
+
     const token = generateToken({ id: newUser.id, email: newUser.email });
     EmailVerification(username,name);
     res.status(200).json({ message: "User created successfully", token });
@@ -64,7 +84,7 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await db.user.findFirst({
       where: {
-        email: username,
+        email: username.toLowerCase(),
       },
     });
 
@@ -177,7 +197,10 @@ export async function ForgotPassword(req:Request,res:Response){
 
   // Find the user by email
   const user = await db.user.findFirst({
-    where: { email },
+    where: { email: {
+      equals: email,  
+      mode: 'insensitive', // Case-insensitive comparison
+    },},
   });
 
   if (!user) {

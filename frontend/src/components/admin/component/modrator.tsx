@@ -16,7 +16,7 @@ export function Modrator() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: email,
+          username: email.toLowerCase(),
           name
         }),
       });

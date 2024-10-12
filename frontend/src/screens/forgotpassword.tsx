@@ -12,7 +12,7 @@ async function onclick() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({email}),
+        body: JSON.stringify({email:email.toLowerCase()}),
       });
   
       if (!response.ok) {

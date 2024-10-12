@@ -53,7 +53,7 @@ async function SearchGameById(){
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex items-center">
       <input type="text" placeholder="Search game by game Id" value={search} onChange={(e)=>setSearch(e.target.value)} className="py-2 max-w-[60%] w-[500px] px-4 rounded" />
         <button onClick={SearchGameById}  className="bg-yellow-600 py-3 px-4 text-white hover:bg-yellow-500 rounded ml-2"><FaSearch/></button>
@@ -71,7 +71,7 @@ async function SearchGameById(){
       {hasMore && !isLoadingMore && (
         <button
           onClick={LoadMoreGames}
-          className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded"
+          className="mt-4 bg-yellow-500 mx-auto text-white py-2 px-4 rounded"
         >
           Load More
         </button>

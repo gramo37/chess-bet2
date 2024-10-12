@@ -7,8 +7,9 @@ export default function SignUP() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [referral,setReferral]=useState("");
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
-
+ 
   async function onclick() {
     if (!email || !name || !password) {
       alertPopUp({
@@ -25,9 +26,10 @@ export default function SignUP() {
       const response = await axios.post(
         url,
         {
-          username: email,
+          username: email.toLowerCase(),
           name: name,
           password: password,
+          referral:referral
         },
         {
           headers: {
@@ -118,7 +120,23 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-
+              <div className="mb-3">
+                <label
+                  htmlFor="referral"
+                  className="block text-white text-sm font-bold mb-2"
+                >
+                  Referral (optional)
+                </label>
+                <input
+                  type="text"
+                  name="referral"
+                  placeholder="Referral ID"
+className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  required
+                  value={referral}
+                  onChange={(e) => setReferral(e.target.value)}
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full mb-2 bg-yellow-500 font-semibold text-black py-2 rounded hover:bg-yellow-600 hover:text-white transition-colors"

@@ -13,21 +13,27 @@ generator client {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String
-  email         String        @unique
-  emailVerified DateTime?
-  password      String
-  gamesAsWhite  Game[]        @relation("GamesAsWhite")
-  gamesAsBlack  Game[]        @relation("GamesAsBlack")
-  rating        Int           @default(800)
-  balance       Float         @default(3)
-  transactions  Transaction[]
-  reports       UserReport[]
-  role          Roles         @default(USER)
-  status        UserStatus    @default(ACTIVE)
-  otp           String?
-  otpExpiresAt  DateTime?
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique @db.Citext
+  emailVerified      DateTime?
+  password           String
+  gamesAsWhite       Game[]              @relation("GamesAsWhite")
+  gamesAsBlack       Game[]              @relation("GamesAsBlack")
+  rating             Int                 @default(800)
+  balance            Float               @default(3)
+  commissionBalance  Float               @default(0.0)
+  transactions       Transaction[]
+  reports            UserReport[]
+  role               Roles               @default(USER)
+  status             UserStatus          @default(ACTIVE)
+  otp                String?
+  otpExpiresAt       DateTime?
+  referralId         String              @unique @default("")
+  referredBy         Referral?           @relation("ReferralByUser")
+  referredUsers      Referral[]          @relation("ReferredUsers")
+  commissionDeposits CommissionDeposit[]
+  totalcommission    Float               @default(0.0)
 }
 
 model Transaction {
@@ -40,9 +46,9 @@ model Transaction {
   type             TransactionType
   status           TransactionStatus
   createdAt        DateTime          @default(now())
-  signature        String
-  checkout_id      String
-  api_ref          String            @unique @default(cuid())
+  signature        String            @default("")
+  checkout_id      String            @default("")
+  api_ref          String            @default("")
   currency         String            @default("USD")
   secret_token     String            @default("")
   mode             String            @default("")
@@ -138,6 +144,29 @@ model ReportMessage {
   createdAt DateTime   @default(now())
 
   @@index([reportId])
+}
+
+model CommissionDeposit {
+  id        String            @id @default(cuid())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Float
+  status    TransactionStatus
+  createdAt DateTime          @default(now())
+
+  @@index([userId])
+}
+
+model Referral {
+  id             String   @id @default(cuid())
+  referrer       User     @relation("ReferredUsers", fields: [referrerId], references: [id]) // Referring user
+  referrerId     String   @unique
+  referredUser   User     @relation("ReferralByUser", fields: [referredUserId], references: [id]) // Referred user
+  referredUserId String   @unique
+  createdAt      DateTime @default(now())
+
+  @@index([referrerId])
+  @@index([referredUserId])
 }
 
 enum ReportStatus {

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import axios from "axios";
 import { BCRYPT_SECRET_KEY, CURRENCY_RATE_URL } from "../constants";
 import bcrypt from 'bcrypt';
@@ -39,6 +39,10 @@ export function generateRandomPassword(length = 12) {
     password += charset[randomIndex];
   }
   return password;
+}
+
+export function generateReferralTokenUrlFriendly(length = 16) {
+  return randomBytes(length).toString('base64url'); // base64url avoids +, /, and =
 }
 
 export async function getFinalAmountInUSD(amount: number, currency: string) {

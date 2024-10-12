@@ -48,7 +48,7 @@ model Transaction {
   createdAt        DateTime          @default(now())
   signature        String            @default("")
   checkout_id      String            @default("")
-  api_ref          String            @default("")
+  api_ref          String            @unique @default("")
   currency         String            @default("USD")
   secret_token     String            @default("")
   mode             String            @default("")

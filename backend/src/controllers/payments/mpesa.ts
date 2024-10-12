@@ -225,9 +225,11 @@ export const successTransaction = async (req: Request, res: Response) => {
           status: "COMPLETED", // Mark transaction as completed
         },
       }),
-      ...(await processCommissionDeposit(transaction.userId, transaction.finalamountInUSD)) || [] // Process the commission if there's a referrer  
+      ...((await processCommissionDeposit(
+        transaction.userId,
+        transaction.finalamountInUSD
+      )) || []), // Process the commission if there's a referrer
     ]);
-    
 
     res.status(200).json({
       message: "Payment Successful",
@@ -238,62 +240,61 @@ export const successTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const processCommissionDeposit = async (userId: string, amount: number) => {
+export const processCommissionDeposit = async (
+  userId: string,
+  amount: number
+) => {
   try {
-
     const user = await db.user.findUnique({
-      where: { 
+      where: {
         id: userId,
       },
       include: {
-        referredBy: true, 
+        referredBy: true,
       },
     });
 
-    if (!user||!user.referredBy) {
-      return null
+    if (!user || !user.referredBy) {
+      return null;
     }
-   
-      const referrerId = user.referredBy.referrerId;
 
-      const commission = amount * 0.03;
-      
+    const referrerId = user.referredBy.referrerId;
+
+    const commission = amount * 0.03;
+
     const transaction = await db.transaction.create({
       data: {
         userId: userId,
         amount: amount,
         finalamountInUSD: amount,
         platform_charges: 0,
-        type: 'REFERRAL_COMMISSION', 
-        status: 'COMPLETED',
+        type: "REFERRAL_COMMISSION",
+        status: "COMPLETED",
       },
     }); //referral commission transcation
 
-      // Update the referrer's commission balance
-      await db.user.update({
-        where: { id: referrerId },
-        data: {
-          commissionBalance: {
-            increment: commission, 
-          },
+    // Update the referrer's commission balance
+    await db.user.update({
+      where: { id: referrerId },
+      data: {
+        commissionBalance: {
+          increment: commission,
         },
-      });
+      },
+    });
 
-      await db.commissionDeposit.create({
-        data: {
-          userId: referrerId,
-          amount: commission,
-          status: 'COMPLETED',
-        },
-      });
-    
+    await db.commissionDeposit.create({
+      data: {
+        userId: referrerId,
+        amount: commission,
+        status: "COMPLETED",
+      },
+    });
   } catch (error) {
     console.error("Error processing deposit:", error);
     throw new Error("Failed to process deposit");
   }
 };
-
-
 
 export const withdraw = async (req: Request, res: Response) => {
   try {
@@ -382,7 +383,10 @@ export const withdraw = async (req: Request, res: Response) => {
       }),
     ]);
 
-    sendWithdrawalRequestNotification(transaction.finalamountInUSD, transaction.id);
+    sendWithdrawalRequestNotification(
+      transaction.finalamountInUSD,
+      transaction.id
+    );
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object
@@ -546,26 +550,99 @@ export const updateTransaction = async (req: Request, res: Response) => {
     try {
       const IntaSend = require("intasend-node");
       const user: any = (req?.user as any)?.user;
-  
+
       let intasend = new IntaSend(
         INTASEND_PUBLISHABLE_KEY,
         INTASEND_SECRET_KEY,
         INTASEND_IS_TEST
       );
-  
+
       let collection = intasend.collection();
       let resp = await collection.status(invoice_id);
 
-      if(resp.invoice.state !== "COMPLETE") {
-        
+      if (!resp || !resp?.invoice?.state) {
+        return res.status(400).json({
+          status: "error",
+          message: "Transaction not found in Instasend",
+        });
       }
+
+      if (resp.invoice.state !== "COMPLETE") {
+        // Don't update the DB and send a error message
+        return res.status(400).json({
+          status: "error",
+          message: "Transaction is imcomplete in instasend",
+        });
+      }
+
+      // If it is complete
+      // Check in DB if the status is PENDING
+      const transaction = await db.webhook.findFirst({
+        where: {
+          invoice_id,
+        },
+        select: {
+          invoice_id: true,
+          transaction: {
+            select: {
+              api_ref: true,
+              status: true,
+              userId: true,
+              finalamountInUSD: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!transaction || !transaction.transaction) {
+        return res.status(404).json({
+          success: "error",
+          message: "Transaction not found",
+        });
+      }
+
+      // If status not pending return error
+      if (
+        !transaction.transaction.status ||
+        transaction.transaction.status !== "PENDING"
+      ) {
+        return res.status(400).json({
+          status: "error",
+          message: "Transaction already completed or cancelled",
+        });
+      }
+
+      // Update transaction it as successful
+      await db.$transaction([
+        db.user.update({
+          where: {
+            // email: user.email,
+            id: transaction.transaction.userId,
+          },
+          data: {
+            balance: {
+              increment: transaction.transaction.finalamountInUSD,
+            },
+          },
+        }),
+        db.transaction.update({
+          where: { id: transaction.transaction.id },
+          data: {
+            status: "COMPLETED", // Mark transaction as completed
+          },
+        }),
+      ]);
 
       return res.status(200).json({
         message: "Success",
-        resp
-      })
+        resp,
+      });
     } catch (error) {
-      console.log("Something went wrong while fetching the transaction from Instasend", error);
+      console.log(
+        "Something went wrong while fetching the transaction from Instasend",
+        error
+      );
       res.status(500).json({ message: "Instasend error", status: "error" });
     }
   } catch (error) {
@@ -576,9 +653,8 @@ export const updateTransaction = async (req: Request, res: Response) => {
 
 export const updateWithdrawal = async (req: Request, res: Response) => {
   try {
-    
   } catch (error) {
     console.error("Error Fetching Transaction:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
-}
+};

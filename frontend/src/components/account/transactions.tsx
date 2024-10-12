@@ -181,7 +181,7 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
         {new Date(transaction.createdAt).toLocaleTimeString()}
       </td>
       <td>
-        <button className="text-black" onClick={refreshTransaction}>
+        {transaction.mode === "mpesa" && <button className="text-black" onClick={refreshTransaction}>
           {isPending ? (
             <svg
               aria-hidden="true"
@@ -202,7 +202,7 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
           ) : (
             <IoMdRefresh />
           )}
-        </button>
+        </button>}
       </td>
     </tr>
   );

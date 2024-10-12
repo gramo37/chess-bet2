@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider             = "postgres"
-  url                  = env("DATABASE_URL")
+  provider     = "postgres"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -13,29 +13,28 @@ generator client {
 }
 
 model User {
-  id               String        @id @default(cuid())
-  name             String
-  email            String        @unique @db.Citext
-  emailVerified    DateTime?
-  password         String
-  gamesAsWhite     Game[]        @relation("GamesAsWhite")
-  gamesAsBlack     Game[]        @relation("GamesAsBlack")
-  rating           Int           @default(800)
-  balance          Float         @default(3)
-  commissionBalance Float        @default(0.0)      
-  transactions     Transaction[]
-  reports          UserReport[]
-  role             Roles         @default(USER)
-  status           UserStatus    @default(ACTIVE)
-  otp              String?
-  otpExpiresAt     DateTime?
-  referralId       String       @unique   @default("")                 
-  referredBy       Referral?    @relation("ReferralByUser")
-  referredUsers    Referral[]   @relation("ReferredUsers")
-  commissionDeposits CommissionDeposit[]          
-  totalcommission    Float      @default(0.0)
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique @db.Citext
+  emailVerified      DateTime?
+  password           String
+  gamesAsWhite       Game[]              @relation("GamesAsWhite")
+  gamesAsBlack       Game[]              @relation("GamesAsBlack")
+  rating             Int                 @default(800)
+  balance            Float               @default(3)
+  commissionBalance  Float               @default(0.0)
+  transactions       Transaction[]
+  reports            UserReport[]
+  role               Roles               @default(USER)
+  status             UserStatus          @default(ACTIVE)
+  otp                String?
+  otpExpiresAt       DateTime?
+  referralId         String              @unique @default("")
+  referredBy         Referral?           @relation("ReferralByUser")
+  referredUsers      Referral[]          @relation("ReferredUsers")
+  commissionDeposits CommissionDeposit[]
+  totalcommission    Float               @default(0.0)
 }
-
 
 model Transaction {
   id               String            @id @default(cuid())
@@ -55,7 +54,37 @@ model Transaction {
   mode             String            @default("")
   wallet_address   String            @default("")
 
+  webhook Webhook?
+
   @@index([userId])
+}
+
+model Webhook {
+  id            String  @id @default(cuid())
+  job_id        String?
+  url           String?
+  invoice_id    String?
+  state         String?
+  provider      String?
+  charges       String?
+  net_amount    String?
+  currency      String?
+  account       String?
+  api_ref       String? @unique
+  host          String?
+  failed_reason String?
+  failed_code   String?
+  created_at    String?
+  updated_at    String?
+
+  transaction Transaction? @relation(fields: [api_ref], references: [api_ref])
+}
+
+model Webhook_retries {
+  id            String        @id @default(cuid())
+  status        WebhookStatus
+  error_message String?
+  job_id        String?
 }
 
 model Game {
@@ -118,21 +147,22 @@ model ReportMessage {
 }
 
 model CommissionDeposit {
-  id             String      @id @default(cuid())
-  user           User        @relation(fields: [userId], references: [id])
-  userId         String
-  amount         Float
-  status         TransactionStatus
-  createdAt    DateTime     @default(now())
+  id        String            @id @default(cuid())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Float
+  status    TransactionStatus
+  createdAt DateTime          @default(now())
+
   @@index([userId])
 }
 
 model Referral {
   id             String   @id @default(cuid())
-  referrer       User     @relation("ReferredUsers", fields: [referrerId], references: [id])  // Referring user
+  referrer       User     @relation("ReferredUsers", fields: [referrerId], references: [id]) // Referring user
   referrerId     String   @unique
-  referredUser   User     @relation("ReferralByUser", fields: [referredUserId], references: [id])  // Referred user
-  referredUserId String @unique
+  referredUser   User     @relation("ReferralByUser", fields: [referredUserId], references: [id]) // Referred user
+  referredUserId String   @unique
   createdAt      DateTime @default(now())
 
   @@index([referrerId])
@@ -178,6 +208,7 @@ enum TransactionStatus {
   COMPLETED
   CANCELLED
   REQUESTED
+  ERROR
 }
 
 enum Roles {
@@ -190,4 +221,9 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   BANNED
+}
+
+enum WebhookStatus {
+  SUCCESS
+  FAILURE
 }

@@ -60,7 +60,9 @@ export const getURL = async (req: Request, res: Response) => {
       });
     }
 
-    const platform_charges = parseFloat((finalamountInUSD * PLATFORM_FEES).toFixed(2));
+    const platform_charges = parseFloat(
+      (finalamountInUSD * PLATFORM_FEES).toFixed(2)
+    );
 
     const IntaSend = require("intasend-node");
     const user: any = (req?.user as any)?.user;
@@ -89,7 +91,6 @@ export const getURL = async (req: Request, res: Response) => {
         last_name,
         email,
         host: FRONTEND_URL,
-        method: "M-PESA",
         amount,
         currency,
         api_ref,
@@ -431,6 +432,13 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
 export const validateTransaction = async (req: Request, res: Response) => {
   try {
     const { api_ref, challenge, state } = req.body;
+
+    console.log(
+      "--------------------------------------------------------------------------------Triggering webhook--------------------------------------------------------------------------------------------"
+    );
+
+    console.log(challenge, api_ref, state, INSTASEND_CHALLENGE);
+
     // Check for challenge and match it
     if (challenge !== INSTASEND_CHALLENGE) {
       return res.status(400).json({
@@ -455,61 +463,122 @@ export const validateTransaction = async (req: Request, res: Response) => {
     });
 
     if (!transaction) {
+      console.log("Transaction not found");
       return res
         .status(404)
         .json({ message: "Transaction not found", status: "error" });
     }
 
-    if (state !== "COMPLETE") {
+    console.log("Transaction for deposit found -> ", transaction);
+
+    try {
+      if (state !== "COMPLETE") {
+        console.log("Payment is", state);
+        await db.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            status: ["PROCESSING", "PENDING"].includes(state)
+              ? "PENDING"
+              : "CANCELLED",
+          },
+        });
+
+        return res.status(400).json({
+          message: `Status is ${state}`,
+          status: "error",
+        });
+      }
+
+      // Check for if the transaction is pending
+      if (transaction.status !== "PENDING") {
+        console.log(
+          "Transaction already completed with status -> ",
+          transaction.status
+        );
+        return res.status(401).json({
+          message: "Transaction already completed or cancelled",
+          status: "error",
+        });
+      }
+
+      // Update transaction it as successful
+      await db.$transaction([
+        db.user.update({
+          where: {
+            // email: user.email,
+            id: transaction.userId,
+          },
+          data: {
+            balance: {
+              increment: transaction.finalamountInUSD,
+            },
+          },
+        }),
+        db.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            status: "COMPLETED", // Mark transaction as completed
+          },
+        }),
+      ]);
+
+      res.status(200).json({
+        message: "Payment Successful",
+      });
+    } catch (error) {
+      console.log("Something went wrong in updating the balances", error);
       await db.transaction.update({
         where: { id: transaction.id },
         data: {
-          status: ["PROCESSING", "PENDING"].includes(state)
-            ? "PENDING"
-            : "CANCELLED",
+          status: "ERROR",
         },
-      });
-
-      return res.status(400).json({
-        message: `Status is ${state}`,
-        status: "error",
       });
     }
-
-    // Check for if the transaction is pending
-    if (transaction.status !== "PENDING") {
-      return res.status(401).json({
-        message: "Transaction already completed or cancelled",
-        status: "error",
-      });
-    }
-
-    // Update transaction it as successful
-    await db.$transaction([
-      db.user.update({
-        where: {
-          // email: user.email,
-          id: transaction.userId,
-        },
-        data: {
-          balance: {
-            increment: transaction.finalamountInUSD,
-          },
-        },
-      }),
-      db.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: "COMPLETED", // Mark transaction as completed
-        },
-      }),
-    ]);
-
-    res.status(200).json({
-      message: "Payment Successful",
-    });
   } catch (error) {
     console.error("Error Validating Deposit:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };
+
+export const updateTransaction = async (req: Request, res: Response) => {
+  try {
+    const { invoice_id } = req.body;
+    try {
+      const IntaSend = require("intasend-node");
+      const user: any = (req?.user as any)?.user;
+  
+      let intasend = new IntaSend(
+        INTASEND_PUBLISHABLE_KEY,
+        INTASEND_SECRET_KEY,
+        INTASEND_IS_TEST
+      );
+  
+      let collection = intasend.collection();
+      let resp = await collection.status(invoice_id);
+
+      if(resp.invoice.state !== "COMPLETE") {
+        
+      }
+
+      return res.status(200).json({
+        message: "Success",
+        resp
+      })
+    } catch (error) {
+      console.log("Something went wrong while fetching the transaction from Instasend", error);
+      res.status(500).json({ message: "Instasend error", status: "error" });
+    }
+  } catch (error) {
+    console.error("Error Fetching Transaction:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};
+
+export const updateWithdrawal = async (req: Request, res: Response) => {
+  try {
+    
+  } catch (error) {
+    console.error("Error Fetching Transaction:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+}

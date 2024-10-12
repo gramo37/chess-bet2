@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { fetchedStatsData } from "../fetch/fetchstats";
 import { calculateStartDate } from "../../../types/utils/utils";
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-};
+// type User = {
+//   id: string;
+//   name: string;
+//   email: string;
+//   role: string;
+//   status: string;
+// };
 
 
 export  function Stats() {

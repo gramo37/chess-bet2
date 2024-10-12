@@ -3,13 +3,13 @@ import { ReportsListProps } from "../schema";
 import { MessageContainerReport } from "../../account/messageContanier";
 
   export const ReportsList: React.FC<ReportsListProps> = ({ reports }) => {
+    const [openMessageReportId, setOpenMessageReportId] = useState<string | null>(null);
+    
     if (!reports || reports.length === 0)
       return <p className="text-gray-600">No Reports found </p>;
-    const [openMessageReportId, setOpenMessageReportId] = useState<string | null>(null);
-  
-const MarkAsComplete = ( )=>{
+// const MarkAsComplete = ( )=>{
 
-}
+// }
 
     return (
       <div className="space-y-4">

@@ -2,7 +2,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
 import usePersonStore from "../../contexts/auth";
 import React, { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Spinner from "../spinner";
 import { IoMdRefresh } from "react-icons/io";
 
@@ -101,6 +101,7 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
     visible: false,
   });
   const user = usePersonStore((state) => state.user);
+  const qc = useQueryClient();
   const copyTransactionId = async (id: string) => {
     try {
       await navigator.clipboard.writeText(id);
@@ -132,6 +133,9 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
       return;
     }
     mutate();
+    qc.invalidateQueries({
+      queryKey: ["TransactionHistory"]
+    })
   };
 
   return (

@@ -9,7 +9,7 @@ import fetchData, { fetchUsersTypeData } from "../fetch/fetchdata";
 
 type UsersProps = {
   users: user[];
-  setUsers: (arg:any) => void;
+  setUsers?: (arg:any) => void;
 };
 
 export const Users = ({ users, setUsers }: UsersProps) => {
@@ -63,7 +63,7 @@ setFilterSearchUsers(data);
     setIsLoadingMore(true);
     const data = await fetchData("users", page + 1);
     setPage((prevPage) => prevPage + 1);
-    setUsers((prevUsers: any) => [...prevUsers, ...data]);
+    setUsers?.((prevUsers: any) => [...prevUsers, ...data]);
     setFilterSearchUsers([...users, ...data]);
     setSearch("");
     setStatusFilter("ALL");

@@ -5,27 +5,30 @@ import {
   withdraw,
   approveWithdrawal,
   validateTransaction,
-  updateTransaction
+  updateTransaction,
 } from "../../controllers/payments/mpesa";
-import { authenticateJWT, emailVerifiedMiddleware } from "../../middlewares/auth";
+import {
+  authenticateJWT,
+  emailVerifiedMiddleware,
+} from "../../middlewares/auth";
 import { addWebhookToQueue } from "../../queue/webhookQueue";
 import { db } from "../../db";
 
 const router = express.Router();
 
-router.post("/get-url", authenticateJWT,emailVerifiedMiddleware, getURL);
+router.post("/get-url", authenticateJWT, emailVerifiedMiddleware, getURL);
 router.post("/success-transaction", successTransaction);
 router.post("/validate/transaction/webhook", validateTransaction);
-router.post("/transaction/status", updateTransaction);
-router.post("/withdraw", authenticateJWT,emailVerifiedMiddleware, withdraw);
+router.post("/transaction/status", authenticateJWT, updateTransaction);
+router.post("/withdraw", authenticateJWT, emailVerifiedMiddleware, withdraw);
 router.post("/approve/withdraw", authenticateJWT, approveWithdrawal);
 
 router.post("/validate/transaction", async (req, res) => {
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
   console.log("Building the full URL", fullUrl);
 
   const webhookData = {
-    url: `${fullUrl}/webhook`,  // Webhook target URL
+    url: `${fullUrl}/webhook`, // Webhook target URL
     payload: req.body, // Data from the request body
   };
 
@@ -35,8 +38,8 @@ router.post("/validate/transaction", async (req, res) => {
   // Send an immediate success response
   res.status(200).json({
     status: "success",
-    message: "Webhook added successfully"
+    message: "Webhook added successfully",
   });
-})
+});
 
 export default router;

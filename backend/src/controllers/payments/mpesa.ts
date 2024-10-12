@@ -224,7 +224,9 @@ export const successTransaction = async (req: Request, res: Response) => {
           status: "COMPLETED", // Mark transaction as completed
         },
       }),
+      ...(await processCommissionDeposit(transaction.userId, transaction.finalamountInUSD)) || [] // Process the commission if there's a referrer  
     ]);
+    
 
     res.status(200).json({
       message: "Payment Successful",
@@ -234,6 +236,63 @@ export const successTransaction = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };
+
+export const processCommissionDeposit = async (userId: string, amount: number) => {
+  try {
+
+    const user = await db.user.findUnique({
+      where: { 
+        id: userId,
+      },
+      include: {
+        referredBy: true, 
+      },
+    });
+
+    if (!user||!user.referredBy) {
+      return null
+    }
+   
+      const referrerId = user.referredBy.referrerId;
+
+      const commission = amount * 0.03;
+      
+    const transaction = await db.transaction.create({
+      data: {
+        userId: userId,
+        amount: amount,
+        finalamountInUSD: amount,
+        platform_charges: 0,
+        type: 'REFERRAL_COMMISSION', 
+        status: 'COMPLETED',
+      },
+    }); //referral commission transcation
+
+      // Update the referrer's commission balance
+      await db.user.update({
+        where: { id: referrerId },
+        data: {
+          commissionBalance: {
+            increment: commission, 
+          },
+        },
+      });
+
+      await db.commissionDeposit.create({
+        data: {
+          userId: referrerId,
+          amount: commission,
+          status: 'COMPLETED',
+        },
+      });
+    
+  } catch (error) {
+    console.error("Error processing deposit:", error);
+    throw new Error("Failed to process deposit");
+  }
+};
+
+
 
 export const withdraw = async (req: Request, res: Response) => {
   try {

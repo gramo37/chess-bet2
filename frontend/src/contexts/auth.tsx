@@ -9,7 +9,8 @@ type TUser = {
   email?: string | undefined;
   role?: string | undefined;
   totalEarnings?: string | undefined;
-  emailVerified?:string | undefined
+  emailVerified?:string | undefined;
+  referralId?:string | undefined
 };
 
 export type Transaction = {

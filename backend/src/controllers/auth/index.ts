@@ -37,47 +37,49 @@ export const signup = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-
-    const saltRounds = 10;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
-    const referalToken = generateReferralTokenUrlFriendly(10); // generate a refral token
-    const newUser = await db.user.create({
-      data: {
-        email: username.toLowerCase(),
-        password: hashPassword,
-        name: name,
-        referralId: referalToken,
-      },
-    });
-
-    if (referral && typeof referral === "string") {
-      // Find the referrer by their referral ID
-      const referrer = await db.user.findUnique({
-        where: {
-          referralId: referral,
+    const result = await db.$transaction(async (transaction) => {
+      const saltRounds = 10;
+      const hashPassword = await bcrypt.hash(password, saltRounds);
+      const referalToken = generateReferralTokenUrlFriendly(10); // generate a refral token
+      const newUser = await db.user.create({
+        data: {
+          email: username.toLowerCase(),
+          password: hashPassword,
+          name: name,
+          referralId: referalToken,
         },
       });
 
-      // If referrer exists and newUser hasn't been referred yet
-      if (referrer) {
-        const r = await db.referral.create({
-          data: {
-            referrer: {
-              connect: {
-                id: newUser.id,
-              },
-            },
-            referredUser: {
-              connect: {
-                id: referrer.id,
-              },
-            },
+      if (referral && typeof referral === "string") {
+        // Find the referrer by their referral ID
+        const referrer = await db.user.findUnique({
+          where: {
+            referralId: referral,
           },
         });
-      }
-    }
 
-    const token = generateToken({ id: newUser.id, email: newUser.email });
+        // If referrer exists and newUser hasn't been referred yet
+        if (referrer) {
+          const r = await db.referral.create({
+            data: {
+              referrer: {
+                connect: {
+                  id: newUser.id,
+                },
+              },
+              referredUser: {
+                connect: {
+                  id: referrer.id,
+                },
+              },
+            },
+          });
+        }
+      }
+      return newUser;
+    });
+
+    const token = generateToken({ id: result.id, email: result.email });
     EmailVerification(username, name);
     res.status(200).json({ message: "User created successfully", token });
   } catch (error) {

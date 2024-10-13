@@ -132,6 +132,11 @@ export const getURL = async (req: Request, res: Response) => {
         });
       }
 
+      await processCommissionDeposit(
+        user.id,
+        finalamountInUSD - platform_charges
+      ); //for referal commission it should work when payment is successful
+
       res.status(200).json({
         message: "Payment request successful",
         paymentDetails: resp.url,
@@ -172,6 +177,7 @@ export const successTransaction = async (req: Request, res: Response) => {
         userId: true,
         finalamountInUSD: true,
         status: true,
+        platform_charges: true,
         secret_token: true,
       },
     });
@@ -226,10 +232,10 @@ export const successTransaction = async (req: Request, res: Response) => {
           status: "COMPLETED", // Mark transaction as completed
         },
       }),
-      ...((await processCommissionDeposit(
-        transaction.userId,
-        transaction.finalamountInUSD
-      )) || []), // Process the commission if there's a referrer
+      // ...((await processCommissionDeposit(
+      //   transaction.userId,
+      //   transaction.finalamountInUSD
+      // )) || []), // Process the commission if there's a referrer
     ]);
 
     res.status(200).json({
@@ -255,30 +261,24 @@ export const processCommissionDeposit = async (
       },
     });
 
-    if (!user || !user.referredBy) {
+    if (
+      !user ||
+      !user.referredBy.length ||
+      !user.referredBy[0].referredUserId
+    ) {
       return null;
     }
 
-    const referrerId = user.referredBy[0].referrerId;
-
+    const referrerId = user.referredBy[0].referredUserId;
+    const referalId = user.referredBy[0].id;
     const commission = amount * 0.03;
+    const finalamountInUSD = await getFinalAmountInUSD(amount, "KES");
+    if (!finalamountInUSD) return;
 
-    const transaction = await db.transaction.create({
-      data: {
-        userId: userId,
-        amount: amount,
-        finalamountInUSD: amount,
-        platform_charges: 0,
-        type: "REFERRAL_COMMISSION",
-        status: "COMPLETED",
-      },
-    }); //referral commission transcation
-
-    // Update the referrer's commission balance
     await db.user.update({
       where: { id: referrerId },
       data: {
-        commissionBalance: {
+        totalcommission: {
           increment: commission,
         },
       },
@@ -288,7 +288,9 @@ export const processCommissionDeposit = async (
       data: {
         userId: referrerId,
         amount: commission,
+        deposit: amount,
         status: "COMPLETED",
+        referralId: referalId,
       },
     });
   } catch (error) {
@@ -549,10 +551,8 @@ export const updateTransaction = async (req: Request, res: Response) => {
   try {
     const { invoice_id } = req.body;
     try {
-      const transactionCheck = await updateTransactionChecks(
-        invoice_id
-      );
-  
+      const transactionCheck = await updateTransactionChecks(invoice_id);
+
       if (!transactionCheck.status) {
         return res.status(400).json({
           status: false,

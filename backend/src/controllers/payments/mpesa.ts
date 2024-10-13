@@ -258,7 +258,7 @@ export const processCommissionDeposit = async (
       return null;
     }
 
-    const referrerId = user.referredBy.referrerId;
+    const referrerId = user.referredBy[0].referrerId;
 
     const commission = amount * 0.03;
 

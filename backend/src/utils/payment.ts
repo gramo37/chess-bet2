@@ -266,3 +266,107 @@ export async function depositChecks(
     };
   }
 }
+
+export async function updateTransactionChecks(invoice_id: string) {
+  try {
+    if(!invoice_id) return {
+      status: false,
+      message: "Invoice ID not provided"
+    }
+    const IntaSend = require("intasend-node");
+
+    let intasend = new IntaSend(
+      INTASEND_PUBLISHABLE_KEY,
+      INTASEND_SECRET_KEY,
+      INTASEND_IS_TEST
+    );
+
+    let collection = intasend.collection();
+    let resp = await collection.status(invoice_id);
+
+    if (!resp || !resp?.invoice?.state) {
+      return {
+        status: false,
+        message: "Transaction not found in Instasend",
+      };
+    }
+
+    if (resp.invoice.state !== "COMPLETE") {
+      // Don't update the DB and send a error message
+      return {
+        status: false,
+        message: "Transaction is imcomplete in instasend",
+      };
+    }
+
+    // If it is complete
+    // Check in DB if the status is PENDING
+    const transaction = await db.webhook.findFirst({
+      where: {
+        invoice_id,
+      },
+      select: {
+        invoice_id: true,
+        transaction: {
+          select: {
+            api_ref: true,
+            status: true,
+            userId: true,
+            finalamountInUSD: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!transaction || !transaction.transaction) {
+      return {
+        status: false,
+        message: "Transaction not found",
+      };
+    }
+
+    // If status not pending return error
+    if (
+      !transaction.transaction.status ||
+      transaction.transaction.status !== "PENDING"
+    ) {
+      return {
+        status: false,
+        message: "Transaction already completed or cancelled",
+      };
+    }
+
+    // Update transaction it as successful
+    await db.$transaction([
+      db.user.update({
+        where: {
+          // email: user.email,
+          id: transaction.transaction.userId,
+        },
+        data: {
+          balance: {
+            increment: transaction.transaction.finalamountInUSD,
+          },
+        },
+      }),
+      db.transaction.update({
+        where: { id: transaction.transaction.id },
+        data: {
+          status: "COMPLETED", // Mark transaction as completed
+        },
+      }),
+    ]);
+
+    return {
+      status: true,
+      message: resp
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      message: "Internal Server Error",
+    };
+  }
+}

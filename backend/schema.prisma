@@ -15,7 +15,7 @@ generator client {
 model User {
   id                 String              @id @default(cuid())
   name               String
-  email              String              @unique @db.Citext
+  email              String              @unique
   emailVerified      DateTime?
   password           String
   gamesAsWhite       Game[]              @relation("GamesAsWhite")
@@ -30,10 +30,23 @@ model User {
   otp                String?
   otpExpiresAt       DateTime?
   referralId         String              @unique @default("")
-  referredBy         Referral?           @relation("ReferralByUser")
+  referredBy         Referral[]          @relation("ReferralByUser")
+  referredById       String?
   referredUsers      Referral[]          @relation("ReferredUsers")
   commissionDeposits CommissionDeposit[]
   totalcommission    Float               @default(0.0)
+}
+
+model Referral {
+  id             String   @id @default(cuid())
+  referrer       User     @relation("ReferralByUser", fields: [referrerId], references: [id])
+  referrerId     String
+  referredUser   User     @relation("ReferredUsers", fields: [referredUserId], references: [id])
+  referredUserId String
+  createdAt      DateTime @default(now())
+
+  @@index([referrerId])
+  @@index([referredUserId])
 }
 
 model Transaction {
@@ -155,18 +168,6 @@ model CommissionDeposit {
   createdAt DateTime          @default(now())
 
   @@index([userId])
-}
-
-model Referral {
-  id             String   @id @default(cuid())
-  referrer       User     @relation("ReferredUsers", fields: [referrerId], references: [id]) // Referring user
-  referrerId     String   @unique
-  referredUser   User     @relation("ReferralByUser", fields: [referredUserId], references: [id]) // Referred user
-  referredUserId String   @unique
-  createdAt      DateTime @default(now())
-
-  @@index([referrerId])
-  @@index([referredUserId])
 }
 
 enum ReportStatus {

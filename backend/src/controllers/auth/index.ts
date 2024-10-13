@@ -1,26 +1,32 @@
 import { db } from "../../db";
-import { EmailVerification, SendForgotPassword} from "./verify";
+import { EmailVerification, SendForgotPassword } from "./verify";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { generateReferralTokenUrlFriendly, generateToken, verifyToken as jwtVerify } from "../../utils";
+import {
+  generateReferralTokenUrlFriendly,
+  generateToken,
+  verifyToken as jwtVerify,
+} from "../../utils";
+import { connect } from "../../db/redis";
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email validation
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { username, name, password,referral } = req.body;
-
+    const { username, name, password, referral } = req.body;
 
     if (!emailRegex.test(username)) {
-      return res.status(400).json({ message: 'Invalid email format.' });
+      return res.status(400).json({ message: "Invalid email format." });
     }
-  console.log(password);
-  
-    if (password.length <= 6) {
-  console.log(password,"anlaks");
+    console.log(password);
 
-      return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+    if (password.length <= 6) {
+      console.log(password, "anlaks");
+
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long." });
     }
     const existingUser = await db.user.findFirst({
       where: {
@@ -34,17 +40,17 @@ export const signup = async (req: Request, res: Response) => {
 
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
-    const referalToken = generateReferralTokenUrlFriendly(10) // generate a refral token
+    const referalToken = generateReferralTokenUrlFriendly(10); // generate a refral token
     const newUser = await db.user.create({
       data: {
         email: username.toLowerCase(),
         password: hashPassword,
         name: name,
-        referralId:referalToken
+        referralId: referalToken,
       },
     });
-    
-    if (referral&&  typeof referral==='string') {
+
+    if (referral && typeof referral === "string") {
       // Find the referrer by their referral ID
       const referrer = await db.user.findUnique({
         where: {
@@ -52,19 +58,27 @@ export const signup = async (req: Request, res: Response) => {
         },
       });
 
-      // If referrer exists, create a referral record
+      // If referrer exists and newUser hasn't been referred yet
       if (referrer) {
-        await db.referral.create({
+        const r = await db.referral.create({
           data: {
-            referrerId: referrer.id,
-            referredUserId: newUser.id,
+            referrer: {
+              connect: {
+                id: newUser.id,
+              },
+            },
+            referredUser: {
+              connect: {
+                id: referrer.id,
+              },
+            },
           },
         });
       }
     }
 
     const token = generateToken({ id: newUser.id, email: newUser.email });
-    EmailVerification(username,name);
+    EmailVerification(username, name);
     res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error:", error);
@@ -76,11 +90,9 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
 
- 
     if (!emailRegex.test(username)) {
-      return res.status(400).json({ message: 'Invalid email format.' });
+      return res.status(400).json({ message: "Invalid email format." });
     }
-  
 
     const user = await db.user.findFirst({
       where: {
@@ -91,9 +103,15 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
-    if(user.status === 'SUSPENDED') return res.status(403).json({ message: "Your account has been suspended" });
-    if(user.status === 'BANNED') return res.status(403).json({ message: "Your account has been permanently banned" });
-    
+    if (user.status === "SUSPENDED")
+      return res
+        .status(403)
+        .json({ message: "Your account has been suspended" });
+    if (user.status === "BANNED")
+      return res
+        .status(403)
+        .json({ message: "Your account has been permanently banned" });
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -130,28 +148,27 @@ export const refresh = async (req: Request, res: Response) => {
   }
 };
 
-export const verifiyEmail = async (req:Request,res:Response)=>{
-  try{
+export const verifiyEmail = async (req: Request, res: Response) => {
+  try {
     const user: any = (req?.user as any)?.user;
-    console.log('reacnkls');
-    
-    if(user.emailVerified){
-     return res.status(400).json({message:"Already verified"});
+    console.log("reacnkls");
+
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Already verified" });
     }
-    const email = user.email
-    EmailVerification(email,user.name);
-    return res.status(200).json({message:"Email has been sent"});
-  }catch(e){
+    const email = user.email;
+    EmailVerification(email, user.name);
+    return res.status(200).json({ message: "Email has been sent" });
+  } catch (e) {
     return res
-    .status(500)
-    .json({ message: "An error occurred while sending the email" });
+      .status(500)
+      .json({ message: "An error occurred while sending the email" });
   }
-  
-} 
+};
 
 export const verifyToken = async (req: Request, res: Response) => {
   console.log("verify");
-  
+
   try {
     const decoded = jwtVerify(req.params.token) as {
       data: string;
@@ -190,51 +207,56 @@ export const verifyToken = async (req: Request, res: Response) => {
   }
 };
 
-export async function ForgotPassword(req:Request,res:Response){
-  
-  try{
+export async function ForgotPassword(req: Request, res: Response) {
+  try {
     const { email } = req.body;
 
-  // Find the user by email
-  const user = await db.user.findFirst({
-    where: { email: {
-      equals: email,  
-      mode: 'insensitive', // Case-insensitive comparison
-    },},
-  });
+    // Find the user by email
+    const user = await db.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: "insensitive", // Case-insensitive comparison
+        },
+      },
+    });
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-  const token = generateToken({ id: user.id, email: user.email }, "10m");
-  await db.user.update({
-    where: { email },
-    data: {
-      otp: token,
-      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
-    },
-  });
-  
- await SendForgotPassword(email,user.name,token);
-  res.status(200).json({ message: "Password reset link sent to your email" });
-  }catch(e){
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const token = generateToken({ id: user.id, email: user.email }, "10m");
+    await db.user.update({
+      where: { email },
+      data: {
+        otp: token,
+        otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now
+      },
+    });
+
+    await SendForgotPassword(email, user.name, token);
+    res.status(200).json({ message: "Password reset link sent to your email" });
+  } catch (e) {
     return res.status(500).json({
       message: "Something went wrong",
       e,
-    }); 
+    });
   }
-  
 }
 
 export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { token, newPassword } = req.body;
 
-    // Verify the token
+    if (newPassword.length <= 6) {
+      console.log(newPassword, "anlaks");
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters long." });
+    }
     let decoded;
     try {
-       decoded = jwtVerify(token) as {
-        id:string;
+      decoded = jwtVerify(token) as {
+        id: string;
         data: string;
       };
     } catch (err) {
@@ -277,7 +299,6 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
-
 export const verifyResetToken = async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
@@ -286,7 +307,7 @@ export const verifyResetToken = async (req: Request, res: Response) => {
     let decoded;
     try {
       decoded = jwtVerify(token) as {
-        id:string;
+        id: string;
         data: string;
       };
     } catch (err) {

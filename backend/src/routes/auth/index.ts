@@ -10,7 +10,10 @@ import {
   verifyToken,
 } from "../../controllers/auth";
 import { authenticateJWT, getUserProfits } from "../../middlewares/auth";
-import { getAllUserReferralDetails } from "../../controllers/users";
+import {
+  UpdateAccountBalanceWithCommission,
+  getAllUserReferralDetails,
+} from "../../controllers/users";
 
 const router = express.Router();
 
@@ -23,5 +26,9 @@ router.post("/forgotpassword", ForgotPassword);
 router.get("/verifyResetToken/:token", verifyResetToken);
 router.post("/updateforgotpassword", resetPassword);
 router.get("/get-referral-details", authenticateJWT, getAllUserReferralDetails);
-
+router.post(
+  "/update-balance-commission",
+  authenticateJWT,
+  UpdateAccountBalanceWithCommission
+);
 export default router;

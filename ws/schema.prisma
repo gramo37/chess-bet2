@@ -85,6 +85,7 @@ model Webhook_retries {
   status        WebhookStatus
   error_message String?
   job_id        String?
+  api_ref       String?
 }
 
 model Game {

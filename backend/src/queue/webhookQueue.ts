@@ -31,8 +31,19 @@ export const addWebhookToQueue = (webhookData: WebhookData): void => {
 webhookQueue.process(async (job) => {
   console.log("Processing webhook:", job.data, job.id);
   console.log("Adding data in webhooks table");
-  await db.webhook.create({
-    data: {
+  // Check if api_ref is present in webhook
+  // If not create record else update the state
+  await db.webhook.upsert({
+    where: {
+      api_ref: job?.data?.payload?.api_ref
+    },
+    update: {
+      state: job?.data?.payload?.state,
+      charges: job?.data?.payload?.charges,
+      net_amount: job?.data?.payload?.net_amount,
+      account: job?.data?.payload?.account,
+    },
+    create: {
       url: job.data.url,
       job_id: String(job.id),
       invoice_id: job?.data?.payload?.invoice_id,
@@ -61,6 +72,7 @@ webhookQueue.process(async (job) => {
         status: "SUCCESS",
         error_message: `Webhook completed`,
         job_id: String(job.id),
+        api_ref: job?.data?.payload?.api_ref
       },
     });
     console.log("Webhook processed successfully:", response.status);

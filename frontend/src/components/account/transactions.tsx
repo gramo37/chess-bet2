@@ -127,15 +127,17 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
         }
       );
     },
+    onSettled: () => {
+      qc.invalidateQueries({
+        queryKey: ["TransactionHistory"]
+      })
+    }
   });
   const refreshTransaction = async () => {
     if (!transaction || !transaction?.webhook?.invoice_id) {
       return;
     }
     mutate();
-    qc.invalidateQueries({
-      queryKey: ["TransactionHistory"]
-    })
   };
 
   return (

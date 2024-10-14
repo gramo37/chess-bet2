@@ -346,13 +346,14 @@ export const withdraw = async (req: Request, res: Response) => {
         finalamountInUSD: finalamountInUSD - platform_charges,
         platform_charges,
         mode: "mpesa",
+        api_ref: checkout_id // Prevent api_ref should be unique error
       },
     });
 
     // Attempt to send the amount to the user's account
     const withdrawSuccess = await withdrawMPesaToUser(amount, account, user);
 
-    if (!withdrawSuccess) {
+    if (!withdrawSuccess.status) {
       // If sending to the user failed, update transaction status to 'CANCELLED'
       await db.transaction.update({
         where: { id: transaction.id },
@@ -380,6 +381,7 @@ export const withdraw = async (req: Request, res: Response) => {
         where: { id: transaction.id },
         data: {
           status: "REQUESTED",
+          api_ref: withdrawSuccess.message.tracking_id
         },
       }),
     ]);
@@ -434,18 +436,20 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
   }
 };
 
+// Webhook route
 export const validateTransaction = async (req: Request, res: Response) => {
   try {
     const { api_ref, challenge, state } = req.body;
 
     console.log(
-      "--------------------------------------------------------------------------------Triggering webhook--------------------------------------------------------------------------------------------"
+      "--------------------------------------------------------------------------------Triggering webhook for deposits--------------------------------------------------------------------------------------------"
     );
 
     console.log(challenge, api_ref, state, INSTASEND_CHALLENGE);
 
     // Check for challenge and match it
     if (challenge !== INSTASEND_CHALLENGE) {
+      console.log("User not authorized")
       return res.status(400).json({
         status: "error",
         message: "User is unauthorized",
@@ -527,6 +531,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
         }),
       ]);
 
+      console.log("Payment Completed")
       res.status(200).json({
         message: "Payment Successful",
       });
@@ -549,10 +554,8 @@ export const updateTransaction = async (req: Request, res: Response) => {
   try {
     const { invoice_id } = req.body;
     try {
-      const transactionCheck = await updateTransactionChecks(
-        invoice_id
-      );
-  
+      const transactionCheck = await updateTransactionChecks(invoice_id);
+
       if (!transactionCheck.status) {
         return res.status(400).json({
           status: false,
@@ -577,8 +580,104 @@ export const updateTransaction = async (req: Request, res: Response) => {
   }
 };
 
+// Webhook route
 export const updateWithdrawal = async (req: Request, res: Response) => {
   try {
+    const { tracking_id, challenge, status } = req.body;
+
+    console.log(
+      "--------------------------------------------------------------------------------Triggering webhook for withdrawals--------------------------------------------------------------------------------------------"
+    );
+    
+    console.log(tracking_id, challenge, status, INSTASEND_CHALLENGE)
+
+    // Check for challenge and match it
+    if (challenge !== INSTASEND_CHALLENGE) {
+      console.log("User not authorized")
+      return res.status(400).json({
+        status: "error",
+        message: "User is unauthorized",
+      });
+    }
+
+    // Check for api_ref and match it
+    const transaction = await db.transaction.findFirst({
+      where: {
+        api_ref: tracking_id,
+        type: "WITHDRAWAL",
+      },
+      select: {
+        id: true,
+        userId: true,
+        finalamountInUSD: true,
+        status: true,
+        secret_token: true,
+      },
+    });
+
+    if (!transaction) {
+      console.log("Transaction not found");
+      return res
+        .status(404)
+        .json({ message: "Transaction not found", status: "error" });
+    }
+
+    console.log("Transaction for withdrawal found -> ", transaction);
+
+    try {
+      if (status !== "Preview and approve") {
+        console.log("Payment is", status);
+        await db.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            status: ["Confirming balance", "Processing (FLT)", "Processing", "Processing (FLTRSLT)", "Sending payment", "Processing payment"].includes(status)
+              ? "PENDING"
+              : "CANCELLED",
+          },
+        });
+
+        return res.status(400).json({
+          message: `Status is ${status}`,
+          status: "error",
+        });
+      }
+
+      // Check for if the transaction is requested
+      if (transaction.status !== "REQUESTED") {
+        console.log(
+          "Transaction already completed with status -> ",
+          transaction.status
+        );
+        return res.status(401).json({
+          message: "Transaction already completed or cancelled",
+          status: "error",
+        });
+      }
+
+      // Update the status to Success
+      await db.transaction.update({
+        where: {
+          // email: user.email,
+          id: transaction.id,
+        },
+        data: {
+          status: "COMPLETED",
+        },
+      });
+
+      console.log("Withdrawal Completed")
+      res.status(200).json({
+        message: "Withdraw Successful",
+      });
+    } catch (error) {
+      console.log("Something went wrong in updating the balances", error);
+      await db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "ERROR",
+        },
+      });
+    }
   } catch (error) {
     console.error("Error Fetching Transaction:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });

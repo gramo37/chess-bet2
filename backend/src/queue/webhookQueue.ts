@@ -34,63 +34,46 @@ webhookQueue.process(async (job) => {
   console.log("Adding data in webhooks table");
   // Check if api_ref is present in webhook
   // If not create record else update the state
-  try {
-    await db.webhook.upsert({
-      where: {
-        api_ref: job?.data?.payload?.api_ref
-      },
-      update: {
-        state: job?.data?.payload?.state,
-        charges: job?.data?.payload?.charges,
-        net_amount: job?.data?.payload?.net_amount,
-        account: job?.data?.payload?.account,
-      },
-      create: {
-        url: job.data.url,
-        job_id: String(job.id),
-        invoice_id: job?.data?.payload?.invoice_id,
-        state: job?.data?.payload?.state,
-        provider: job?.data?.payload?.provider,
-        charges: job?.data?.payload?.charges,
-        net_amount: job?.data?.payload?.net_amount,
-        currency: job?.data?.payload?.currency,
-        account: job?.data?.payload?.account,
-        api_ref: job?.data?.payload?.api_ref,
-        host: job?.data?.payload?.host,
-        failed_reason: job?.data?.payload?.failed_reason,
-        failed_code: job?.data?.payload?.failed_code,
-        created_at: job?.data?.payload?.created_at,
-        updated_at: job?.data?.payload?.updated_at,
-      },
-    });
-  } catch (error) {
-    console.log("Something went wrong while entering data in webhook", error)
-  }
+    try {
+      await db.webhook.upsert({
+        where: {
+          api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
+        },
+        update: {
+          state: job?.data?.payload?.state,
+          charges: job?.data?.payload?.charges,
+          net_amount: job?.data?.payload?.net_amount,
+          account: job?.data?.payload?.account,
+        },
+        create: {
+          url: job.data.url,
+          job_id: String(job.id),
+          invoice_id: job?.data?.payload?.invoice_id,
+          state: job?.data?.payload?.state ?? job?.data?.payload?.status,
+          provider: job?.data?.payload?.provider,
+          charges: job?.data?.payload?.charges,
+          net_amount: job?.data?.payload?.net_amount,
+          currency: job?.data?.payload?.currency,
+          account: job?.data?.payload?.account,
+          api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
+          host: job?.data?.payload?.host,
+          failed_reason: job?.data?.payload?.failed_reason,
+          failed_code: job?.data?.payload?.failed_code,
+          created_at: job?.data?.payload?.created_at,
+          updated_at: job?.data?.payload?.updated_at,
+        },
+      });
+    } catch (error) {
+      console.log("Something went wrong while entering data in webhook", error);
+    }
 
   try {
     const response = await axios.post(job.data.url, job.data.payload, {
       headers: { "Content-Type": "application/json" },
     });
-    // Add the webhook in DB for later use
-    // await db.webhook_retries.create({
-    //   data: {
-    //     status: "SUCCESS",
-    //     error_message: `Webhook completed`,
-    //     job_id: String(job.id),
-    //     api_ref: job?.data?.payload?.api_ref
-    //   },
-    // });
     console.log("Webhook processed successfully:", response.status);
   } catch (error: any) {
     console.error("Failed to process webhook, retrying...", error.message);
-    // await db.webhook_retries.create({
-    //   data: {
-    //     status: "FAILURE",
-    //     error_message: `Webhook not processed ${error.message}`,
-    //     job_id: String(job.id),
-    //     api_ref: job?.data?.payload?.api_ref
-    //   },
-    // });
     throw new Error("Failed to process webhook"); // This will trigger a retry
   }
 });
@@ -103,19 +86,25 @@ webhookQueue.on("failed", async (job: any, err) => {
       status: "FAILURE",
       error_message: `Webhook failed -> ${err.message}`,
       job_id: String(job.id),
-      api_ref: job?.data?.payload?.api_ref
+      api_ref: job?.data?.payload?.api_ref,
     },
   });
-  // If the transaction fails check the transaction in instasend
-  const transactionCheck = await updateTransactionChecks(
-    job?.data?.payload?.invoice_id
-  );
-
-  if (!transactionCheck.status) {
-    console.log(`Transaction Updation failed. Error -> `, transactionCheck.message)
-  } else {
-    console.log("Transaction updated successfully")
+  if(job?.data?.payload?.invoice_id) {
+    // If the transaction fails check the transaction in instasend
+    const transactionCheck = await updateTransactionChecks(
+      job?.data?.payload?.invoice_id
+    );
+  
+    if (!transactionCheck.status) {
+      console.log(
+        `Transaction Updation failed. Error -> `,
+        transactionCheck.message
+      );
+    } else {
+      console.log("Transaction updated successfully");
+    }
   }
+  
   console.log(`Retrying ${job.opts.attempts - job.attemptsMade} more times...`);
 });
 
@@ -126,7 +115,7 @@ webhookQueue.on("completed", async (job) => {
       status: "SUCCESS",
       error_message: `Webhook completed`,
       job_id: String(job.id),
-      api_ref: job?.data?.payload?.api_ref
+      api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
     },
   });
   console.log(`Job completed successfully: ${job.id}`);

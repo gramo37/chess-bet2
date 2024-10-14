@@ -28,7 +28,10 @@ export const withdrawMPesaToUser = async (
   user: TUser
 ) => {
   try {
-    if (!user || !user?.id) return false;
+    if (!user || !user?.id) return {
+      status: false,
+      message: "User Not Found"
+    };
     console.log("Deposit Money to user", amount, "Received from", user);
 
     const IntaSend = require("intasend-node");
@@ -43,7 +46,7 @@ export const withdrawMPesaToUser = async (
 
     console.log("User Details", user?.name, account, amount);
 
-    await payouts.mpesa({
+    const resp = await payouts.mpesa({
       currency: "KES",
 
       transactions: [
@@ -55,10 +58,58 @@ export const withdrawMPesaToUser = async (
         },
       ],
     });
-    return true;
+    console.log("Payments", resp);
+
+    // Sample response
+    // {
+    //   file_id: 'MRLJ08Q',
+    //   device_id: null,
+    //   tracking_id: '163172da-ddd2-4ca7-bb07-a965e1179c1c',
+    //   batch_reference: null,
+    //   status: 'Preview and approve',
+    //   status_code: 'BP103',
+    //   nonce: '657b2f',
+    //   wallet: {
+    //     wallet_id: 'Q6470JY',
+    //     label: 'default',
+    //     can_disburse: false,
+    //     currency: 'KES',
+    //     wallet_type: 'SETTLEMENT',
+    //     current_balance: 133568.49,
+    //     available_balance: 98668.49,
+    //     updated_at: '2024-10-13T16:34:56.584884+03:00'
+    //   },
+    //   transactions: [
+    //     {
+    //       status: 'Pending',
+    //       status_code: 'TP101',
+    //       request_reference_id: 'e63f92a9-ea58-4242-bac6-1b3dae1cf569',
+    //       name: 'Prasanna',
+    //       account: '254342423423',
+    //       id_number: null,
+    //       bank_code: null,
+    //       amount: 1000,
+    //       narrative: 'Withdrawal of Money by User'
+    //     }
+    //   ],
+    //   charge_estimate: 15,
+    //   total_amount_estimate: 1015,
+    //   total_amount: 1000,
+    //   transactions_count: 1,
+    //   created_at: '2024-10-14T07:26:22.928732+03:00',
+    //   updated_at: '2024-10-14T07:26:23.040350+03:00'
+    // }
+
+    return {
+      status: true,
+      message: resp
+    };
   } catch (error) {
     console.log("Error in payment to user", error, "" + error);
-    return false;
+    return {
+      status: false,
+      message: `Error in payment to user", ${error}, ${"" + error}`
+    };
   }
 };
 

@@ -54,10 +54,11 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
 
     const referredUsers = await Promise.all(
       referredUserDetails.referredUsers.map(async (referral) => {
-        return await db.user.findUnique({
+        const u = await db.user.findUnique({
           where: { id: referral.referrerId },
           select: { name: true },
         });
+        return { name: u?.name || "User", joinedDate: referral.createdAt };
       })
     );
     // const referredBy =
@@ -92,7 +93,7 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
           deposit: depositAmount,
           amount,
           createdAt,
-          user: user?.name || "Unknown User", // Provide a fallback if the user is not found
+          user: user?.name || "User", // Provide a fallback if the user is not found
         };
       })
     );
@@ -138,11 +139,26 @@ export async function UpdateAccountBalanceWithCommission(
     if (!referredUserDetails.referredUsers.length) {
       return res.status(403).json({ message: "No referred users" });
     }
-    // if (referredUserDetails.totalcommission <= 50) {
-    //   return res.status(403).json({
-    //     message: "Total commission Earned should be greater or equal $50",
-    //   });
-    // }
+    if (referredUserDetails.totalcommission <= 50) {
+      return res.status(403).json({
+        message: "Total commission Earned should be greater or equal $50",
+      });
+    }
+
+    const today = new Date();
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    ).getDate();
+
+    console.log(today.getDate(), lastDayOfMonth);
+
+    if (today.getDate() !== lastDayOfMonth) {
+      return res.status(403).json({
+        message: "Commission can only be withdrawn at the end of the month",
+      });
+    }
 
     await db.transaction.create({
       data: {

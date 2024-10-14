@@ -32,6 +32,9 @@ export const addWebhookToQueue = (webhookData: WebhookData): void => {
 webhookQueue.process(async (job) => {
   console.log("Processing webhook:", job.data, job.id);
   console.log("Adding data in webhooks table");
+  // If the status is already completed dont update it again
+  const status = job?.data?.payload?.state ?? job?.data?.payload?.status
+  if(status === "COMPLETE" || status === "Completed") return;
   // Check if api_ref is present in webhook
   // If not create record else update the state
     try {
@@ -40,7 +43,7 @@ webhookQueue.process(async (job) => {
           api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
         },
         update: {
-          state: job?.data?.payload?.state,
+          state: job?.data?.payload?.state ?? job?.data?.payload?.status,
           charges: job?.data?.payload?.charges,
           net_amount: job?.data?.payload?.net_amount,
           account: job?.data?.payload?.account,

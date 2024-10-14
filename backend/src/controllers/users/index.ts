@@ -53,7 +53,7 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
     }
 
     const referredUsers = await Promise.all(
-      referredUserDetails.referredUsers.map(async (referral) => {
+      referredUserDetails.referredUsers.map(async (referral: any) => {
         return await db.user.findUnique({
           where: { id: referral.referrerId },
           select: { name: true },
@@ -69,7 +69,7 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
     //     : null;
 
     const commissionDeposits = await Promise.all(
-      referredUserDetails.commissionDeposits.map(async (deposit) => {
+      referredUserDetails.commissionDeposits.map(async (deposit: any) => {
         const {
           referralId: userId,
           deposit: depositAmount,

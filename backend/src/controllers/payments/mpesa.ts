@@ -388,10 +388,14 @@ export const withdraw = async (req: Request, res: Response) => {
       }),
     ]);
 
-    sendWithdrawalRequestNotification(
-      transaction.finalamountInUSD,
-      transaction.id
-    );
+    try {
+      sendWithdrawalRequestNotification(
+        transaction.finalamountInUSD,
+        transaction.id
+      );
+    } catch (error) {
+      console.log(error)
+    }
     res.status(200).json({
       message: "Money withdrawal initiated! Kindly wait till it is approved.",
       transaction, // Return the transaction object

@@ -37,7 +37,7 @@ export const signup = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const result = await db.$transaction(async (transaction) => {
+    const result = await db.$transaction(async () => {
       const saltRounds = 10;
       const hashPassword = await bcrypt.hash(password, saltRounds);
       const referalToken = generateReferralTokenUrlFriendly(10); // generate a refral token

@@ -132,10 +132,10 @@ export const getURL = async (req: Request, res: Response) => {
         });
       }
 
-      await processCommissionDeposit(
-        user.id,
-        finalamountInUSD - platform_charges
-      ); //for referal commission it should work when payment is successful
+      // await processCommissionDeposit(
+      //   user.id,
+      //   finalamountInUSD - platform_charges
+      // ); //for referal commission it should work when payment is successful
 
       res.status(200).json({
         message: "Payment request successful",
@@ -232,10 +232,10 @@ export const successTransaction = async (req: Request, res: Response) => {
           status: "COMPLETED", // Mark transaction as completed
         },
       }),
-      // ...((await processCommissionDeposit(
-      //   transaction.userId,
-      //   transaction.finalamountInUSD
-      // )) || []), // Process the commission if there's a referrer
+      ...((await processCommissionDeposit(
+        transaction.userId,
+        transaction.finalamountInUSD - transaction.platform_charges
+      )) || []), // Process the commission if there's a referrer
     ]);
 
     res.status(200).json({
@@ -348,7 +348,7 @@ export const withdraw = async (req: Request, res: Response) => {
         finalamountInUSD: finalamountInUSD - platform_charges,
         platform_charges,
         mode: "mpesa",
-        api_ref: checkout_id // Prevent api_ref should be unique error
+        api_ref: checkout_id, // Prevent api_ref should be unique error
       },
     });
 
@@ -383,7 +383,7 @@ export const withdraw = async (req: Request, res: Response) => {
         where: { id: transaction.id },
         data: {
           status: "REQUESTED",
-          api_ref: withdrawSuccess.message.tracking_id
+          api_ref: withdrawSuccess.message.tracking_id,
         },
       }),
     ]);
@@ -451,7 +451,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
 
     // Check for challenge and match it
     if (challenge !== INSTASEND_CHALLENGE) {
-      console.log("User not authorized")
+      console.log("User not authorized");
       return res.status(400).json({
         status: "error",
         message: "User is unauthorized",
@@ -533,7 +533,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
         }),
       ]);
 
-      console.log("Payment Completed")
+      console.log("Payment Completed");
       res.status(200).json({
         message: "Payment Successful",
       });
@@ -590,12 +590,12 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
     console.log(
       "--------------------------------------------------------------------------------Triggering webhook for withdrawals--------------------------------------------------------------------------------------------"
     );
-    
-    console.log(tracking_id, challenge, status, INSTASEND_CHALLENGE)
+
+    console.log(tracking_id, challenge, status, INSTASEND_CHALLENGE);
 
     // Check for challenge and match it
     if (challenge !== INSTASEND_CHALLENGE) {
-      console.log("User not authorized")
+      console.log("User not authorized");
       return res.status(400).json({
         status: "error",
         message: "User is unauthorized",
@@ -632,7 +632,14 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
         await db.transaction.update({
           where: { id: transaction.id },
           data: {
-            status: ["Confirming balance", "Processing (FLT)", "Processing", "Processing (FLTRSLT)", "Sending payment", "Processing payment"].includes(status)
+            status: [
+              "Confirming balance",
+              "Processing (FLT)",
+              "Processing",
+              "Processing (FLTRSLT)",
+              "Sending payment",
+              "Processing payment",
+            ].includes(status)
               ? "PENDING"
               : "CANCELLED",
           },
@@ -667,7 +674,7 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
         },
       });
 
-      console.log("Withdrawal Completed")
+      console.log("Withdrawal Completed");
       res.status(200).json({
         message: "Withdraw Successful",
       });

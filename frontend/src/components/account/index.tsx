@@ -155,7 +155,7 @@ export default function Account() {
   );
 }
 
-function TabButton({
+export function TabButton({
   title,
   activeTab,
   setActiveTab,

@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import { randomBytes, randomUUID } from "crypto";
 import axios from "axios";
 import { BCRYPT_SECRET_KEY, CURRENCY_RATE_URL } from "../constants";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+import { db } from "../db";
 
 dotenv.config();
 
@@ -41,8 +42,33 @@ export function generateRandomPassword(length = 12) {
   return password;
 }
 
-export function generateReferralTokenUrlFriendly(length = 16) {
-  return randomBytes(length).toString('base64url'); // base64url avoids +, /, and =
+export async function generateReferralTokenUrlFriendly() {
+  const companyName = "prochesser";
+
+  const generateCode = () => {
+    const randomString = Math.random()
+      .toString(36)
+      .substring(2, 10)
+      .toUpperCase();
+    return `${companyName.toUpperCase()}${randomString}`;
+  };
+
+  let referralCode;
+  let isDuplicate = true;
+  // checking for duplications in referrals
+  while (isDuplicate) {
+    referralCode = generateCode();
+
+    const existingCode = await db.user.findUnique({
+      where: { referralId: referralCode },
+    });
+
+    if (!existingCode) {
+      isDuplicate = false; // Exit loop if the code is unique
+    }
+  }
+
+  return referralCode;
 }
 
 export async function getFinalAmountInUSD(amount: number, currency: string) {
@@ -72,26 +98,29 @@ export async function getFinalAmountInUSD(amount: number, currency: string) {
 export async function createHash(password: string): Promise<string> {
   const saltRounds = 10;
   const passwordWithSecret = password + BCRYPT_SECRET_KEY;
-  
+
   try {
     const hash = await bcrypt.hash(passwordWithSecret, saltRounds);
     return hash;
   } catch (error) {
-    throw new Error('Error creating hash');
+    throw new Error("Error creating hash");
   }
 }
 
 // Function to compare a password with the stored hash
-export async function compareHash(password: string, storedHash: string): Promise<boolean> {
+export async function compareHash(
+  password: string,
+  storedHash: string
+): Promise<boolean> {
   const passwordWithSecret = password + BCRYPT_SECRET_KEY;
 
   try {
     const isMatch = await bcrypt.compare(passwordWithSecret, storedHash);
-    console.log("IS Matching", isMatch)
+    console.log("IS Matching", isMatch);
 
     return isMatch;
   } catch (error) {
-    console.error('Error comparing hash');
+    console.error("Error comparing hash");
     return false;
   }
 }

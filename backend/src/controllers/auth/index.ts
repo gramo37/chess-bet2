@@ -37,10 +37,22 @@ export const signup = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
+    let referrer: any;
+    if (referral) {
+      referrer = await db.user.findUnique({
+        where: {
+          referralId: referral,
+        },
+      });
+      if (!referrer) {
+        return res.status(400).json({ message: "Referral Not found" });
+      }
+    }
+
     const result = await db.$transaction(async (transaction) => {
       const saltRounds = 10;
       const hashPassword = await bcrypt.hash(password, saltRounds);
-      const referalToken = generateReferralTokenUrlFriendly(10); // generate a refral token
+      const referalToken = await generateReferralTokenUrlFriendly();
       const newUser = await db.user.create({
         data: {
           email: username.toLowerCase(),
@@ -50,31 +62,21 @@ export const signup = async (req: Request, res: Response) => {
         },
       });
 
-      if (referral && typeof referral === "string") {
-        // Find the referrer by their referral ID
-        const referrer = await db.user.findUnique({
-          where: {
-            referralId: referral,
-          },
-        });
-
-        // If referrer exists and newUser hasn't been referred yet
-        if (referrer) {
-          const r = await db.referral.create({
-            data: {
-              referrer: {
-                connect: {
-                  id: newUser.id,
-                },
-              },
-              referredUser: {
-                connect: {
-                  id: referrer.id,
-                },
+      if (referrer) {
+        const r = await db.referral.create({
+          data: {
+            referrer: {
+              connect: {
+                id: newUser.id,
               },
             },
-          });
-        }
+            referredUser: {
+              connect: {
+                id: referrer.id,
+              },
+            },
+          },
+        });
       }
       return newUser;
     });

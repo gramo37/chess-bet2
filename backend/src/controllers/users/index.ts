@@ -56,26 +56,117 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
       referredUserDetails.referredUsers.map(async (referral) => {
         return await db.user.findUnique({
           where: { id: referral.referrerId },
-          select: { name: true, email: true },
+          select: { name: true },
         });
       })
     );
-    console.log(user, referredUserDetails, referredUsers);
-    const referredBy =
-      referredUserDetails.referredBy.length > 0
-        ? await db.user.findUnique({
-            where: { id: referredUserDetails.referredBy[0].referrerId },
-            select: { name: true, email: true },
-          })
-        : null;
+    // const referredBy =
+    //   referredUserDetails.referredBy.length > 0
+    //     ? await db.user.findUnique({
+    //         where: { id: referredUserDetails.referredBy[0].referredUserId },
+    //         select: { name: true },
+    //       })
+    //     : null;
+
+    const commissionDeposits = await Promise.all(
+      referredUserDetails.commissionDeposits.map(async (deposit) => {
+        const {
+          referralId: userId,
+          deposit: depositAmount,
+          amount,
+          createdAt,
+        } = deposit;
+
+        const referral = await db.referral.findUnique({
+          where: { id: userId },
+          select: { referrerId: true },
+        });
+        const user = await db.user.findUnique({
+          where: {
+            id: referral?.referrerId,
+          },
+        });
+        console.log(userId, user);
+
+        return {
+          deposit: depositAmount,
+          amount,
+          createdAt,
+          user: user?.name || "Unknown User", // Provide a fallback if the user is not found
+        };
+      })
+    );
+
+    console.log(commissionDeposits);
 
     return res.status(200).json({
       referralId: referredUserDetails.referralId,
       referredUsers: referredUsers.filter(Boolean),
-      referredBy,
-      commissionDeposits: referredUserDetails.commissionDeposits,
+      commissionDeposits: commissionDeposits,
       totalCommission: referredUserDetails.totalcommission,
     });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send("Something Went Wrong!");
+  }
+}
+
+export async function UpdateAccountBalanceWithCommission(
+  req: Request,
+  res: Response
+) {
+  try {
+    const user: any = (req?.user as any)?.user;
+    console.log("comes here");
+
+    const referredUserDetails = await db.user.findUnique({
+      where: {
+        email: user.email,
+      },
+      select: {
+        referredUsers: true,
+        referredBy: true,
+        referralId: true,
+        commissionDeposits: true,
+        totalcommission: true,
+      },
+    });
+
+    if (!referredUserDetails) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!referredUserDetails.referredUsers.length) {
+      return res.status(403).json({ message: "No referred users" });
+    }
+    // if (referredUserDetails.totalcommission <= 50) {
+    //   return res.status(403).json({
+    //     message: "Total commission Earned should be greater or equal $50",
+    //   });
+    // }
+
+    await db.transaction.create({
+      data: {
+        amount: referredUserDetails.totalcommission,
+        finalamountInUSD: referredUserDetails.totalcommission,
+        status: "COMPLETED",
+        type: "REFERRAL_COMMISSION",
+        userId: user.id,
+        platform_charges: 0,
+      },
+    });
+
+    await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        balance: {
+          increment: referredUserDetails.totalcommission,
+        },
+        totalcommission: 0,
+      },
+    });
+    res.status(200).json({ message: "Added to the account balance" });
   } catch (e) {
     console.log(e);
     res.status(500).send("Something Went Wrong!");

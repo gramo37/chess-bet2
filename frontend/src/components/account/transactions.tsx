@@ -73,8 +73,8 @@ const TransactionHistory: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction) => (
-                <TransactionComponent transaction={transaction} />
+              {transactions.map((transaction, key) => (
+                <TransactionComponent key={key} transaction={transaction} />
               ))}
             </tbody>
           </table>
@@ -88,7 +88,6 @@ const TransactionHistory: React.FC = () => {
 
 export default TransactionHistory;
 type TransactionProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transaction: any;
 };
 
@@ -141,10 +140,7 @@ const TransactionComponent = ({ transaction }: TransactionProps) => {
   };
 
   return (
-    <tr
-      key={transaction.id}
-      className="border-t hover:bg-gray-50 transition duration-200"
-    >
+    <tr className="border-t hover:bg-gray-50 transition duration-200">
       <td
         className="py-3 px-4 text-sm text-gray-600 cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis relative"
         onClick={() => copyTransactionId(transaction.id)}

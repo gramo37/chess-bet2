@@ -13,29 +13,28 @@ generator client {
 }
 
 model User {
-  id                  String              @id @default(cuid())
-  name                String
-  email               String              @unique
-  emailVerified       DateTime?
-  password            String
-  gamesAsWhite        Game[]              @relation("GamesAsWhite")
-  gamesAsBlack        Game[]              @relation("GamesAsBlack")
-  rating              Int                 @default(800)
-  balance             Float               @default(3)
-  commissionBalance   Float               @default(0.0)
-  transactions        Transaction[]
-  reports             UserReport[]
-  role                Roles               @default(USER)
-  status              UserStatus          @default(ACTIVE)
-  otp                 String?
-  otpExpiresAt        DateTime?
-  referralId          String              @unique @default("")
-  referredBy          Referral[]          @relation("ReferralByUser")
-  referredById        String?
-  referredUsers       Referral[]          @relation("ReferredUsers")
-  commissionDeposits  CommissionDeposit[]
-  totalcommission     Float               @default(0.0)
-  commissionWithdrawn DateTime?
+  id                 String              @id @default(cuid())
+  name               String
+  email              String              @unique
+  emailVerified      DateTime?
+  password           String
+  gamesAsWhite       Game[]              @relation("GamesAsWhite")
+  gamesAsBlack       Game[]              @relation("GamesAsBlack")
+  rating             Int                 @default(800)
+  balance            Float               @default(3)
+  commissionBalance  Float               @default(0.0)
+  transactions       Transaction[]
+  reports            UserReport[]
+  role               Roles               @default(USER)
+  status             UserStatus          @default(ACTIVE)
+  otp                String?
+  otpExpiresAt       DateTime?
+  referralId         String              @unique @default("")
+  referredBy         Referral[]          @relation("ReferralByUser")
+  referredById       String?
+  referredUsers      Referral[]          @relation("ReferredUsers")
+  commissionDeposits CommissionDeposit[]
+  totalcommission    Float               @default(0.0)
 }
 
 model Referral {

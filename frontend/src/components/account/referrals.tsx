@@ -4,18 +4,26 @@ import usePersonStore from "../../contexts/auth";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "../spinner";
+import { FaCopy } from "react-icons/fa";
 
 export default function ReferralComponent() {
   const { user, transactions } = usePersonStore();
   const [referralDetails, setReferralDetails] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<string>("General");
-  const [totalWithdrawals, setTotalWithdrawals] = useState<number>(0);
+  const [earnedCommission, setEarnedCommission] = useState<number>(0);
+  const [totalPayouts, setTotalPayouts] = useState(0);
 
   useEffect(() => {
-    const withdrawalsPayout = transactions
-      ?.filter((t) => t.type === "REFERRAL_COMMISSION")
-      ?.reduce((total, current) => total + current.amount, 0);
-    setTotalWithdrawals(withdrawalsPayout || 0);
+    const withdrawalsPayout = transactions?.filter(
+      (t) => t.type === "REFERRAL_COMMISSION"
+    );
+    const earnedCommission = withdrawalsPayout?.reduce(
+      (total, current) => total + current.amount,
+      0
+    );
+    const totalpayouts = withdrawalsPayout?.length;
+    setEarnedCommission(earnedCommission || 0);
+    setTotalPayouts(totalpayouts || 0);
   }, [transactions]);
 
   const fetchReferralDetails = async () => {
@@ -44,7 +52,7 @@ export default function ReferralComponent() {
     queryFn: fetchReferralDetails,
   });
 
-  if (isLoading) {
+  if (isLoading || !referralDetails) {
     return <Spinner />;
   }
 
@@ -56,18 +64,28 @@ export default function ReferralComponent() {
     );
   }
 
-  if (!referralDetails || !referralDetails.referredUsers?.length) {
+  if (referralDetails && !referralDetails.referredUsers?.length) {
     return <div className="text-center py-6">No referred users yet.</div>;
   }
 
   async function AddCommissionToAccountBalance() {
     try {
       const today = new Date();
-      const nextDay = new Date(today);
-      nextDay.setDate(today.getDate() + 1);
+      const lastDayOfMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        0
+      ).getDate();
 
-      if (nextDay.getDate() !== 1) {
-        alert("You can withdraw at the end of the month");
+      console.log(today.getDate(), lastDayOfMonth);
+
+      if (
+        today.getDate() !== lastDayOfMonth ||
+        referralDetails.totalCommission < 50
+      ) {
+        alert(
+          "Commission withdrawals are only allowed at the end of the month, and the total commission must be at least $50 to proceed."
+        );
         return;
       }
 
@@ -107,6 +125,14 @@ export default function ReferralComponent() {
     }
   }
 
+  const copyTransactionId = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+    } catch (err) {
+      console.error("Failed to copy transaction ID:", err);
+    }
+  };
+
   const GeneralTab = () => {
     return (
       <div className="p-4 bg-white border rounded-md shadow-md">
@@ -114,8 +140,12 @@ export default function ReferralComponent() {
           <p className="text-sm text-gray-500">
             Referral balance: ${referralDetails.totalCommission.toFixed(2)}
           </p>
-          <p className="text-sm text-yellow-600 break-all">
+          <p className="text-sm text-yellow-600 break-all flex gap-2 items-center">
             Referral Id: {user?.referralId}
+            <FaCopy
+              className="cursor-pointer"
+              onClick={() => copyTransactionId(user?.referralId || "")}
+            />
           </p>
         </div>
         <div className="flex justify-between items-center mb-4">
@@ -129,11 +159,11 @@ export default function ReferralComponent() {
             </span>
           </p>
           <p className="text-sm">
-            Payments: <span className="font-bold">0</span>
+            Payments: <span className="font-bold">{totalPayouts}</span>
           </p>
           <p className="text-sm">
             Earned:{" "}
-            <span className="font-bold">${totalWithdrawals.toFixed(2)}</span>
+            <span className="font-bold">${earnedCommission.toFixed(2)}</span>
           </p>
         </div>
 

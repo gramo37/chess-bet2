@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Game from "./screens/Game";
 import Login from "./screens/login";
 import Signup from "./screens/signup";
-import ForgotPassword from "./screens/forgotpassword"
+import ForgotPassword from "./screens/forgotpassword";
 import {
   PrivateRoute,
   PublicRoute,
@@ -16,17 +16,21 @@ import AccountPage from "./screens/account";
 import GameProfile from "./components/admin/component/gameprofile";
 import ResetPassword from "./screens/resetPassword";
 import PopUp from "./components/popup";
-import NavBar from "./components/navbar"
+import NavBar from "./components/navbar";
+import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 
-// Initialize QueryClient outside the App component to prevent unnecessary reinitializations
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className=" min-h-screen w-screen">
+        <TawkMessengerReact
+          propertyId="6706978802d78d1a30eefdb7"
+          widgetId="1i9s2li2d"
+        />
         <PopUp />
-        <NavBar/>
+        <NavBar />
         <BrowserRouter>
           <Routes>
             {/* Private Routes */}
@@ -68,7 +72,7 @@ function App() {
               path="/login"
               element={
                 <PublicRoute>
-                  <Login  />
+                  <Login />
                 </PublicRoute>
               }
             />
@@ -76,17 +80,18 @@ function App() {
               path="/signup"
               element={
                 <PublicRoute>
-                  <Signup  />
+                  <Signup />
                 </PublicRoute>
               }
-            /><Route
-            path="/forgotpassword"
-            element={
-              <PublicRoute>
-                <ForgotPassword/>
-              </PublicRoute>
-            }
-          />
+            />
+            <Route
+              path="/forgotpassword"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
             <Route
               path="/dashboard"
               element={

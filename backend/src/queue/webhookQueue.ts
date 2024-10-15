@@ -20,7 +20,7 @@ const webhookQueue = new Bull<WebhookData>("webhookQueue", {
 // Function to add a webhook to the queue
 export const addWebhookToQueue = (webhookData: WebhookData): void => {
   webhookQueue.add(webhookData, {
-    attempts: 3, // Retry 3 times
+    attempts: 2, // Retry 3 times
     backoff: {
       type: "exponential", // Exponential backoff strategy
       delay: 300000, // Initial delay of 5 minutes (in ms)
@@ -38,20 +38,19 @@ webhookQueue.process(async (job) => {
   //   console.log(`------------------------------------ Stopping trigger as status is ${status} -----------------------------------`)
   //   return;
   // }
-  // Check if api_ref is present in webhook
-  // If not create record else update the state
     try {
-      await db.webhook.upsert({
-        where: {
-          api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
-        },
-        update: {
-          state: job?.data?.payload?.state ?? job?.data?.payload?.status,
-          charges: job?.data?.payload?.charges,
-          net_amount: job?.data?.payload?.net_amount,
-          account: job?.data?.payload?.account,
-        },
-        create: {
+      // Adding all the webhook data to DB for debugging purpose
+      await db.webhook.create({
+        // where: {
+        //   api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
+        // },
+        // update: {
+        //   state: job?.data?.payload?.state ?? job?.data?.payload?.status,
+        //   charges: job?.data?.payload?.charges,
+        //   net_amount: job?.data?.payload?.net_amount,
+        //   account: job?.data?.payload?.account,
+        // },
+        data: {
           url: job.data.url,
           job_id: String(job.id),
           invoice_id: job?.data?.payload?.invoice_id,

@@ -487,16 +487,22 @@ export const validateTransaction = async (req: Request, res: Response) => {
     console.log("Transaction for deposit found -> ", transaction);
 
     try {
-      if (state !== "COMPLETE") {
-        console.log("Payment is", state);
+      if(state === "FAILED") {
         await db.transaction.update({
           where: { id: transaction.id },
           data: {
-            status: ["PROCESSING", "PENDING"].includes(state)
-              ? "PENDING"
-              : "CANCELLED",
+            status: "CANCELLED",
           },
         });
+
+        return res.status(400).json({
+          message: `Status is ${state}`,
+          status: "error",
+        });
+      }
+
+      if (state !== "COMPLETE") {
+        console.log("Payment is", state);
 
         return res.status(400).json({
           message: `Status is ${state}`,
@@ -631,24 +637,9 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
     console.log("Transaction for withdrawal found -> ", transaction);
 
     try {
-      if (status !== "Preview and approve") {
+      // Check if transaction is completed on instasend side or not
+      if (status !== "Completed") {
         console.log("Payment is", status);
-        await db.transaction.update({
-          where: { id: transaction.id },
-          data: {
-            status: [
-              "Confirming balance",
-              "Processing (FLT)",
-              "Processing",
-              "Processing (FLTRSLT)",
-              "Sending payment",
-              "Processing payment",
-            ].includes(status)
-              ? "PENDING"
-              : "CANCELLED",
-          },
-        });
-
         return res.status(400).json({
           message: `Status is ${status}`,
           status: "error",

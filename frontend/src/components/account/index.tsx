@@ -11,6 +11,7 @@ import { ReportHistory } from "./reporthistory";
 import Refresh from "../Refresh";
 import { BACKEND_URL } from "../../constants/routes";
 import ReferralComponent from "./referrals";
+import { FaCopy } from "react-icons/fa";
 
 export default function Account() {
   const user = usePersonStore((state) => state.user);
@@ -31,6 +32,14 @@ export default function Account() {
         return <ReferralComponent />;
       default:
         return <ReportHistory />;
+    }
+  };
+
+  const copyTransactionId = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+    } catch (err) {
+      console.error("Failed to copy transaction ID:", err);
     }
   };
 
@@ -106,9 +115,15 @@ export default function Account() {
 
             <Refresh />
           </div>
-          <h3 className="mb-2 text-lg text-left">
-            Referral Id: {user?.referralId}
-          </h3>
+          <div className="flex gap-2 items-center">
+            <h3 className="text-lg text-left">
+              Referral Id: {user?.referralId}
+            </h3>
+            <FaCopy
+              className="cursor-pointer"
+              onClick={() => copyTransactionId(user?.referralId || "")}
+            />
+          </div>
         </div>
       </div>
       <div className="flex space-x-3 w-full my-4 overflow-x-auto scrollbar-hide">
@@ -155,7 +170,7 @@ export default function Account() {
   );
 }
 
-function TabButton({
+export function TabButton({
   title,
   activeTab,
   setActiveTab,

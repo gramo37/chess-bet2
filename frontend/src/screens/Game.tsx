@@ -11,13 +11,15 @@ import Board from "../components/game/Board";
 import Abondon from "../components/abondon";
 import { ABONDON_TIME } from "../constants";
 import CopyToClipboard from "../components/CopyToClipboard";
+import { useChatStore } from "../contexts/auth";
+import { useEffect } from "react";
 
 export default function Game() {
-  const { color, opponent, player, gameTime } = useGameStore([
+  const { color, opponent, player, gameTime,result ,socket} = useGameStore([
     "color",
     "opponent",
     "player",
-    "gameTime",
+    "gameTime",'result','socket'
   ]);
   useInitSocket();
   const {
@@ -26,9 +28,14 @@ export default function Game() {
     message,
     localGameId,
     player1timeLeft,
-    player2timeLeft,
+    player2timeLeft
   } = useSocketHandler();
   useGameLogic();
+ 
+  const {setChatVisibility}=useChatStore()
+useEffect(()=>{
+if(!result||!socket)setChatVisibility(true)
+},[result,socket])
 
   return (
     <div className="min-h-screen flex flex-col max-w-[90%] m-auto items-center justify-center bg-black p-0 sm:p-4">

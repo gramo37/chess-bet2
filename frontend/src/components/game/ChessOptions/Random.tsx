@@ -1,4 +1,5 @@
 import { INIT_GAME } from "../../../constants";
+import { useChatStore } from "../../../contexts/auth";
 import { useGameStore } from "../../../contexts/game.context";
 
 const Random = () => {
@@ -11,9 +12,12 @@ const Random = () => {
       "stake",
       "setStake",
     ]);
+  const { setChatVisibility } = useChatStore();
+
   const startGame = () => {
     if (!socket) return;
     setIsGameStarted(true);
+    setChatVisibility(false);
     setResult(null);
     setColor(null);
     socket?.send(

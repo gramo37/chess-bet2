@@ -5,7 +5,7 @@ import { useGameStore } from "../../../contexts/game.context";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { WS_BACKEND_URL } from "../../../constants/routes";
-import usePersonStore from "../../../contexts/auth";
+import usePersonStore, { useChatStore } from "../../../contexts/auth";
 import { INIT_GAME } from "../../../constants";
 
 const Lobby = () => {
@@ -30,6 +30,8 @@ const Lobby = () => {
   ]);
   const [opponents, setOpponents] = useState([]);
   const user = usePersonStore((state) => state.user);
+  const { setChatVisibility } = useChatStore();
+
   const { isPending, isError, isSuccess, mutate } = useMutation({
     mutationFn: async () => {
       // TODO: Send token and stake
@@ -53,6 +55,7 @@ const Lobby = () => {
     if (!socket) return;
     setIsGameStarted(true);
     setResult(null);
+    setChatVisibility(false);
     setColor(null);
     socket?.send(
       JSON.stringify({

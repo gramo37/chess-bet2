@@ -65,4 +65,16 @@ const usePersonStore = create<State & Action>((set) => ({
   setGames: (games) => set(() => ({ games })),
 }));
 
+type ChatStore = {
+  isChatVisible: boolean;
+  toggleChat: () => void;
+  setChatVisibility: (visible: boolean) => void;
+}
+
+export const useChatStore = create<ChatStore>((set) => ({
+  isChatVisible: true,
+  toggleChat: () => set((state) => ({ isChatVisible: !state.isChatVisible })),
+  setChatVisibility: (visible: boolean) => set({ isChatVisible: visible }),
+}));
+
 export default usePersonStore;

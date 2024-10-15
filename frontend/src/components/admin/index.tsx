@@ -6,6 +6,7 @@ import { TransactionsList } from "./component/transaction";
 import { Users } from "./component/users";
 import { Stats } from "./component/dashboardstats";
 import { Modrator } from "./component/modrator";
+import { useChatStore } from "../../contexts/auth";
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const [games, setGames] = useState([]);
   const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState<string>("reports");
+  const { setChatVisibility } = useChatStore();
 
   useEffect(() => {
     async function getdata() {
@@ -24,6 +26,7 @@ const Dashboard = () => {
       setTransactions(fetchedTransactions);
       setGames(fetchedGames);
       setUsers(fetchedUsers);
+      setChatVisibility(false);
     }
 
     getdata();

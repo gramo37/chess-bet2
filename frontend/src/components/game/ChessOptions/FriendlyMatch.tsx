@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameStore } from "../../../contexts/game.context";
 import { INIT_GAME } from "../../../constants";
+import { useChatStore } from "../../../contexts/auth";
 
 type FriendlyOption = "Create Game" | "Join Game";
 
@@ -8,7 +9,7 @@ const FriendlyMatch = () => {
   const [friendlyOption, setFriendlyOption] = useState<FriendlyOption | null>(
     null
   );
-
+  const { setChatVisibility } = useChatStore();
   const {
     setGameId,
     gameId,
@@ -40,6 +41,7 @@ const FriendlyMatch = () => {
 
   const startGame = () => {
     if (!socket) return;
+    setChatVisibility(false);
     setIsGameStarted(true);
     setResult(null);
     setColor(null);

@@ -53,7 +53,7 @@ export async function getAllUserReferralDetails(req: Request, res: Response) {
     }
 
     const referredUsers = await Promise.all(
-      referredUserDetails.referredUsers.map(async (referral) => {
+      referredUserDetails.referredUsers.map(async (referral: any) => {
         const u = await db.user.findUnique({
           where: { id: referral.referrerId },
           select: { name: true },

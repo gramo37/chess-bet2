@@ -88,7 +88,7 @@ export default function DepositMoney() {
       Please verify your email to use payment options.
     </p>
   )}
-  {["apple", "mpesa", "card"].includes(paymentMethod) && user && user.emailVerified && <Mpesa />}
+  {["apple", "mpesa", "card"].includes(paymentMethod) && user && user.emailVerified && <Mpesa paymentMethod={paymentMethod}/>}
   {paymentMethod === "crypto" && user && user.emailVerified && <Crypto />}
 </div>
 

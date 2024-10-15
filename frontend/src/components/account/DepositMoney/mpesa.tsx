@@ -4,7 +4,7 @@ import usePersonStore from "../../../contexts/auth";
 import { useState } from "react";
 import { useGlobalStore } from "../../../contexts/global.context";
 
-const Mpesa = () => {
+const Mpesa = ({ paymentMethod }: { paymentMethod: string }) => {
   const user = usePersonStore((state) => state.user);
   const [amount, setAmount] = useState("");
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
@@ -18,6 +18,7 @@ const Mpesa = () => {
         url,
         {
           amount: 1.03 * Number(amount),
+          currency: ["card", "apple"].includes(paymentMethod) ? "USD" : "KES"
         },
         {
           headers: {
@@ -60,7 +61,7 @@ const Mpesa = () => {
         body: <div className="p-2">{"Please provide a amount"}</div>,
       });
 
-    if (Number(amount) < 700)
+    if (paymentMethod === "mpesa" && Number(amount) < 700)
       return alertPopUp({
         message: "Final amount less than the required limit.",
         type: "error",
@@ -68,9 +69,17 @@ const Mpesa = () => {
         body: <div className="p-2">The amount should be above KES 700.</div>,
       });
 
+    if (["card", "apple"].includes(paymentMethod) && Number(amount) < 5)
+      return alertPopUp({
+        message: "Final amount less than the required limit.",
+        type: "error",
+        showPopUp: true,
+        body: <div className="p-2">The amount should be above $5.</div>,
+      });
+
     const url = `${BACKEND_URL}/payments/get-amount-in-USD`;
     const finalamountInUSD = await axios.post(url, {
-      currency: "KES",
+      currency: ["card", "apple"].includes(paymentMethod) ? "USD" : "KES",
       amount: 1.03 * Number(amount),
     });
 
@@ -85,9 +94,10 @@ const Mpesa = () => {
       body: (
         <div className="p-2">
           <p>
-            Kindly note that KES {0.03 * Number(amount)} will be considered as
-            platform fees. Therefore the final amount will be KES{" "}
-            {1.03 * Number(amount)}. Your balance will be updated by ${finalBalance}.
+            Kindly note that {["card", "apple"].includes(paymentMethod) ? "$" : "KES "}{0.03 * Number(amount)} will be considered as
+            platform fees. Therefore the final amount will be {["card", "apple"].includes(paymentMethod) ? "$" : "KES "}
+            {1.03 * Number(amount)}. Your balance will be updated by $
+            {finalBalance}.
           </p>
           <p>Do you want to proceed ?</p>
         </div>
@@ -114,7 +124,7 @@ const Mpesa = () => {
           disabled
           className="px-4 rounded bg-gray-700 text-white"
         >
-          <option value="KES">KES</option>
+          {["card", "apple"].includes(paymentMethod) ? <option value="USD">USD</option> : <option value="KES">KES</option> }
         </select>
       </div>
       <button

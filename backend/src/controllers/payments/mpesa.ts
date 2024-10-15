@@ -29,8 +29,8 @@ import { sendWithdrawalRequestNotification } from "../auth/verify";
 export const getURL = async (req: Request, res: Response) => {
   try {
     console.log("Deposit Money: ", req.body);
-    let { amount } = req.body;
-    const currency = "KES"; // All Mpesa payments are in KES
+    let { amount, currency } = req.body;
+    // const currency = "KES"; // All Mpesa payments are in KES
     const mode = "mpesa";
     amount = Number(amount);
 
@@ -38,6 +38,13 @@ export const getURL = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: false,
         message: "Please provide a valid amount to be deposited",
+      });
+    }
+
+    if (!currency) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide a valid currency",
       });
     }
 

@@ -9,51 +9,51 @@ export default function WithdrawMoney() {
 
   return (
     <div>
-    <div className="p-2">
-      <div className="flex my-2">
-        <div className="space-y-2">
-          <button
-            onClick={() => {
-              if (!user || !user.emailVerified) {
-                alert("Please verify your email to use Mpesa.");
-                return;
-              }
-              setPaymentMethod("mpesa");
-            }}
-            className={`btn m-2 p-2 ${
-              paymentMethod === "mpesa"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-blue-800"
-            }`}
-          >
-            Mpesa
-          </button>
-          <button
-            onClick={() => {
-              if (!user || !user.emailVerified) {
-                alert("Please verify your email to use Crypto.");
-                return;
-              }
-              setPaymentMethod("crypto");
-            }}
-            className={`btn m-2 p-2 ${
-              paymentMethod === "crypto"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-blue-800"
-            }`}
-          >
-            Crypto
-          </button>
+      <div className="p-2">
+        <div className="flex my-2">
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                if (!user || !user.emailVerified) {
+                  alert("Please verify your email to use Mpesa.");
+                  return;
+                }
+                setPaymentMethod("mpesa");
+              }}
+              className={`btn m-2 p-2 ${
+                paymentMethod === "mpesa"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-200 text-blue-800"
+              }`}
+            >
+              M-pesa
+            </button>
+            <button
+              onClick={() => {
+                if (!user || !user.emailVerified) {
+                  alert("Please verify your email to use Crypto.");
+                  return;
+                }
+                setPaymentMethod("crypto");
+              }}
+              className={`btn m-2 p-2 ${
+                paymentMethod === "crypto"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-200 text-blue-800"
+              }`}
+            >
+              Crypto
+            </button>
+          </div>
         </div>
+        {user && !user.emailVerified && (
+          <p className="text-red-500">
+            Please verify your email to use payment options.
+          </p>
+        )}
+        {paymentMethod === "mpesa" && user?.emailVerified && <Mpesa />}
+        {paymentMethod === "crypto" && user?.emailVerified && <Crypto />}
       </div>
-      {user&&!user.emailVerified && (
-    <p className="text-red-500">
-      Please verify your email to use payment options.
-    </p>
-  )}
-      {paymentMethod === "mpesa" && user?.emailVerified && <Mpesa />}
-      {paymentMethod === "crypto" && user?.emailVerified && <Crypto />}
     </div>
-  </div>
-    );
+  );
 }

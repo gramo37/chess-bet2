@@ -169,9 +169,11 @@ export default function ReferralComponent() {
 
         <div className="my-4 text-gray-600">
           <p>
-            You can add your referral earnings to your account balance when they
-            reach $50 or more, and withdrawals are available at the end of each
-            month.
+            Refer an individual and earn a 3% commission on every deposit they
+            make for the duration of their account. You can withdraw your
+            referral earnings to your account balance once they total $50 or
+            more, with withdrawals available at the end of each month. For
+            further details, please <a href="#">read more here</a>.
           </p>
         </div>
 

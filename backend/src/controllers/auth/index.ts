@@ -78,7 +78,16 @@ export const signup = async (req: Request, res: Response) => {
             },
           },
         });
+        await db.user.update({
+          where: {
+            id: newUser.id,
+          },
+          data: {
+            balance: 3,
+          },
+        });
       }
+
       return newUser;
     });
 

@@ -11,7 +11,7 @@ import { ReportHistory } from "./reporthistory";
 import Refresh from "../Refresh";
 import { BACKEND_URL } from "../../constants/routes";
 import ReferralComponent from "./referrals";
-import { FaCopy } from "react-icons/fa";
+import CopyToClipboard from "../CopyToClipboard";
 
 export default function Account() {
   const user = usePersonStore((state) => state.user);
@@ -32,14 +32,6 @@ export default function Account() {
         return <ReferralComponent />;
       default:
         return <ReportHistory />;
-    }
-  };
-
-  const copyTransactionId = async (id: string) => {
-    try {
-      await navigator.clipboard.writeText(id);
-    } catch (err) {
-      console.error("Failed to copy transaction ID:", err);
     }
   };
 
@@ -119,10 +111,7 @@ export default function Account() {
             <h3 className="text-lg text-left">
               Referral Id: {user?.referralId}
             </h3>
-            <FaCopy
-              className="cursor-pointer"
-              onClick={() => copyTransactionId(user?.referralId || "")}
-            />
+            <CopyToClipboard id={user?.referralId || ""} />
           </div>
         </div>
       </div>

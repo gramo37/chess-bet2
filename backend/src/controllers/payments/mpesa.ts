@@ -397,7 +397,7 @@ export const withdraw = async (req: Request, res: Response) => {
       console.log(error)
     }
     res.status(200).json({
-      message: "Money withdrawal initiated! Kindly wait till it is approved.",
+      message: "Your money withdrawal has been initiated! Expect to receive your funds within 24 hours.",
       transaction, // Return the transaction object
     });
   } catch (error) {

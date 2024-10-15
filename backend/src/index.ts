@@ -64,3 +64,13 @@ cron.schedule('* * * * *', async () => {
 app.listen(PORT, () => {
   console.log("Connected to PORT: ", PORT);
 });
+
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  // Optionally, gracefully shutdown the server
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});

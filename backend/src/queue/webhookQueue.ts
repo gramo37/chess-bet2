@@ -33,8 +33,11 @@ webhookQueue.process(async (job) => {
   console.log("Processing webhook:", job.data, job.id);
   console.log("Adding data in webhooks table");
   // If the status is already completed dont update it again
-  const status = job?.data?.payload?.state ?? job?.data?.payload?.status
-  if(status === "COMPLETE" || status === "Completed") return;
+  // const status = job?.data?.payload?.state ?? job?.data?.payload?.status
+  // if(status === "COMPLETE" || status === "Completed") {
+  //   console.log(`------------------------------------ Stopping trigger as status is ${status} -----------------------------------`)
+  //   return;
+  // }
   // Check if api_ref is present in webhook
   // If not create record else update the state
     try {

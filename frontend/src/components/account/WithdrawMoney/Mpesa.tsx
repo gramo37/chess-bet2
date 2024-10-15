@@ -18,7 +18,7 @@ const Mpesa = () => {
       const response = await axios.post(
         url,
         {
-          amount: Number(amount),
+          amount: 0.97 * Number(amount),
           account: phoneNumber,
           currency: "KES",
           mode: "mpesa",

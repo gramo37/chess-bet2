@@ -294,7 +294,7 @@ export class GameManager {
       return;
     }
 
-    if (Number(stake) <= 5) {
+    if (Number(stake) < 5) {
       sendMessage(socket, {
         type: GAMEABORTED,
       });

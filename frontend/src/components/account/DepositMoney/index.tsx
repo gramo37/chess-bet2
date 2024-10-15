@@ -11,6 +11,42 @@ export default function DepositMoney() {
     <div className="p-2">
   <div className="flex my-2">
     <div className="space-y-2">
+    <button
+        onClick={() => {
+          if (user&&!user.emailVerified) {
+            alert("Please verify your email to use Mpesa.");
+            return;
+          }
+          setPaymentMethod("card");
+        }}
+        className={`btn m-2 p-2 ${
+          paymentMethod === "card"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-200 text-blue-800"
+        }`}
+        disabled={(!user||!user.emailVerified)} // Optional: Disable button if not verified
+      >
+        Card
+      </button>
+
+      <button
+        onClick={() => {
+          if (user&&!user.emailVerified) {
+            alert("Please verify your email to use Mpesa.");
+            return;
+          }
+          setPaymentMethod("apple");
+        }}
+        className={`btn m-2 p-2 ${
+          paymentMethod === "apple"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-200 text-blue-800"
+        }`}
+        disabled={(!user||!user.emailVerified)} // Optional: Disable button if not verified
+      >
+        Apple Pay
+      </button>
+
       <button
         onClick={() => {
           if (user&&!user.emailVerified) {
@@ -52,7 +88,7 @@ export default function DepositMoney() {
       Please verify your email to use payment options.
     </p>
   )}
-  {paymentMethod === "mpesa" && user && user.emailVerified && <Mpesa />}
+  {["apple", "mpesa", "card"].includes(paymentMethod) && user && user.emailVerified && <Mpesa />}
   {paymentMethod === "crypto" && user && user.emailVerified && <Crypto />}
 </div>
 

@@ -349,6 +349,7 @@ export const withdraw = async (req: Request, res: Response) => {
         platform_charges,
         mode: "mpesa",
         api_ref: checkout_id, // Prevent api_ref should be unique error
+        currency
       },
     });
 

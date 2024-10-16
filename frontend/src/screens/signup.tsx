@@ -7,9 +7,9 @@ export default function SignUP() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [referral,setReferral]=useState("");
+  const [referral, setReferral] = useState("");
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
- 
+
   async function onclick() {
     if (!email || !name || !password) {
       alertPopUp({
@@ -20,8 +20,8 @@ export default function SignUP() {
       });
       return;
     }
-    const url = `${BACKEND_URL}/auth/register`
-      
+    const url = `${BACKEND_URL}/auth/register`;
+
     try {
       const response = await axios.post(
         url,
@@ -29,7 +29,7 @@ export default function SignUP() {
           username: email.toLowerCase(),
           name: name,
           password: password,
-          referral:referral
+          referral: referral,
         },
         {
           headers: {
@@ -47,24 +47,29 @@ export default function SignUP() {
 
       console.log(data, response);
       // alert(data.message);
-      window.location.href ="/game";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      window.location.href = "/game";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error);
       alertPopUp({
         message: "Error",
         type: "Error",
         showPopUp: true,
-        body: <div className="p-2">{error?.response?.data?.message ?? "Registration failed. Please try again."}</div>
-      })
+        body: (
+          <div className="p-2">
+            {error?.response?.data?.message ??
+              "Registration failed. Please try again."}
+          </div>
+        ),
+      });
     }
   }
 
   return (
-    <section className="w-full bg-black text-black mx-auto">
+    <section className="w-full bg-black mt-5 text-black mx-auto">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[500px] lg:py-0">
-          <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
               Sign up to your account
             </h1>
@@ -96,7 +101,7 @@ export default function SignUP() {
                 <input
                   type="text"
                   name="username"
-className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   placeholder="Full name"
                   required
                   value={name}
@@ -114,7 +119,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
                   type="password"
                   name="password"
                   placeholder="••••••••"
-className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -131,7 +136,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
                   type="text"
                   name="referral"
                   placeholder="Referral ID"
-className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   required
                   value={referral}
                   onChange={(e) => setReferral(e.target.value)}
@@ -147,7 +152,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account ?{" "}
                 <a
-                  href= "/login"
+                  href="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Log In
@@ -156,7 +161,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </section>
   );
 }

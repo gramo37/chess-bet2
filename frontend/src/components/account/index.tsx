@@ -109,7 +109,7 @@ export default function Account() {
           </div>
           <div className="flex gap-2 items-center">
             <h3 className="text-lg text-left">
-              Referral Id: {user?.referralId}
+              Referral ID: {user?.referralId}
             </h3>
             <CopyToClipboard id={user?.referralId || ""} />
           </div>

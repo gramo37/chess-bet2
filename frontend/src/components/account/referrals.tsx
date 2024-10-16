@@ -141,7 +141,7 @@ export default function ReferralComponent() {
             Referral balance: ${referralDetails.totalCommission.toFixed(2)}
           </p>
           <p className="text-sm text-yellow-600 break-all flex gap-2 items-center">
-            Referral Id: {user?.referralId}
+            Referral ID: {user?.referralId}
             <FaCopy
               className="cursor-pointer"
               onClick={() => copyTransactionId(user?.referralId || "")}
@@ -167,13 +167,19 @@ export default function ReferralComponent() {
           </p>
         </div>
 
-        <div className="my-4 text-gray-600">
+        <div className="my-4 text-gray-600 text-justify">
           <p>
             Refer an individual and earn a 3% commission on every deposit they
-            make for the duration of their account. You can withdraw your
-            referral earnings to your account balance once they total $50 or
-            more, with withdrawals available at the end of each month. For
-            further details, please <a href="#">read more here</a>.
+            make for the duration of their account. Plus, every user who signs
+            up using your unique referral ID receives a $3 bonus, encouraging
+            more registrations through you. This means more potential earnings
+            for you!
+          </p>
+          <p className="mt-2">
+            You can withdraw your referral earnings to your account balance once
+            they total $50 or more, with withdrawals available at the end of
+            each month. For further details, please{" "}
+            <a href="#">read more here</a>.
           </p>
         </div>
 

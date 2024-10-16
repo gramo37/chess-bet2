@@ -7,5 +7,10 @@ body {
   font-weight: 400;
   font-style: normal;
   overflow-x: hidden;
-  background-color: black; 
+  background-color: black;
+}
+
+h1,
+h2 {
+  text-transform: capitalize;
 }

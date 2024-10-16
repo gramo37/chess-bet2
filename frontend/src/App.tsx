@@ -18,35 +18,35 @@ import ResetPassword from "./screens/resetPassword";
 import PopUp from "./components/popup";
 import NavBar from "./components/navbar";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
-import {useChatStore} from "./contexts/auth";
+import { useChatStore } from "./contexts/auth";
 import { useEffect, useRef, useState } from "react";
+import HowItWorks from "./components/howitworks";
+import Rules from "./components/rules";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const { isChatVisible,setChatVisibility } = useChatStore();
+  const { isChatVisible, setChatVisibility } = useChatStore();
   const tawkMessengerRef = useRef(null);
   const [tawkLoaded, setTawkLoaded] = useState(false);
 
   // Listen for the Tawk.to widget load event
   useEffect(() => {
     const handleLoad = () => {
-      setTawkLoaded(true); 
+      setTawkLoaded(true);
     };
-    window.addEventListener('tawkLoad', handleLoad);
+    window.addEventListener("tawkLoad", handleLoad);
   }, []);
 
-
-
   useEffect(() => {
-      if (tawkLoaded && window.Tawk_API) {
-        if (isChatVisible) {
-          window.Tawk_API.showWidget(); 
-        } else {
-          window.Tawk_API.hideWidget(); 
-        }
+    if (tawkLoaded && window.Tawk_API) {
+      if (isChatVisible) {
+        window.Tawk_API.showWidget();
+      } else {
+        window.Tawk_API.hideWidget();
       }
-  }, [isChatVisible,setChatVisibility]);
+    }
+  }, [isChatVisible, setChatVisibility]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -54,7 +54,7 @@ function App() {
         <TawkMessengerReact
           propertyId="6706978802d78d1a30eefdb7"
           widgetId="1i9s2li2d"
-          onLoad={() => window.dispatchEvent(new Event('tawkLoad'))}
+          onLoad={() => window.dispatchEvent(new Event("tawkLoad"))}
           ref={tawkMessengerRef}
         />
         <PopUp />
@@ -128,6 +128,8 @@ function App() {
                 </AdminPrivateRoute>
               }
             />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/rules" element={<Rules />} />
             <Route path="/player/:id" element={<PlayerProfile />} />
             <Route path="/game/:id" element={<GameProfile />} />
             <Route path="/reset-password/:id" element={<ResetPassword />} />

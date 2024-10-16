@@ -5,7 +5,7 @@ import { useGameStore } from "../../../contexts/game.context";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { WS_BACKEND_URL } from "../../../constants/routes";
-import usePersonStore, { useChatStore } from "../../../contexts/auth";
+import usePersonStore from "../../../contexts/auth";
 import { INIT_GAME } from "../../../constants";
 
 const Lobby = () => {
@@ -17,7 +17,7 @@ const Lobby = () => {
     stake,
     setGameId,
     gameId,
-    setStake
+    setStake,
   } = useGameStore([
     "setIsGameStarted",
     "setResult",
@@ -26,11 +26,10 @@ const Lobby = () => {
     "stake",
     "setGameId",
     "gameId",
-    "setStake"
+    "setStake",
   ]);
   const [opponents, setOpponents] = useState([]);
   const user = usePersonStore((state) => state.user);
-  const { setChatVisibility } = useChatStore();
 
   const { isPending, isError, isSuccess, mutate } = useMutation({
     mutationFn: async () => {
@@ -46,7 +45,7 @@ const Lobby = () => {
   });
   const getOpponents = () => {
     setGameId(null);
-    setStake(10)
+    setStake(10);
     // Make an API call to get all players matching current users rating, stake and type should not be friendly
     mutate();
   };
@@ -55,7 +54,6 @@ const Lobby = () => {
     if (!socket) return;
     setIsGameStarted(true);
     setResult(null);
-    setChatVisibility(false);
     setColor(null);
     socket?.send(
       JSON.stringify({
@@ -96,8 +94,8 @@ const Lobby = () => {
                         className="form-checkbox h-5 w-5 cursor-pointer text-indigo-600 mr-3"
                         checked={opponent.gameId === gameId}
                         onChange={() => {
-                          setGameId(opponent.gameId)
-                          setStake(opponent.stake)
+                          setGameId(opponent.gameId);
+                          setStake(opponent.stake);
                         }}
                       />
                       <div className="flex justify-center items-center gap-3 w-full text-white">

@@ -15,11 +15,11 @@ import { useChatStore } from "../contexts/auth";
 import { useEffect } from "react";
 
 export default function Game() {
-  const { color, opponent, player, gameTime,result ,socket} = useGameStore([
+  const { color, opponent, player, gameTime } = useGameStore([
     "color",
     "opponent",
     "player",
-    "gameTime",'result','socket'
+    "gameTime",
   ]);
   useInitSocket();
   const {
@@ -28,14 +28,17 @@ export default function Game() {
     message,
     localGameId,
     player1timeLeft,
-    player2timeLeft
+    player2timeLeft,
   } = useSocketHandler();
   useGameLogic();
- 
-  const {setChatVisibility}=useChatStore()
-useEffect(()=>{
-if(!result||!socket)setChatVisibility(true)
-},[result,socket])
+
+  const { setChatVisibility } = useChatStore();
+  useEffect(() => {
+    setChatVisibility(false);
+    return () => {
+      setChatVisibility(true);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col max-w-[90%] m-auto items-center justify-center bg-black p-0 sm:p-4">

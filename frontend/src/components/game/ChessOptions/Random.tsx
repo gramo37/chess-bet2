@@ -17,7 +17,6 @@ const Random = () => {
   const startGame = () => {
     if (!socket) return;
     setIsGameStarted(true);
-    setChatVisibility(false);
     setResult(null);
     setColor(null);
     socket?.send(

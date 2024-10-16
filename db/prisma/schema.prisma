@@ -35,6 +35,7 @@ model User {
   referredUsers      Referral[]          @relation("ReferredUsers")
   commissionDeposits CommissionDeposit[]
   totalcommission    Float               @default(0.0)
+  createdAt          DateTime            @default(now())
 }
 
 model Referral {

@@ -28,7 +28,7 @@ export default function WithdrawMoney() {
             >
               M-pesa
             </button>
-            <button
+            {/* <button
               onClick={() => {
                 if (!user || !user.emailVerified) {
                   alert("Please verify your email to use Crypto.");
@@ -43,7 +43,7 @@ export default function WithdrawMoney() {
               }`}
             >
               Crypto
-            </button>
+            </button> */}
           </div>
         </div>
         {user && !user.emailVerified && (

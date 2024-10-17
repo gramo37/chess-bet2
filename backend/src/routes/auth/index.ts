@@ -1,6 +1,7 @@
 import express from "express";
 import {
   ForgotPassword,
+  SubscribeNewsletter,
   login,
   refresh,
   resetPassword,
@@ -31,4 +32,5 @@ router.post(
   authenticateJWT,
   UpdateAccountBalanceWithCommission
 );
+router.post("/newsletter", SubscribeNewsletter);
 export default router;

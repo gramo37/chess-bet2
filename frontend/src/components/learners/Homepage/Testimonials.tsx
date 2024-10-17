@@ -1,24 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const testimonialsData = [
   {
-    quote: "Finally, a chess platform that truly values skill and intelligence. It's thrilling, competitive, and rewarding.",
+    quote:
+      "Finally, a chess platform that truly values skill and intelligence. It's thrilling, competitive, and rewarding.",
     author: "Alejandro H.",
   },
   {
-    quote: "The thrill of real competition plus the bonus of earning money? Sign me up!",
+    quote:
+      "The thrill of real competition plus the bonus of earning money? Sign me up!",
     author: "James F.",
   },
   {
-    quote: "ProChesser transformed how I enjoy chess. Winning has never been so rewarding!",
+    quote:
+      "ProChesser transformed how I enjoy chess. Winning has never been so rewarding!",
     author: "Wilkins D.",
   },
   {
-    quote: "ProChesser has transformed how I view chess. Winning cash for my strategic plays is unbelievably rewarding!",
+    quote:
+      "ProChesser has transformed how I view chess. Winning cash for my strategic plays is unbelievably rewarding!",
     author: "Santiago M.",
   },
   {
-    quote: "A seamless interface and a vibrant community. My go-to platform for chess.",
+    quote:
+      "A seamless interface and a vibrant community. My go-to platform for chess.",
     author: "Alvaro G.",
   },
 ];
@@ -30,7 +35,9 @@ const Testimonials = () => {
   useEffect(() => {
     if (!isPaused) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonialsData.length);
+        setCurrentIndex(
+          (prevIndex) => (prevIndex + 1) % testimonialsData.length
+        );
       }, 5000); // Change testimonial every 5 seconds
 
       return () => clearInterval(interval);
@@ -56,7 +63,8 @@ const Testimonials = () => {
               Hear From Our Victorious Players
             </h3>
             <p className="text-lg text-gray-600">
-              Discover what our players have to say about their journey with ProChesser!
+              Discover what our players have to say about their journey with
+              ProChesser!
             </p>
           </div>
 
@@ -78,9 +86,9 @@ const Testimonials = () => {
 
         {/* Call to Action Button */}
         <div className="mt-10 text-center">
-          <button 
-              className="bg-yellow-500 hover:bg-yellow-600 text-black hover:text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50"
-              onClick={() => alert("Join Us!")} // Example action
+          <button
+            className="bg-yellow-500 hover:bg-yellow-600 text-black hover:text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50"
+            disabled={true}
             aria-label="Join the community where your skills pay off" // Accessibility
           >
             Join a Community Where Your Skills Pay Off

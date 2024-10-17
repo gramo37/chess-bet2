@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CHESS_GAME_APP_URL } from "../constants";
+import { ACADEMY_FRONTEND_URL } from "../constants/learner";
 
 const Footer = () => {
   return (
@@ -10,7 +11,7 @@ const Footer = () => {
           <ul>
             <li className="mb-2">
               <Link
-                to="/learnchess"
+                to={`${ACADEMY_FRONTEND_URL}/register`}
                 className="text-black hover:text-yellow-500"
               >
                 Sign Up for Chess Classes
@@ -41,10 +42,7 @@ const Footer = () => {
           <h3 className="text-lg text-yellow-600 font-bold mb-4">Earn Money</h3>
           <ul>
             <li className="mb-2">
-              <Link
-                to={`${CHESS_GAME_APP_URL}/game`}
-                className="text-black hover:text-yellow-500"
-              >
+              <Link to="/game" className="text-black hover:text-yellow-500">
                 Play Chess
               </Link>
             </li>

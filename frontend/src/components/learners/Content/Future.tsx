@@ -5,11 +5,17 @@ const YourFutureAwaits = () => {
         Your Future Awaits at ProChesser Academy
       </h2>
       <p className="text-lg mb-6 max-w-2xl mx-auto leading-relaxed text-gray-300">
-        Once you've completed your chess mastery training, you'll have the opportunity to compete and earn from your skills on our exclusive platform. Imagine a place where chess isn't just about winning—it's about unlocking new opportunities for success.
+        Once you've completed your chess mastery training, you'll have the
+        opportunity to compete and earn from your skills on our exclusive
+        platform. Imagine a place where chess isn't just about winning—it's
+        about unlocking new opportunities for success.
       </p>
-      <button className="bg-yellow-600 text-white font-bold py-3 px-6 rounded-full mt-4 transition duration-300 ease-in-out transform hover:bg-yellow-600 hover:scale-105 mb-4">
+      <a
+        href="#learningpath"
+        className="bg-yellow-600 text-white font-bold py-3 px-6 rounded-full mt-4 transition duration-300 ease-in-out transform hover:bg-yellow-600 hover:scale-105 mb-4"
+      >
         Choose Your Learning Path
-      </button>
+      </a>
     </section>
   );
 };

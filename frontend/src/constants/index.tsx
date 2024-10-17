@@ -30,4 +30,4 @@ export const SEND_MESSAGE = "SEND_MESSAGE";
 export const SHOW_ERROR = "SHOW_ERROR";
 export const ABANDON = "ABANDON";
 
-export const CHESS_GAME_APP_URL = "http://prochesser.com";
+export const CHESS_GAME_APP_URL = "https://prochesser.com";

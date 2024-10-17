@@ -1,28 +1,46 @@
 import { useState } from "react";
+import { BACKEND_URL } from "../../constants/routes";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    // Logic for form submission
-    console.log("Newsletter subscription:", email);
+    const url = `${BACKEND_URL}/auth/newsletter`;
 
-    setEmail("");
-    setMessage("Thank you for subscribing!");
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.toLowerCase() }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Something went wrong");
+      }
+
+      const data = await response.json();
+      alert(data.message);
+      console.log(data);
+      setEmail("");
+      setMessage(data.message || "Thank You for Subscribing!!");
+    } catch (error: any) {
+      alert(error.message || "An error occurred. Please try again.");
+      console.error(error);
+    }
   };
 
   return (
     <section className="pt-32 relative w-screen bg-gray-100 text-black py-16 px-6 mx-auto">
-
-
-     <div className="pt-20 text-center mb-12">
-          <h2 className="text-4xl font-bold text-yellow-600">
-           Subscribe to Our Newsletter
-          </h2>
-        </div>
+      <div className="pt-20 text-center mb-12">
+        <h2 className="text-4xl font-bold text-yellow-600">
+          Subscribe to Our Newsletter
+        </h2>
+      </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
         <input
@@ -40,10 +58,11 @@ const Newsletter = () => {
           Subscribe
         </button>
         {message && (
-          <p className="mt-4 text-green-600 font-medium text-center">{message}</p>
+          <p className="mt-4 text-green-600 font-medium text-center">
+            {message}
+          </p>
         )}
       </form>
-
     </section>
   );
 };

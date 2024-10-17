@@ -16,7 +16,7 @@ import AccountPage from "./screens/account";
 import GameProfile from "./components/admin/component/gameprofile";
 import ResetPassword from "./screens/resetPassword";
 import PopUp from "./components/popup";
-import NavBar from "./components/Navbar";
+import NavBar from "./components/navbar";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 import { useChatStore } from "./contexts/auth";
 import { useEffect, useRef, useState } from "react";
@@ -33,6 +33,7 @@ import Newsletter from "./components/learners/NewsLetter";
 import AffiliateProgram from "./components/learners/AffiliateProgram";
 import PrivacyPolicy from "./components/learners/privacy";
 import TermsOfService from "./components/learners/termsofservices";
+import ScrollToTop from "./components/scrolltop";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,8 @@ function App() {
         />
         <PopUp />
         <BrowserRouter>
+          <ScrollToTop />
+
           <RecoilRoot>
             <NavBar />
             <Routes>

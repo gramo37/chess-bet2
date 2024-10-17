@@ -3,7 +3,7 @@ import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
 
 export default function NavBar() {
-  const { isLoading } = useGetUser();
+  useGetUser();
   const user = usePersonStore((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

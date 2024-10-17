@@ -12,7 +12,7 @@ const Random = () => {
       "stake",
       "setStake",
     ]);
-  const { setChatVisibility } = useChatStore();
+  useChatStore();
 
   const startGame = () => {
     if (!socket) return;

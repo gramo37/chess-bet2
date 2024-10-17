@@ -3,7 +3,7 @@ export default function TimeLeft(props: { timeLeft: string }) {
 
   return (
     <div className="mb-4 text-center">
-      <p className="text-gray-400">Time left: {timeLeft}</p>
+      <p className="text-gray-400">Time Left: {timeLeft}</p>
     </div>
   );
 }

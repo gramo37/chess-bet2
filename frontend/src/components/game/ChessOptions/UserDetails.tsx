@@ -6,7 +6,7 @@ const UserDetails = () => {
   return (
     <>
       <h2 className="text-white text-2xl font-bold">
-        Choose how to play chess:
+        Choose How To Play Chess:
       </h2>
       <div className="inline-flex text-white gap-3 ">
         <h2 className="text-white text-xl font-bold">

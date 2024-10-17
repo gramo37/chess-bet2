@@ -5,7 +5,7 @@ import { useGlobalStore } from "../contexts/global.context";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const {alertPopUp} = useGlobalStore(["alertPopUp"])
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
 
   async function onclick() {
     if (!email || !password) {
@@ -13,12 +13,12 @@ export default function Login() {
         message: "Error",
         type: "Error",
         showPopUp: true,
-        body: <div className="p-2">Please enter all details</div>
-      })
+        body: <div className="p-2">Please enter all details</div>,
+      });
       return;
     }
 
-    const url =  `${BACKEND_URL}/auth/login`
+    const url = `${BACKEND_URL}/auth/login`;
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -27,7 +27,7 @@ export default function Login() {
         },
         body: JSON.stringify({
           username: email.toLowerCase(),
-          password: password,  
+          password: password,
         }),
       });
 
@@ -36,8 +36,7 @@ export default function Login() {
         throw new Error("Invalid username or password.");
       } else if (response.status >= 500) {
         throw new Error("Internal server error. Please try again later.");
-      }
-      else if (response.status === 403) {
+      } else if (response.status === 403) {
         throw new Error(data.message);
       }
       console.log("Login successful:", data);
@@ -53,15 +52,17 @@ export default function Login() {
 
       // alert("Login successful");
       window.location.href = "/game";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error);
       alertPopUp({
         message: "Error",
         type: "Error",
         showPopUp: true,
-        body: <div className="p-2">{error.message ?? "Something went wrong"}</div>
-      })
+        body: (
+          <div className="p-2">{error.message ?? "Something went wrong"}</div>
+        ),
+      });
     }
 
     setEmail("");
@@ -74,15 +75,15 @@ export default function Login() {
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
-              Login in to your account
+              Login In to Your Account
             </h1>
             <div className="space-y-4 md:space-y-6">
-            <div className="mb-3">
+              <div className="mb-3">
                 <label
                   htmlFor="email"
                   className="block text-white text-sm font-bold mb-2"
                 >
-                  Your email
+                  Your Email
                 </label>
                 <input
                   type="email"
@@ -105,7 +106,7 @@ export default function Login() {
                   type="password"
                   name="password"
                   placeholder="••••••••"
-className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -116,9 +117,9 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
                 onClick={() => (window.location.href = "/forgotpassword")}
                 className="text-sm font-medium text-white hover:underline "
               >
-                Forgot password?
+                Forgot Password?
               </button>
-              
+
               <button
                 type="submit"
                 className="w-full mb-2 bg-yellow-500 font-semibold text-black py-2 rounded hover:bg-yellow-600 hover:text-white transition-colors"
@@ -126,8 +127,8 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
               >
                 Login
               </button>
-              <p className="text-sm font-light text-white dark:text-gray-400">
-                Already have an account ?{" "}
+              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                Don’t Have a Account?{" "}
                 <a
                   href="/signup"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"

@@ -138,7 +138,7 @@ export default function ReferralComponent() {
       <div className="p-4 bg-white border rounded-md shadow-md">
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-gray-500">
-            Referral balance: ${referralDetails.totalCommission.toFixed(2)}
+            Referral Balance: ${referralDetails.totalCommission.toFixed(2)}
           </p>
           <p className="text-sm text-yellow-600 break-all flex gap-2 items-center">
             Referral ID: {user?.referralId}
@@ -188,7 +188,7 @@ export default function ReferralComponent() {
             onClick={AddCommissionToAccountBalance}
             className="px-4 py-2 bg-green-100 text-green-600 border border-green-500 rounded-md"
           >
-            Withdraw to balance
+            Withdraw To Balance
           </button>
         </div>
       </div>

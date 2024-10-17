@@ -1,6 +1,7 @@
 import { useState } from "react";
 import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
+import { Link } from "react-router-dom";
 
 export default function NavBar() {
   useGetUser();
@@ -43,6 +44,40 @@ export default function NavBar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-4 px-4">
+          <ul className="flex items-center">
+            <li className="m-2 text-black text-lg font-medium">
+              <Link to="/" className="text-black hover:text-yellow-500">
+                Home
+              </Link>
+            </li>
+
+            <li className="m-2 text-black text-lg font-medium">
+              <Link to="/about" className="text-black hover:text-yellow-500">
+                About
+              </Link>
+            </li>
+
+            <li className="m-2 text-black text-lg font-medium">
+              <Link to="/faqs" className="text-black hover:text-yellow-500">
+                FAQs
+              </Link>
+            </li>
+
+            <li className="m-2 text-black text-lg font-medium">
+              <Link to="/blog" className="text-black hover:text-yellow-500">
+                Blog
+              </Link>
+            </li>
+
+            <li className="m-2 text-black text-lg font-medium">
+              <Link
+                to="/learnchess"
+                className="text-black hover:text-yellow-500"
+              >
+                Academy
+              </Link>
+            </li>
+          </ul>
           <a
             href="/how-it-works"
             className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"

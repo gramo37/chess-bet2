@@ -9,7 +9,7 @@ export const BACKEND_ROUTE = "api";
 //   import.meta.env.VITE_WS_REST_URL ?? "http://localhost:8000"
 // }/${WS_ROUTE}`;
 
-// // Deployment routes
-export const BACKEND_URL = "http://prochesser.com/api";
-export const WS_URL = "http://prochesser.com/ws";
+// // // Deployment routes
+export const BACKEND_URL = "https://prochesser.com/api";
+export const WS_URL = "https://prochesser.com/ws";
 export const WS_BACKEND_URL = "https://prochesser.com/ws";

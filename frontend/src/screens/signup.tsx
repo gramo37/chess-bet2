@@ -66,7 +66,7 @@ export default function SignUP() {
   }
 
   return (
-    <section className="w-full bg-black mt-5 text-black mx-auto">
+    <section className="w-full bg-black pt-5 h-fit border text-black mx-auto">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[500px] lg:py-0">
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -149,7 +149,7 @@ export default function SignUP() {
               >
                 Sign Up
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+              <span className="text-sm font-light text-white dark:text-gray-400">
                 Already have an account ?{" "}
                 <a
                   href="/login"
@@ -157,7 +157,7 @@ export default function SignUP() {
                 >
                   Log In
                 </a>
-              </p>
+              </span>
             </div>
           </div>
         </div>

@@ -126,7 +126,7 @@ className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:bo
               >
                 Login
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+              <p className="text-sm font-light text-white dark:text-gray-400">
                 Already have an account ?{" "}
                 <a
                   href="/signup"

@@ -37,7 +37,7 @@ const MainOptions = () => {
             type === "lobby" ? "bg-yellow-500 text-white" : "bg-gray-200"
           }`}
         >
-          Choose your opponent
+          Choose Your Opponent
         </button>
       </div>
     </>

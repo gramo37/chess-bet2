@@ -9,8 +9,3 @@ body {
   overflow-x: hidden;
   background-color: black;
 }
-
-h1,
-h2 {
-  text-transform: capitalize;
-}

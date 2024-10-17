@@ -71,7 +71,7 @@ export default function SignUP() {
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
-              Sign up to your account
+              Sign Up to Your Account
             </h1>
             <div className="space-y-4 md:space-y-6">
               <div className="mb-3">
@@ -79,7 +79,7 @@ export default function SignUP() {
                   htmlFor="email"
                   className="block text-white text-sm font-bold mb-2"
                 >
-                  Your email
+                  Your Email
                 </label>
                 <input
                   type="email"
@@ -96,7 +96,7 @@ export default function SignUP() {
                   htmlFor="username"
                   className="block text-white text-sm font-bold mb-2"
                 >
-                  Your name
+                  Your Name
                 </label>
                 <input
                   type="text"
@@ -130,7 +130,7 @@ export default function SignUP() {
                   htmlFor="referral"
                   className="block text-white text-sm font-bold mb-2"
                 >
-                  Referral (optional)
+                  Referral (Optional)
                 </label>
                 <input
                   type="text"
@@ -150,7 +150,7 @@ export default function SignUP() {
                 Sign Up
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account ?{" "}
+                Already Have an Account?
                 <a
                   href="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"

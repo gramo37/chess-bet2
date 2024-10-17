@@ -16,7 +16,7 @@ export default function NavBar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="bg-white w-full shadow-md">
+    <nav className="bg-white w-full shadow-md" id="nav">
       <div className="flex justify-between items-center max-w-7xl mx-auto py-3 px-4">
         <a
           href="/"

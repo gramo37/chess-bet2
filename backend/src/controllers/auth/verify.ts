@@ -1,19 +1,17 @@
 import nodemailer from "nodemailer";
 import { generateToken } from "../../utils";
 import { db } from "../../db";
-import { BACKEND_URL ,NODEMAILER_MAIL,NODEMAILER_PASS} from "../../constants";
+import { BACKEND_URL, NODEMAILER_MAIL, NODEMAILER_PASS } from "../../constants";
 import { BACKEND_ROUTE } from "../..";
 
-
-
 const transporter = nodemailer.createTransport({
-  host: 'mail.privateemail.com',
-  port: 465 ,
-  secure:true,
+  host: "mail.privateemail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: NODEMAILER_MAIL,
-    pass: NODEMAILER_PASS
-  }
+    pass: NODEMAILER_PASS,
+  },
 });
 // Function to send email verification
 export async function EmailVerification(email: string, name: string) {
@@ -24,8 +22,8 @@ export async function EmailVerification(email: string, name: string) {
       },
       "10m"
     );
-   console.log(NODEMAILER_MAIL);
-   
+    console.log(NODEMAILER_MAIL);
+
     const mailConfigurations = {
       from: `${NODEMAILER_MAIL}`,
       to: email,
@@ -49,10 +47,14 @@ export async function EmailVerification(email: string, name: string) {
 }
 
 // Function to send the forgot password email with a reset link
-export const SendForgotPassword = async (email: string, name: string, token: string) => {
+export const SendForgotPassword = async (
+  email: string,
+  name: string,
+  token: string
+) => {
   try {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-    console.log('Sending: ', token);
+    console.log("Sending: ", token);
 
     const mailOptions = {
       from: `${NODEMAILER_MAIL}`,
@@ -77,7 +79,11 @@ export const SendForgotPassword = async (email: string, name: string, token: str
   }
 };
 
-export async function SendModeratorNotification(email: string,name:string, password: string) {
+export async function SendModeratorNotification(
+  email: string,
+  name: string,
+  password: string
+) {
   try {
     const mailOptions = {
       from: NODEMAILER_MAIL,
@@ -96,7 +102,6 @@ export async function SendModeratorNotification(email: string,name:string, passw
 
     await transporter.sendMail(mailOptions);
     console.log("Moderator notification email sent successfully");
-
   } catch (error) {
     console.error("Error sending email:", error);
     throw error;
@@ -149,7 +154,10 @@ export async function sendUserActivationNotification(email: string) {
   }
 }
 
-export async function sendUserBannedNotification(email: string, reason: string) {
+export async function sendUserBannedNotification(
+  email: string,
+  reason: string
+) {
   try {
     const mailOptions = {
       from: NODEMAILER_MAIL,
@@ -173,14 +181,17 @@ export async function sendUserBannedNotification(email: string, reason: string) 
   }
 }
 
-export async function sendWithdrawalRequestNotification(amount: number, requestId: string) {
+export async function sendWithdrawalRequestNotification(
+  amount: number,
+  requestId: string
+) {
   try {
-    const admins = await db.user.findMany({ where: { role: 'ADMIN' } });
+    const admins = await db.user.findMany({ where: { role: "ADMIN" } });
 
     const mailConfigurations = (email: string) => ({
       from: NODEMAILER_MAIL,
       to: email,
-      subject: 'Withdrawal Request Notification',
+      subject: "Withdrawal Request Notification",
       html: `
         <p>A new withdrawal request has been submitted with the following details:</p>
         <p>Request ID: <strong>${requestId}</strong></p>
@@ -193,9 +204,38 @@ export async function sendWithdrawalRequestNotification(amount: number, requestI
       await transporter.sendMail(mailConfigurations(admin.email));
     }
 
-    console.log('Withdrawal request notifications sent successfully to admins.');
+    console.log(
+      "Withdrawal request notifications sent successfully to admins."
+    );
   } catch (error) {
     console.error("Error sending withdrawal request notifications:", error);
     throw error;
   }
 }
+
+export const SendNewsletterNotification = async (email: string) => {
+  try {
+    const mailOptions = {
+      from: `${NODEMAILER_MAIL}`,
+      to: email,
+      subject: "Welcome to Our Newsletter!",
+      html: `
+        <p>Dear Subscriber,</p>
+        <p>Thank you for subscribing to our newsletter!</p>
+        <p>Stay tuned for the latest updates, news, and special offers.</p>
+        <p>We are excited to have you on board!</p>
+        <p>If you have any questions or need assistance, feel free to reach out to our support team at ${NODEMAILER_MAIL}.</p>
+        <p>Thank you for choosing ProChesser!</p>
+          <p>Sincerely,</p>
+        <p>The ProChesser Team</p>
+        <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>    
+      `,
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+    console.log(`Newsletter notification sent to ${email}`);
+  } catch (error) {
+    console.error("Error sending newsletter notification:", error);
+  }
+};

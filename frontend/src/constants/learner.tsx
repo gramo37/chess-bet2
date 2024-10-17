@@ -69,4 +69,4 @@ export const packages = [
   },
 ];
 
-export const ACADEMY_FRONTEND_URL = "http://academy.prochesser.com"
+export const ACADEMY_FRONTEND_URL = "https://academy.prochesser.com";

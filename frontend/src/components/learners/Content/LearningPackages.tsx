@@ -1,20 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import { useRecoilValue } from "recoil";
-import { userState } from "../state/userState";
 import { FaCheckCircle } from "react-icons/fa";
-import PaymentPopup from "./popup";
 import { ACADEMY_FRONTEND_URL, packages } from "../../../constants/learner";
 
 const LearningSection = () => {
-  const user = useRecoilValue(userState);
-  const [packag, setPackag] = useState(null);
-
   return (
-    <section className="learning-section py-12 bg-gray-100">
-      {packag && (
-        <PaymentPopup setPackag={setPackag} user={user} packag={packag} />
-      )}
+    <section id="learningpath" className="learning-section py-12 bg-gray-100">
       <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
         Our Learning Packages
       </h2>
@@ -74,9 +63,7 @@ const LearningSection = () => {
               <button
                 className="bg-yellow-600 text-white font-bold py-2 px-6 rounded-full hover:bg-yellow-500 hover:shadow-lg transition-colors duration-300"
                 onClick={() => {
-                  user
-                    ? (window.location.href = `/prompt/${packageData.type}`)
-                    : (window.location.href = `${ACADEMY_FRONTEND_URL}/register`);
+                  window.location.href = `${ACADEMY_FRONTEND_URL}/register`;
                 }}
               >
                 {packageData.cta}

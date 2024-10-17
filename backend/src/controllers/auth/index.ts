@@ -1,5 +1,9 @@
 import { db } from "../../db";
-import { EmailVerification, SendForgotPassword } from "./verify";
+import {
+  EmailVerification,
+  SendForgotPassword,
+  SendNewsletterNotification,
+} from "./verify";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -347,6 +351,20 @@ export const verifyResetToken = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Token is valid", email: user.email });
   } catch (error) {
     console.error("Error verifying reset token:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const SubscribeNewsletter = async (req: Request, res: Response) => {
+  try {
+    const email = req.body.email;
+    if (!email) {
+      return res.status(400).json({ message: "Invalid Email" });
+    }
+    await SendNewsletterNotification(email);
+    return res.status(200).json({ message: "Thank You for Subscribing!!" });
+  } catch (e) {
+    console.error("Error Subscribing the token", e);
     res.status(500).json({ message: "Internal server error" });
   }
 };

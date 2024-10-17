@@ -14,7 +14,7 @@ const GameLobbySection = () => {
 
         {/* Button */}
         <a
-          href="/game-lobby"
+          href="/game"
           className="bg-yellow-500 hover:bg-yellow-600 text-black hover:text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50"
         >
           Explore the Game Lobby

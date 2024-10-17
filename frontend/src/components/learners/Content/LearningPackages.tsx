@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { userState } from "../state/userState";
 import { FaCheckCircle } from "react-icons/fa";
 import PaymentPopup from "./popup";
-import { packages } from "../../../constants/learner";
+import { ACADEMY_FRONTEND_URL, packages } from "../../../constants/learner";
 
 const LearningSection = () => {
   const user = useRecoilValue(userState);
@@ -76,7 +76,7 @@ const LearningSection = () => {
                 onClick={() => {
                   user
                     ? (window.location.href = `/prompt/${packageData.type}`)
-                    : (window.location.href = "/register");
+                    : (window.location.href = `${ACADEMY_FRONTEND_URL}/register`);
                 }}
               >
                 {packageData.cta}

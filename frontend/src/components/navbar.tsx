@@ -7,11 +7,13 @@ import { ACADEMY_FRONTEND_URL } from "../constants/learner";
 export default function NavBar() {
   useGetUser();
   const user = usePersonStore((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false); // Submenu state for account creation
   const [loginSubmenuOpen, setLoginSubmenuOpen] = useState(false); // Submenu state for login
   const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
   const toggleLoginSubmenu = () => setLoginSubmenuOpen(!loginSubmenuOpen);
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
     <nav className="bg-white w-full shadow-md">
@@ -51,25 +53,37 @@ export default function NavBar() {
         <div className="hidden lg:flex items-center gap-4 px-4">
           <ul className="flex items-center">
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
+              <Link
+                to="/"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
                 Home
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/about" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
+              <Link
+                to="/about"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
                 About
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/faqs" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
+              <Link
+                to="/faqs"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
                 FAQs
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/blog" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
+              <Link
+                to="/blog"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
                 Blog
               </Link>
             </li>
@@ -234,18 +248,62 @@ export default function NavBar() {
           </a>
           {!user ? (
             <div className="flex flex-col gap-2">
-              <a
-                href="/login"
-                className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+              <button
+                onClick={toggleLoginSubmenu}
+                className="text-black font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform"
               >
                 Login
-              </a>
-              <a
-                href="/signup"
-                className="bg-transparent  border-2 border-yellow-500 hover:bg-yellow-500 hover:text-white text-black font-semibold py-1 px-2 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
+              </button>
+              {loginSubmenuOpen && (
+                <ul className="space-y-2 pl-4">
+                  <li>
+                    <Link
+                      to={`${ACADEMY_FRONTEND_URL}/login`}
+                      className="block text-black hover:text-yellow-500"
+                      onClick={toggleMenu}
+                    >
+                      Learners
+                    </Link>
+                  </li>
+                  <li>
+                    <a
+                      href="/login"
+                      className="block text-black hover:text-yellow-500"
+                      onClick={toggleMenu}
+                    >
+                      Gamers
+                    </a>
+                  </li>
+                </ul>
+              )}
+              <button
+                onClick={toggleSubmenu}
+                className="bg-yellow-500 text-black font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 hover:bg-yellow-400"
               >
-                Signup
-              </a>
+                Create Account
+              </button>
+              {submenuOpen && (
+                <ul className="space-y-2 pl-4">
+                  <li>
+                    <Link
+                      to={`${ACADEMY_FRONTEND_URL}/register`}
+                      className="block text-black hover:text-yellow-500"
+                      onClick={toggleMenu}
+                    >
+                      Learners Account
+                    </Link>
+                  </li>
+                  <li>
+                    <a
+                      href="/signup"
+                      className="block text-black hover:text-yellow-500"
+                      onClick={toggleMenu}
+                    >
+                      Gamers Account
+                    </a>
+                  </li>
+                </ul>
+              )}
             </div>
           ) : (
             <div className="flex flex-col gap-2">

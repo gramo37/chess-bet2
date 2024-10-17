@@ -29,6 +29,10 @@ import FAQ from "./components/learners/FAQ";
 import Blog from "./components/learners/Blog";
 import Content from "./components/learners/Content";
 import { RecoilRoot } from "recoil";
+import Newsletter from "./components/learners/NewsLetter";
+import AffiliateProgram from "./components/learners/AffiliateProgram";
+import PrivacyPolicy from "./components/learners/privacy";
+import TermsOfService from "./components/learners/termsofservices";
 
 const queryClient = new QueryClient();
 
@@ -142,6 +146,10 @@ function App() {
               <Route path="/faqs" element={<FAQ />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/learnchess" element={<Content />} />
+              <Route path="/subscribe" element={<Newsletter />} />
+              <Route path="/affliate" element={<AffiliateProgram />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
               <Route path="/rules" element={<Rules />} />
               <Route path="/player/:id" element={<PlayerProfile />} />
               <Route path="/game/:id" element={<GameProfile />} />

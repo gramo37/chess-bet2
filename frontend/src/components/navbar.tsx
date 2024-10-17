@@ -23,7 +23,7 @@ export default function NavBar() {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden focus:outline-none"
+          className="lg:hidden focus:outline-none"
           aria-label="Toggle Menu"
         >
           <svg
@@ -43,28 +43,28 @@ export default function NavBar() {
         </button>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-4 px-4">
+        <div className="hidden lg:flex items-center gap-4 px-4">
           <ul className="flex items-center">
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/" className="text-black hover:text-yellow-500">
+              <Link to="/" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
                 Home
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/about" className="text-black hover:text-yellow-500">
+              <Link to="/about" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
                 About
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/faqs" className="text-black hover:text-yellow-500">
+              <Link to="/faqs" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
                 FAQs
               </Link>
             </li>
 
             <li className="m-2 text-black text-lg font-medium">
-              <Link to="/blog" className="text-black hover:text-yellow-500">
+              <Link to="/blog" className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300">
                 Blog
               </Link>
             </li>
@@ -72,7 +72,7 @@ export default function NavBar() {
             <li className="m-2 text-black text-lg font-medium">
               <Link
                 to="/learnchess"
-                className="text-black hover:text-yellow-500"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
               >
                 Academy
               </Link>
@@ -132,7 +132,37 @@ export default function NavBar() {
       </div>
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="flex flex-col md:hidden px-4 py-2">
+        <div className="flex flex-col lg:hidden px-4 py-2 gap-2">
+          <Link
+            to="/"
+            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+          >
+            Home
+          </Link>
+          <Link
+            to="/about"
+            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+          >
+            About
+          </Link>
+          <Link
+            to="/faqs"
+            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+          >
+            FAQs
+          </Link>
+          <Link
+            to="/blog"
+            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+          >
+            Blog
+          </Link>
+          <Link
+            to="/learnchess"
+            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+          >
+            Academy
+          </Link>
           <a
             href="/how-it-works"
             className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"

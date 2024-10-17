@@ -1,5 +1,3 @@
-import chessImage from '/KQChessimage.jpg';
-
 const WhoAreWe = () => {
   return (
     <section className="flex flex-col md:flex-row items-center w-screen py-12 px-6 bg-black">
@@ -16,7 +14,7 @@ const WhoAreWe = () => {
       {/* Image Section */}
       <div className="md:w-1/2">
         <img
-          src={chessImage}
+          src='/KQChessimage.jpg'
           alt="Chess King and Queen"
           className="w-full h-auto object-cover rounded-lg shadow-lg"
         />

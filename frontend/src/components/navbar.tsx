@@ -2,11 +2,16 @@ import { useState } from "react";
 import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
 import { Link } from "react-router-dom";
+import { ACADEMY_FRONTEND_URL } from "../constants/learner";
 
 export default function NavBar() {
   useGetUser();
   const user = usePersonStore((state) => state.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState(false); // Submenu state for account creation
+  const [loginSubmenuOpen, setLoginSubmenuOpen] = useState(false); // Submenu state for login
+  const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
+  const toggleLoginSubmenu = () => setLoginSubmenuOpen(!loginSubmenuOpen);
 
   return (
     <nav className="bg-white w-full shadow-md">
@@ -94,18 +99,70 @@ export default function NavBar() {
           <div className="w-[2px] h-[20px] bg-black"></div>
           {!user ? (
             <div className="flex gap-2">
-              <a
-                href="/login"
-                className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+              <button
+                onClick={toggleLoginSubmenu}
+                className="text-black font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform"
               >
                 Login
-              </a>
-              <a
-                href="/signup"
-                className="bg-transparent  border-2 border-yellow-500 hover:bg-yellow-500 hover:text-white text-black font-semibold py-1 px-2 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
+              </button>
+
+              {/* Login Submenu for login options */}
+              {loginSubmenuOpen && (
+                <div className="absolute top-12 right-60 bg-white shadow-lg rounded-lg z-10 p-4">
+                  <ul className="space-y-2">
+                    <li>
+                      <Link
+                        to={`${ACADEMY_FRONTEND_URL}/signin`}
+                        className="block text-black hover:text-yellow-500"
+                        onClick={() => setLoginSubmenuOpen(false)}
+                      >
+                        Learners
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/login"
+                        className="block text-black hover:text-yellow-500"
+                        onClick={() => setLoginSubmenuOpen(false)}
+                      >
+                        Gamers
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )}
+              <button
+                onClick={toggleSubmenu}
+                className="bg-yellow-500 text-black font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 hover:bg-yellow-400"
               >
-                Signup
-              </a>
+                Create Account
+              </button>
+
+              {/* Submenu for account creation */}
+              {submenuOpen && (
+                <div className="absolute top-12 right-10 bg-white shadow-lg rounded-lg z-10 p-4">
+                  <ul className="space-y-2">
+                    <li>
+                      <Link
+                        to={`${ACADEMY_FRONTEND_URL}/register`}
+                        className="block text-black hover:text-yellow-500"
+                        onClick={() => setSubmenuOpen(false)}
+                      >
+                        Learners Account
+                      </Link>
+                    </li>
+                    <li>
+                      <a
+                        href="/signup"
+                        className="block text-black hover:text-yellow-500"
+                        onClick={() => setSubmenuOpen(false)}
+                      >
+                        Gamers Account
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex gap-4 items-center">

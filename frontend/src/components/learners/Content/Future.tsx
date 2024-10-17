@@ -1,5 +1,3 @@
-import React from 'react';
-
 const YourFutureAwaits = () => {
   return (
     <section className="your-future-awaits py-12 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 text-white text-center rounded-lg shadow-lg">

@@ -2,7 +2,7 @@ import GameLobbySection from "./GameLobbySection";
 import Guide from "./Guide";
 import HeroSection from "./HeroSection";
 import FAQ from "./miniFAQ";
-import MiniHowItWorks from "./MiniHowItWorks";
+import MiniHowItWorks from "./miniHowItWorks";
 import Testimonials from "./Testimonials";
 import WhoAreWe from "./WhoAreWe";
 import WhyChooseProChesser from "./WhyChooseProChesser";

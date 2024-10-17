@@ -3,7 +3,7 @@ import WhyChooseProChesser from "./Homepage/WhyChooseProChesser";
 
 const About = () => {
   return (
-    <div className="mt-24">
+    <div>
       <WhoAreWe />
       <WhyChooseProChesser />
     </div>

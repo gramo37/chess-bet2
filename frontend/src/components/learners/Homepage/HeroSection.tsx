@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import mockupImage from '/mockup.png'; 
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -43,7 +42,7 @@ const HeroSection = () => {
         {/* Right: Image */}
         <div className="flex-1 w-full md:w-1/2 h-full flex items-center justify-center md:pl-10 order-1 md:order-2">
           <img
-            src={mockupImage}
+            src="/mockup.png"
             alt="Mockup"
             className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
           />

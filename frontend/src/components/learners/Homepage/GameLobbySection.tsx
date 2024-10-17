@@ -1,5 +1,3 @@
-import React from 'react';
-
 const GameLobbySection = () => {
   return (
     <section className="bg-black w-screen py-12 px-6 md:py-16 md:px-8">

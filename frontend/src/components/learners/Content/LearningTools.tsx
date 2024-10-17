@@ -1,5 +1,3 @@
-import React from 'react';
-
 const LearningTools = () => {
   return (
     <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white py-12 px-6 rounded-lg shadow-2xl relative">

@@ -66,7 +66,7 @@ export default function SignUP() {
   }
 
   return (
-    <section className="w-full bg-black mt-5 text-black mx-auto">
+    <section className="w-full bg-black py-5 text-black mx-auto">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[500px] lg:py-0">
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -144,12 +144,12 @@ export default function SignUP() {
               </div>
               <button
                 type="submit"
-                className="w-full mb-2 bg-yellow-500 font-semibold text-black py-2 rounded hover:bg-yellow-600 hover:text-white transition-colors"
+                className="w-full bg-yellow-500 font-semibold text-black py-2 rounded hover:bg-yellow-600 hover:text-white transition-colors"
                 onClick={onclick}
               >
                 Sign Up
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+              <p className="text-sm font-light text-white dark:text-gray-400">
                 Already Have an Account?
                 <a
                   href="/login"

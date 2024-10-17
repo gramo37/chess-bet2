@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CommunitySection = () => {
   return (
     <section className="community-and-support py-12 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 text-white rounded-lg shadow-lg overflow-hidden">

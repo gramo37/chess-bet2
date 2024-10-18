@@ -26,11 +26,12 @@ const Newsletter = () => {
       const data = await response.json();
       alert(data.message);
       console.log(data);
-      setEmail("");
       setMessage(data.message || "Thank You for Subscribing!!");
     } catch (error: any) {
       alert(error.message || "An error occurred. Please try again.");
       console.error(error);
+    } finally {
+      setEmail("");
     }
   };
 

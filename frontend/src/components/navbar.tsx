@@ -51,66 +51,72 @@ export default function NavBar() {
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-4 px-4">
-          <ul className="flex items-center">
-            <li className="m-2 text-black text-lg font-medium">
-              <Link
-                to="/"
-                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-              >
-                Home
-              </Link>
-            </li>
+          {!user && (
+            <ul className="flex items-center">
+              <li className="m-2 text-black text-lg font-medium">
+                <Link
+                  to="/"
+                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                >
+                  Home
+                </Link>
+              </li>
 
-            <li className="m-2 text-black text-lg font-medium">
-              <Link
-                to="/about"
-                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-              >
-                About
-              </Link>
-            </li>
+              <li className="m-2 text-black text-lg font-medium">
+                <Link
+                  to="/about"
+                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                >
+                  About
+                </Link>
+              </li>
 
-            <li className="m-2 text-black text-lg font-medium">
-              <Link
-                to="/faqs"
-                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-              >
-                FAQs
-              </Link>
-            </li>
+              <li className="m-2 text-black text-lg font-medium">
+                <Link
+                  to="/faqs"
+                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                >
+                  FAQs
+                </Link>
+              </li>
 
-            <li className="m-2 text-black text-lg font-medium">
-              <Link
-                to="/blog"
-                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-              >
-                Blog
-              </Link>
-            </li>
+              <li className="m-2 text-black text-lg font-medium">
+                <Link
+                  to="/blog"
+                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                >
+                  Blog
+                </Link>
+              </li>
 
-            <li className="m-2 text-black text-lg font-medium">
+              <li className="m-2 text-black text-lg font-medium">
+                <Link
+                  to="/learnchess"
+                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                >
+                  Academy
+                </Link>
+              </li>
+            </ul>
+          )}
+          {(!user || (user && user.role === "USER")) && (
+            <>
               <Link
-                to="/learnchess"
+                to="/how-it-works"
                 className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
               >
-                Academy
+                How It Works
               </Link>
-            </li>
-          </ul>
-          <a
-            href="/how-it-works"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            How It Works
-          </a>
-          <div className="w-[2px] h-[20px] bg-black"></div>
-          <a
-            href="/rules"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            Rules
-          </a>
-          <div className="w-[2px] h-[20px] bg-black"></div>
+              <div className="w-[2px] h-[20px] bg-black"></div>
+              <Link
+                to="/rules"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                Rules
+              </Link>
+              <div className="w-[2px] h-[20px] bg-black"></div>
+            </>
+          )}
           {!user ? (
             <div className="flex gap-2">
               <button
@@ -181,12 +187,22 @@ export default function NavBar() {
           ) : (
             <div className="flex gap-4 items-center">
               {user?.role === "USER" && (
-                <a
-                  href="/account"
-                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-                >
-                  Account
-                </a>
+                <>
+                  <Link
+                    to="/game"
+                    className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                  >
+                    Game
+                  </Link>
+                  <div className="w-[2px] h-[20px] bg-black"></div>
+
+                  <Link
+                    to="/account"
+                    className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                  >
+                    Account
+                  </Link>
+                </>
               )}
               <button
                 onClick={() => {
@@ -204,48 +220,56 @@ export default function NavBar() {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="flex flex-col lg:hidden px-4 py-2 gap-2">
-          <Link
-            to="/"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            About
-          </Link>
-          <Link
-            to="/faqs"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            FAQs
-          </Link>
-          <Link
-            to="/blog"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            Blog
-          </Link>
-          <Link
-            to="/learnchess"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            Academy
-          </Link>
-          <a
-            href="/how-it-works"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            How It Works
-          </a>
-          <a
-            href="/rules"
-            className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-          >
-            Rules
-          </a>
+          {!user && (
+            <>
+              <Link
+                to="/"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                Home
+              </Link>
+              <Link
+                to="/about"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                About
+              </Link>
+              <Link
+                to="/faqs"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                FAQs
+              </Link>
+              <Link
+                to="/blog"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                Blog
+              </Link>
+              <Link
+                to="/learnchess"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                Academy
+              </Link>
+            </>
+          )}
+          {(!user || (user && user.role === "USER")) && (
+            <>
+              <Link
+                to="/how-it-works"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                How It Works
+              </Link>
+              <Link
+                to="/rules"
+                className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+              >
+                Rules
+              </Link>
+            </>
+          )}
           {!user ? (
             <div className="flex flex-col gap-2">
               <button
@@ -294,13 +318,13 @@ export default function NavBar() {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="/signup"
+                    <Link
+                      to="/signup"
                       className="block text-black hover:text-yellow-500"
                       onClick={toggleMenu}
                     >
                       Gamers Account
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               )}
@@ -308,12 +332,20 @@ export default function NavBar() {
           ) : (
             <div className="flex flex-col gap-2">
               {user?.role === "USER" && (
-                <a
-                  href="/account"
-                  className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
-                >
-                  Account
-                </a>
+                <>
+                  <Link
+                    to="/game"
+                    className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                  >
+                    Game
+                  </Link>
+                  <Link
+                    to="/account"
+                    className="text-black text-lg font-medium hover:text-yellow-500 transition-colors duration-300"
+                  >
+                    Account
+                  </Link>
+                </>
               )}
               <button
                 onClick={() => {

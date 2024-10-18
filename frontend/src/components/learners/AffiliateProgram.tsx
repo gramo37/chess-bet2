@@ -72,16 +72,16 @@ const AffiliateProgram = () => {
           </p>
           {[
             {
-              title: "Sign Up: ",
+              title: "Sign Up",
               description: "Create your account on ProChesser as a gamer.",
             },
             {
-              title: "Access the Affiliate Dashboard:",
+              title: "Access the Affiliate Dashboard",
               description:
                 "Navigate to your account page and click on the “Referral Program” button. Here, you’ll find all the essential information.",
             },
             {
-              title: "Share Your Unique Referral ID:",
+              title: "Share Your Unique Referral ID",
               description:
                 "Promote your personal referral ID. Anyone who registers using your ID becomes your referral, and you’ll earn from their deposits.",
             },
@@ -108,22 +108,22 @@ const AffiliateProgram = () => {
           </p>
           {[
             {
-              title: "Track Sign-Ups:",
+              title: "Track Sign-Ups",
               description:
                 "Monitor the total number of users you’ve referred to gauge your campaign effectiveness.",
             },
             {
-              title: "Track Payments:",
+              title: "Track Payments",
               description:
                 "Receive detailed monthly reports on your payouts, complete with all relevant payment information.",
             },
             {
-              title: "All-Time Earnings:",
+              title: "All-Time Earnings",
               description:
                 "Access a complete history of your earnings, so you can see how far you've come.",
             },
             {
-              title: "Track Orders:",
+              title: "Track Orders",
               description:
                 "Keep tabs on the number of deposits made by your referrals and identify your top performers.",
             },
@@ -152,26 +152,26 @@ const AffiliateProgram = () => {
           </p>
           {[
             {
-              title: "Referral ID:",
+              title: "Referral ID",
               description:
                 "This unique ID is what you’ll distribute. All sign-ups using this ID will count as your referrals.",
             },
             {
-              title: "Referrals Count:",
+              title: "Referrals Count",
               description: "View the total number of users you’ve referred.",
             },
             {
-              title: "Commission Percentage:",
+              title: "Commission Percentage",
               description:
                 "See the percentage you earn from your referrals' deposits.",
             },
             {
-              title: "Payments Overview:",
+              title: "Payments Overview",
               description:
                 "Track how many deposits have been made by your referrals and watch your referral balance grow.",
             },
             {
-              title: "Total Earnings:",
+              title: "Total Earnings",
               description:
                 "Keep track of your total earnings, which will remain visible even after you withdraw funds.",
             },
@@ -200,12 +200,12 @@ const AffiliateProgram = () => {
           </p>
           {[
             {
-              title: "Transfer to Internal Balance: ",
+              title: "Transfer to Internal Balance",
               description:
                 "Withdraw your earnings to your internal ProChesser balance.",
             },
             {
-              title: "Choose Your Payment Method: ",
+              title: "Choose Your Payment Method",
               description:
                 "Go to the withdrawals page to transfer your funds to PayPal, cryptocurrency, or mobile money. Your funds will be processed manually and credited to your chosen wallet within 24 hours.",
             },

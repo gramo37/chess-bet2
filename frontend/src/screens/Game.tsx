@@ -41,7 +41,7 @@ export default function Game() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col max-w-[90%] m-auto items-center justify-center bg-black p-0 sm:p-4">
+    <div className="min-h-screen flex flex-col max-w-full m-auto items-center justify-center bg-black p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray rounded-lg shadow-lg overflow-hidden w-full">
         <div className="w-full relative lg:w-1/2 p-4 lg:p-8 flex flex-col items-center">
           <div className="flex justify-between w-full">

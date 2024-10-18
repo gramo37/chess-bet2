@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 // import { CHESS_GAME_APP_URL } from "../constants";
 import { ACADEMY_FRONTEND_URL } from "../constants/learner";
-
-const Footer = () => {
+type props = {
+  maxLiveChat: () => void;
+};
+const Footer = ({ maxLiveChat }: props) => {
   return (
     <footer className="bg-white w-full text-black py-10">
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4">
@@ -57,12 +59,12 @@ const Footer = () => {
         <div>
           <h3 className="text-lg text-yellow-600 font-bold mb-4">Contact Us</h3>
           <p className="mb-2">
-            <a
-              href="https://tawk.to/chat/66fda66a37379df10df0f185/1i97d447c"
+            <button
+              onClick={maxLiveChat}
               className="text-black hover:text-yellow-500"
             >
               Live Chat
-            </a>
+            </button>
           </p>
           <p className="mb-2">
             Email:{" "}

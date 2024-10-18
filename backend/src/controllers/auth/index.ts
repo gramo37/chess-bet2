@@ -201,9 +201,7 @@ export const verifyToken = async (req: Request, res: Response) => {
     if (!user) {
       console.log("not verified successfully");
 
-      return res
-        .status(404)
-        .json({ message: "User not found or invalid token" });
+      return res.status(404).send("User not found or invalid token");
     }
     const date = new Date().toISOString();
     await db.user.update({
@@ -212,12 +210,12 @@ export const verifyToken = async (req: Request, res: Response) => {
     });
     console.log("verified successfully");
 
-    res.json({ message: "Verified" });
+    res.redirect(`${FRONTEND_URL}/login`);
   } catch (error) {
     console.error("Error verifying token:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res.status(400).send("Invalid or expired token");
     }
     return res
       .status(500)
@@ -361,6 +359,17 @@ export const SubscribeNewsletter = async (req: Request, res: Response) => {
     if (!email) {
       return res.status(400).json({ message: "Invalid Email" });
     }
+    const user = await db.newsletterSubscriber.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      return res.status(400).json({ message: "Already Subscribed" });
+    }
+    await db.newsletterSubscriber.create({
+      data: { email },
+    });
     await SendNewsletterNotification(email);
     return res.status(200).json({ message: "Thank You for Subscribing!!" });
   } catch (e) {

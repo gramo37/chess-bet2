@@ -1,9 +1,8 @@
 import { db } from "../../db";
 import bcrypt from "bcrypt";
-import { request, Request, Response } from "express";
+import { request, Request, response, Response } from "express";
 import { generateToken } from "../../utils";
 import { EmailVerification } from "../auth/verify";
-
 
 export const createAdmin = async (req: Request, res: Response) => {
   try {
@@ -28,21 +27,18 @@ export const createAdmin = async (req: Request, res: Response) => {
         password: hashPassword,
         name: name,
         role: "ADMIN",
-        emailVerified: new Date().toISOString()
+        emailVerified: new Date().toISOString(),
       },
     });
 
     const token = generateToken({ id: newUser.id, email: newUser.email });
     EmailVerification(username, name);
-    res
-      .status(200)
-      .json({ message: "Admin created successfully", token });
+    res.status(200).json({ message: "Admin created successfully", token });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
 };
-
 
 export const adminLogin = async (req: Request, res: Response) => {
   try {
@@ -73,14 +69,13 @@ export const adminLogin = async (req: Request, res: Response) => {
   }
 };
 
-
 export const GetTransactions = async (req: Request, res: Response) => {
   try {
-    const { page } = req.params
+    const { page } = req.params;
     const user: any = (req?.user as any)?.user;
-    const role = user.role as string
+    const role = user.role as string;
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
-    const pageSize = 8; // Number of games per page  
+    const pageSize = 8; // Number of games per page
     const transactions = await db.transaction.findMany({
       select: {
         amount: true,
@@ -94,11 +89,11 @@ export const GetTransactions = async (req: Request, res: Response) => {
             name: true,
             email: true,
             id: true,
-          }
+          },
         },
       },
-        skip: (pageNumber - 1) * pageSize, // Skip games for previous pages
-        take: pageSize, // Take only pageSize games
+      skip: (pageNumber - 1) * pageSize, // Skip games for previous pages
+      take: pageSize, // Take only pageSize games
     });
     res.status(200).json(transactions);
   } catch (error) {
@@ -106,7 +101,6 @@ export const GetTransactions = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 export const GetTransaction = async (req: Request, res: Response) => {
   try {
@@ -137,14 +131,14 @@ export const GetTransaction = async (req: Request, res: Response) => {
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const { page } = req.params
+    const { page } = req.params;
     const user: any = (req?.user as any)?.user;
-    const role = user.role as string
+    const role = user.role as string;
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
-    const pageSize = 8; // Number of games per page  
-    if (role === 'MODRATOR') {
+    const pageSize = 8; // Number of games per page
+    if (role === "MODRATOR") {
       const users = await db.user.findMany({
-        where: { role: 'USER' },
+        where: { role: "USER" },
         select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
         skip: (pageNumber - 1) * pageSize, // Skip games for previous pages
         take: pageSize, // Take only pageSize games
@@ -153,10 +147,7 @@ export const getUsers = async (req: Request, res: Response) => {
     } else {
       const users = await db.user.findMany({
         where: {
-          OR: [
-            { role: 'MODRATOR' },
-            { role: 'USER' }
-          ]
+          OR: [{ role: "MODRATOR" }, { role: "USER" }],
         },
         select: { id: true, name: true, email: true, role: true, status: true }, // Minimal fields
         skip: (pageNumber - 1) * pageSize, // Skip games for previous pages
@@ -183,21 +174,30 @@ export const getUser = async (req: Request, res: Response) => {
         balance: true,
         rating: true,
         status: true,
-        gamesAsWhite: { select: { id: true, status: true, result: true, stake: true } },
-        gamesAsBlack: { select: { id: true, status: true, result: true, stake: true } },
-        transactions: { select: { id: true, amount: true, status: true, currency: true } },
+        gamesAsWhite: {
+          select: { id: true, status: true, result: true, stake: true },
+        },
+        gamesAsBlack: {
+          select: { id: true, status: true, result: true, stake: true },
+        },
+        transactions: {
+          select: { id: true, amount: true, status: true, currency: true },
+        },
       },
     });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const whiteWins = user.gamesAsWhite.filter((game: any) => game.status === 'COMPLETED' && game.result === "WHITE_WINS");
-    const blackWins = user.gamesAsBlack.filter((game: any) => game.status === 'COMPLETED' && game.result === 'BLACK_WINS');
-    const totalEarnings =
-      [...whiteWins, ...blackWins]
-        .map(game => parseFloat(game.stake))
-        .reduce((acc, stake) => acc + stake * 0.85, 0);
+    const whiteWins = user.gamesAsWhite.filter(
+      (game: any) => game.status === "COMPLETED" && game.result === "WHITE_WINS"
+    );
+    const blackWins = user.gamesAsBlack.filter(
+      (game: any) => game.status === "COMPLETED" && game.result === "BLACK_WINS"
+    );
+    const totalEarnings = [...whiteWins, ...blackWins]
+      .map((game) => parseFloat(game.stake))
+      .reduce((acc, stake) => acc + stake * 0.85, 0);
     console.log(whiteWins, blackWins);
 
     res.status(200).json({ ...user, totalEarnings });
@@ -210,9 +210,9 @@ export const getUser = async (req: Request, res: Response) => {
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
-   
+
     const user = await db.user.findUnique({
-      where: { email:email.toLowerCase() },
+      where: { email: email.toLowerCase() },
       select: {
         id: true,
         name: true,
@@ -220,21 +220,30 @@ export const getUserByEmail = async (req: Request, res: Response) => {
         balance: true,
         rating: true,
         status: true,
-        gamesAsWhite: { select: { id: true, status: true, result: true, stake: true } },
-        gamesAsBlack: { select: { id: true, status: true, result: true, stake: true } },
-        transactions: { select: { id: true, amount: true, status: true, currency: true } },
+        gamesAsWhite: {
+          select: { id: true, status: true, result: true, stake: true },
+        },
+        gamesAsBlack: {
+          select: { id: true, status: true, result: true, stake: true },
+        },
+        transactions: {
+          select: { id: true, amount: true, status: true, currency: true },
+        },
       },
     });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const whiteWins = user.gamesAsWhite.filter((game: any) => game.status === 'COMPLETED' && game.result === "WHITE_WINS");
-    const blackWins = user.gamesAsBlack.filter((game: any) => game.status === 'COMPLETED' && game.result === 'BLACK_WINS');
-    const totalEarnings =
-      [...whiteWins, ...blackWins]
-        .map(game => parseFloat(game.stake))
-        .reduce((acc, stake) => acc + stake * 0.85, 0);
+    const whiteWins = user.gamesAsWhite.filter(
+      (game: any) => game.status === "COMPLETED" && game.result === "WHITE_WINS"
+    );
+    const blackWins = user.gamesAsBlack.filter(
+      (game: any) => game.status === "COMPLETED" && game.result === "BLACK_WINS"
+    );
+    const totalEarnings = [...whiteWins, ...blackWins]
+      .map((game) => parseFloat(game.stake))
+      .reduce((acc, stake) => acc + stake * 0.85, 0);
     console.log(whiteWins, blackWins);
 
     res.status(200).json({ ...user, totalEarnings });
@@ -246,9 +255,9 @@ export const getUserByEmail = async (req: Request, res: Response) => {
 
 export const getGames = async (req: Request, res: Response) => {
   try {
-    const { page } = req.params
+    const { page } = req.params;
     const user: any = (req?.user as any)?.user;
-    const role = user.role as string
+    const role = user.role as string;
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
     const pageSize = 8; // Number of games per page
     const games = await db.game.findMany({
@@ -277,7 +286,6 @@ export const getGames = async (req: Request, res: Response) => {
 };
 
 export const getGame = async (req: Request, res: Response) => {
-
   try {
     const { id } = req.params;
     const game = await db.game.findUnique({
@@ -322,14 +330,12 @@ export const getAllReports = async (req: Request, res: Response) => {
         },
       },
       where: {
-        status: "PENDING"
+        status: "PENDING",
       },
       orderBy: {
-        createdAt: 'desc', // Order by created date, latest first
+        createdAt: "desc", // Order by created date, latest first
       },
     });
-
-
 
     res.status(200).json(reports);
   } catch (error) {
@@ -341,14 +347,14 @@ export const getAllReports = async (req: Request, res: Response) => {
 export async function getBannedUsers(req: Request, res: Response) {
   try {
     const user: any = (req?.user as any)?.user;
-    const role = user.role as string
- console.log('lkmkslaclas');
- 
-    if (role === 'MODRATOR') {
+    const role = user.role as string;
+    console.log("lkmkslaclas");
+
+    if (role === "MODRATOR") {
       const users = await db.user.findMany({
-        where: { 
-          status:'BANNED',
-          role: 'USER' 
+        where: {
+          status: "BANNED",
+          role: "USER",
         },
         select: { id: true, name: true, email: true, role: true, status: true },
       });
@@ -356,11 +362,8 @@ export async function getBannedUsers(req: Request, res: Response) {
     } else {
       const users = await db.user.findMany({
         where: {
-          status:'BANNED',
-          OR: [
-            { role: 'MODRATOR' },
-            { role: 'USER' }
-          ]
+          status: "BANNED",
+          OR: [{ role: "MODRATOR" }, { role: "USER" }],
         },
         select: { id: true, name: true, email: true, role: true, status: true },
       });
@@ -376,13 +379,13 @@ export async function getBannedUsers(req: Request, res: Response) {
 export async function getSuspendedUsers(req: Request, res: Response) {
   try {
     const user: any = (req?.user as any)?.user;
-    const role = user.role as string
-    console.log('lkmkslaclas');
-    if (role === 'MODRATOR') {
+    const role = user.role as string;
+    console.log("lkmkslaclas");
+    if (role === "MODRATOR") {
       const users = await db.user.findMany({
-        where: { 
-          status:'SUSPENDED',
-          role: 'USER' 
+        where: {
+          status: "SUSPENDED",
+          role: "USER",
         },
         select: { id: true, name: true, email: true, role: true, status: true },
       });
@@ -390,15 +393,12 @@ export async function getSuspendedUsers(req: Request, res: Response) {
     } else {
       const users = await db.user.findMany({
         where: {
-          status:'SUSPENDED',
-          OR: [
-            { role: 'MODRATOR' },
-            { role: 'USER' }
-          ]
+          status: "SUSPENDED",
+          OR: [{ role: "MODRATOR" }, { role: "USER" }],
         },
         select: { id: true, name: true, email: true, role: true, status: true },
       });
-    console.log(users);
+      console.log(users);
 
       res.status(200).json(users);
     }
@@ -407,17 +407,33 @@ export async function getSuspendedUsers(req: Request, res: Response) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-export async function getModrators(req:Request,res:Response){
-  try{
-   const users = await db.user.findMany({
-    where:{
-      role:'MODRATOR'
-    },
-    select: { id: true, name: true, email: true, role: true, status: true },
-   })
-   res.status(200).json(users);
+export async function getModrators(req: Request, res: Response) {
+  try {
+    const users = await db.user.findMany({
+      where: {
+        role: "MODRATOR",
+      },
+      select: { id: true, name: true, email: true, role: true, status: true },
+    });
+    res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+export async function getNewsLetterSubscriber(req: Request, res: Response) {
+  try {
+    console.log("lkmlsac");
+
+    const subscribers = await db.newsletterSubscriber.findMany({
+      select: {
+        email: true,
+        date: true,
+      },
+    });
+    return res.status(200).json({ subscribers });
+  } catch (e) {
+    console.error("Error fetching newsletter subscribers:", e);
     res.status(500).json({ message: "Internal server error" });
   }
 }

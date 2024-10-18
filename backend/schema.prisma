@@ -74,6 +74,12 @@ model Transaction {
   @@index([userId])
 }
 
+model NewsletterSubscriber{
+  id            String  @id @default(cuid())
+  email         String  @unique
+  date          DateTime  @default(now())
+}
+
 model Webhook {
   id            String  @id @default(cuid())
   job_id        String?

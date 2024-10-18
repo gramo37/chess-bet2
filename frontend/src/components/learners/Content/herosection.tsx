@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { ACADEMY_FRONTEND_URL } from "../../../constants/learner";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white  py-24  shadow-2xl h-full relative overflow-hidden">

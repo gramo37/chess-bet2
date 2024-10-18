@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CHESS_GAME_APP_URL } from "../constants";
+// import { CHESS_GAME_APP_URL } from "../constants";
 import { ACADEMY_FRONTEND_URL } from "../constants/learner";
 
 const Footer = () => {

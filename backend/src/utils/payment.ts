@@ -13,6 +13,7 @@ import { db } from "../db";
 import { createHash } from ".";
 import axios from "axios";
 import { BACKEND_ROUTE } from "..";
+import { processCommissionDeposit } from "../controllers/payments/mpesa";
 
 type TUser = {
   id: string;
@@ -28,10 +29,11 @@ export const withdrawMPesaToUser = async (
   user: TUser
 ) => {
   try {
-    if (!user || !user?.id) return {
-      status: false,
-      message: "User Not Found"
-    };
+    if (!user || !user?.id)
+      return {
+        status: false,
+        message: "User Not Found",
+      };
     console.log("Deposit Money to user", amount, "Received from", user);
 
     const IntaSend = require("intasend-node");
@@ -102,13 +104,13 @@ export const withdrawMPesaToUser = async (
 
     return {
       status: true,
-      message: resp
+      message: resp,
     };
   } catch (error) {
     console.log("Error in payment to user", error, "" + error);
     return {
       status: false,
-      message: `Error in payment to user", ${error}, ${"" + error}`
+      message: `Error in payment to user", ${error}, ${"" + error}`,
     };
   }
 };
@@ -320,10 +322,11 @@ export async function depositChecks(
 
 export async function updateTransactionChecks(invoice_id: string) {
   try {
-    if(!invoice_id) return {
-      status: false,
-      message: "Invoice ID not provided"
-    }
+    if (!invoice_id)
+      return {
+        status: false,
+        message: "Invoice ID not provided",
+      };
     const IntaSend = require("intasend-node");
 
     let intasend = new IntaSend(
@@ -365,6 +368,7 @@ export async function updateTransactionChecks(invoice_id: string) {
             userId: true,
             finalamountInUSD: true,
             id: true,
+            platform_charges: true,
           },
         },
       },
@@ -407,11 +411,16 @@ export async function updateTransactionChecks(invoice_id: string) {
           status: "COMPLETED", // Mark transaction as completed
         },
       }),
+      ...((await processCommissionDeposit(
+        transaction.transaction.userId,
+        transaction.transaction.finalamountInUSD -
+          transaction.transaction.platform_charges
+      )) || []),
     ]);
 
     return {
       status: true,
-      message: resp
+      message: resp,
     };
   } catch (error) {
     console.log(error);

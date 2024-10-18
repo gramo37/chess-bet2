@@ -356,7 +356,7 @@ export const withdraw = async (req: Request, res: Response) => {
         platform_charges,
         mode: "mpesa",
         api_ref: checkout_id, // Prevent api_ref should be unique error
-        currency
+        currency,
       },
     });
 
@@ -402,10 +402,11 @@ export const withdraw = async (req: Request, res: Response) => {
         transaction.id
       );
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     res.status(200).json({
-      message: "Your money withdrawal has been initiated! Expect to receive your funds within 24 hours.",
+      message:
+        "Your money withdrawal has been initiated! Expect to receive your funds within 24 hours.",
       transaction, // Return the transaction object
     });
   } catch (error) {
@@ -481,6 +482,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
         userId: true,
         finalamountInUSD: true,
         status: true,
+        platform_charges: true,
         secret_token: true,
       },
     });
@@ -495,7 +497,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
     console.log("Transaction for deposit found -> ", transaction);
 
     try {
-      if(state === "FAILED") {
+      if (state === "FAILED") {
         await db.transaction.update({
           where: { id: transaction.id },
           data: {
@@ -549,6 +551,10 @@ export const validateTransaction = async (req: Request, res: Response) => {
             status: "COMPLETED", // Mark transaction as completed
           },
         }),
+        ...((await processCommissionDeposit(
+          transaction.userId,
+          transaction.finalamountInUSD - transaction.platform_charges
+        )) || []), // Process the commission if there's a referrer
       ]);
 
       console.log("Payment Completed");

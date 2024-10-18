@@ -64,10 +64,6 @@ export default function ReferralComponent() {
     );
   }
 
-  if (referralDetails && !referralDetails.referredUsers?.length) {
-    return <div className="text-center py-6">No referred users yet.</div>;
-  }
-
   async function AddCommissionToAccountBalance() {
     try {
       const today = new Date();
@@ -136,34 +132,36 @@ export default function ReferralComponent() {
   const GeneralTab = () => {
     return (
       <div className="p-4 bg-white border rounded-md shadow-md">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center flex-wrap mb-4">
           <p className="text-sm text-gray-500">
-            Referral Balance: ${referralDetails.totalCommission.toFixed(2)}
+            Referral Balance: ${referralDetails.totalCommission.toFixed(2) || 0}
           </p>
           <p className="text-sm text-yellow-600 break-all flex gap-2 items-center">
-            Referral ID: {user?.referralId}
+            Referral ID: {user?.referralId || ""}
             <FaCopy
               className="cursor-pointer"
               onClick={() => copyTransactionId(user?.referralId || "")}
             />
           </p>
         </div>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between flex-wrap items-center mb-4">
           <p className="text-sm">
             Percent: <span className="font-bold">3%</span>
           </p>
           <p className="text-sm">
             Referrals:{" "}
             <span className="font-bold">
-              {referralDetails.referredUsers.length}
+              {referralDetails.referredUsers.length || 0}
             </span>
           </p>
           <p className="text-sm">
-            Payments: <span className="font-bold">{totalPayouts}</span>
+            Payments: <span className="font-bold">{totalPayouts || 0}</span>
           </p>
           <p className="text-sm">
-            Earned:{" "}
-            <span className="font-bold">${earnedCommission.toFixed(2)}</span>
+            Earned:
+            <span className="font-bold">
+              ${earnedCommission.toFixed(2) || 0}
+            </span>
           </p>
         </div>
 
@@ -200,20 +198,22 @@ export default function ReferralComponent() {
       <div className="p-4 bg-white border rounded-md shadow-md">
         <h2 className="text-lg font-semibold mb-4">Referred Users</h2>
         <ul className="space-y-3">
-          {referralDetails.referredUsers.map((user: any, index: number) => (
-            <li
-              key={index}
-              className="flex justify-between bg-gray-100 p-3 rounded-md shadow-sm"
-            >
-              <p className="text-sm text-gray-700">
-                <span className="font-semibold">User:</span> {user.name}
-              </p>
-              <p className="text-sm text-gray-700">
-                <span className="font-semibold">Joined on:</span>{" "}
-                {new Date(user.joinedDate).toLocaleDateString()}
-              </p>
-            </li>
-          ))}
+          {referralDetails &&
+            referralDetails.referredUsers &&
+            referralDetails.referredUsers.map((user: any, index: number) => (
+              <li
+                key={index}
+                className="flex justify-between bg-gray-100 p-3 rounded-md shadow-sm"
+              >
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">User:</span> {user.name}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Joined on:</span>{" "}
+                  {new Date(user.joinedDate).toLocaleDateString()}
+                </p>
+              </li>
+            ))}
         </ul>
 
         <h2 className="text-lg font-semibold mt-6 mb-4">Commission Deposits</h2>
@@ -236,22 +236,26 @@ export default function ReferralComponent() {
               </tr>
             </thead>
             <tbody>
-              {referralDetails.commissionDeposits.map(
-                (deposit: any, index: number) => (
-                  <tr key={index} className="border-t hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-700">{deposit.user}</td>
-                    <td className="px-4 py-2 text-gray-700">
-                      ${deposit.amount.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-2 text-gray-700">
-                      ${deposit.deposit.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-2 text-gray-700">
-                      {new Date(deposit.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                )
-              )}
+              {referralDetails &&
+                referralDetails.commissionDeposits &&
+                referralDetails.commissionDeposits.map(
+                  (deposit: any, index: number) => (
+                    <tr key={index} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-2 text-gray-700">
+                        {deposit.user}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        ${deposit.amount.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        ${deposit.deposit.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        {new Date(deposit.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  )
+                )}
             </tbody>
           </table>
         </div>
@@ -260,7 +264,7 @@ export default function ReferralComponent() {
   };
 
   return (
-    <div className="p-6 rounded-lg shadow-md bg-white text-black mx-auto">
+    <div className="p-6 rounded-lg shadow-md bg-white w-[1400px] max-w-full text-black mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Referral Program</h1>
       <div className="flex  w-full mb-6">
         <TabButton

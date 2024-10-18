@@ -7,6 +7,7 @@ import { Users } from "./component/users";
 import { Stats } from "./component/dashboardstats";
 import { Modrator } from "./component/modrator";
 import { useChatStore } from "../../contexts/auth";
+import Newsletter from "./component/newsletter";
 
 const Dashboard = () => {
   const [reports, setReports] = useState([]);
@@ -33,12 +34,12 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="container mx-auto relative py-8">
+    <div className="container mx-auto relative bg-black py-8">
       <div className="w-[90%]  rounded-lg p-3 mb-2 m-auto relative bg-amber-50">
         <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
         <Stats />
       </div>
-      <div className="w-[90%] m-auto">
+      <div className="w-[90%] m-auto min-h-[200px]">
         {/* Tabs Header */}
         <div className="flex space-x-3 w-full my-4 overflow-x-auto scrollbar-hide">
           <TabButton
@@ -71,6 +72,12 @@ const Dashboard = () => {
             setActiveTab={setActiveTab}
             tabKey="modrator"
           />
+          <TabButton
+            title={"Newsletter Subscribers"}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabKey="newsletter"
+          />
         </div>
 
         {/* Tabs Content */}
@@ -87,6 +94,7 @@ const Dashboard = () => {
           )}
           {activeTab === "users" && <Users users={users} setUsers={setUsers} />}
           {activeTab === "modrator" && <Modrator />}
+          {activeTab === "newsletter" && <Newsletter />}
         </div>
       </div>
     </div>

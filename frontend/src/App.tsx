@@ -18,7 +18,7 @@ import ResetPassword from "./screens/resetPassword";
 import PopUp from "./components/popup";
 import NavBar from "./components/navbar";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
-import { useChatStore } from "./contexts/auth";
+import usePersonStore, { useChatStore } from "./contexts/auth";
 import { useEffect, useRef, useState } from "react";
 import HowItWorks from "./components/howitworks";
 import Rules from "./components/rules";
@@ -41,6 +41,7 @@ function App() {
   const { isChatVisible, setChatVisibility } = useChatStore();
   const tawkMessengerRef = useRef(null);
   const [tawkLoaded, setTawkLoaded] = useState(false);
+  const user = usePersonStore((state) => state.user);
 
   // Listen for the Tawk.to widget load event
   useEffect(() => {
@@ -59,6 +60,12 @@ function App() {
       }
     }
   }, [isChatVisible, setChatVisibility]);
+
+  function LiveChatMaximize() {
+    if (tawkLoaded && window.Tawk_API) {
+      window.Tawk_API.maximize();
+    }
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -158,7 +165,7 @@ function App() {
               <Route path="/game/:id" element={<GameProfile />} />
               <Route path="/reset-password/:id" element={<ResetPassword />} />
             </Routes>
-            <Footer />
+            {!user && <Footer maxLiveChat={LiveChatMaximize} />}
           </RecoilRoot>
         </BrowserRouter>
       </div>

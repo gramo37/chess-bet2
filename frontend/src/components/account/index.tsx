@@ -55,7 +55,7 @@ export default function Account() {
 
       const data = await response.json();
       alert(data.message);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       alert(error.message || "An error occurred. Please try again.");
       console.error(error);
@@ -63,12 +63,12 @@ export default function Account() {
   }
 
   return (
-    <div className="text-white bg-black max-w-[1000px] min-h-[600px] w-full  m-auto px-4 py-3">
+    <div className="text-white bg-black max-w-full min-h-screen w-full  m-auto px-4 py-3">
       <div className="flex justify-between mx-2 mb-3">
         <button
           className=" p-2 bg-yellow-500 text-white rounded-full shadow-lg"
           onClick={() => {
-            navigate("/");
+            navigate("/game");
           }}
         >
           <IoMdArrowBack size={24} />

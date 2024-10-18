@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { TbMessageReportFilled } from "react-icons/tb";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { BACKEND_URL } from "../../constants/routes";
@@ -105,7 +104,7 @@ export function Report({ token }: ReportProps) {
       onClick={openModal}
       className="flex items-center gap-2 bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition-colors"
     >
-      <TbMessageReportFilled className="text-xl" />
+      Report
     </button>
   );
 }

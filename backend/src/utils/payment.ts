@@ -266,8 +266,8 @@ export async function withdrawalChecks(
       where: {
         OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
         gameOutCome: {
-          not: "ABANDON"
-        }
+          not: "ABANDON",
+        },
       },
     });
 
@@ -416,8 +416,7 @@ export async function updateTransactionChecks(invoice_id: string) {
       }),
       ...((await processCommissionDeposit(
         transaction.transaction.userId,
-        transaction.transaction.finalamountInUSD -
-          transaction.transaction.platform_charges
+        transaction.transaction.finalamountInUSD
       )) || []),
     ]);
 

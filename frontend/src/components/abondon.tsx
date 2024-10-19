@@ -11,10 +11,10 @@ const Abondon = ({ timeLeft }: { timeLeft: number }) => {
   return (
     <>
       {color === "white" && moves.length === 0 && (
-        <p className="text-white">Game will be abondoned in {timeLeft} secs</p>
+        <p className="text-white">Game will be abandoned in {timeLeft} secs</p>
       )}
       {color === "black" && moves.length === 1 && (
-        <p className="text-white">Game will be abondoned in {timeLeft} secs</p>
+        <p className="text-white">Game will be abandoned in {timeLeft} secs</p>
       )}
     </>
   );

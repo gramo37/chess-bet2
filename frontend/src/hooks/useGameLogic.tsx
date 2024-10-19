@@ -45,12 +45,12 @@ export const useGameLogic = () => {
       });
     } else if(result?.gameResult === ABANDON) {
       alertPopUp({
-        message: "Game Abondoned",
+        message: "Game Abandoned",
         type: "success",
         showPopUp: true,
         body: (
           <div className="p-2">
-            Game has been Abondoned because of no activity
+            Game has been Abandoned because of no activity
           </div>
         ),
       });

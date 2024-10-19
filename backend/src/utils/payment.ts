@@ -265,6 +265,9 @@ export async function withdrawalChecks(
     const games = await db.game.count({
       where: {
         OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+        gameOutCome: {
+          not: "ABANDON"
+        }
       },
     });
 

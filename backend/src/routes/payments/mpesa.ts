@@ -28,7 +28,8 @@ router.post("/validate/withdrawal/webhook", updateWithdrawal);
 // TODO: Function is same for below routes. Can be written nicely
 router.post("/validate/transaction", async (req, res) => {
   try {
-    const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
+    const fullUrl = "https" + "://" + req.get("host") + req.originalUrl;
+    // const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     console.log("Building the full URL", fullUrl);
 
     const webhookData = {
@@ -55,7 +56,8 @@ router.post("/validate/transaction", async (req, res) => {
 
 router.post("/validate/withdrawal", async (req, res) => {
   try {
-    const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
+    const fullUrl = "https" + "://" + req.get("host") + req.originalUrl;
+    // const fullUrl = req.protocol + "://" + req.get("host") + req.originalUrl;
     console.log("Building the full URL", fullUrl);
 
     const webhookData = {

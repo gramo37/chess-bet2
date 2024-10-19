@@ -8,6 +8,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER} # The PostgreSQL user (useful to connect to the database)
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # The PostgreSQL password (useful to connect to the database)
       POSTGRES_DB: ${POSTGRES_DB} # The PostgreSQL default database (automatically created at first launch)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Volume to persist database data
+
   redis:
     image: redis:latest
     container_name: my_redis
@@ -114,3 +117,5 @@ services:
       CRYPTO_PAYOUT_API_KEY: ${CRYPTO_PAYOUT_API_KEY}
       CRYTPOMUS_URI: ${CRYTPOMUS_URI}
       BCRYPT_SECRET_KEY: ${BCRYPT_SECRET_KEY}
+volumes:
+  postgres_data:

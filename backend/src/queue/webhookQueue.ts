@@ -40,17 +40,17 @@ webhookQueue.process(async (job) => {
   // }
     try {
       // Adding all the webhook data to DB for debugging purpose
-      await db.webhook.create({
-        // where: {
-        //   api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
-        // },
-        // update: {
-        //   state: job?.data?.payload?.state ?? job?.data?.payload?.status,
-        //   charges: job?.data?.payload?.charges,
-        //   net_amount: job?.data?.payload?.net_amount,
-        //   account: job?.data?.payload?.account,
-        // },
-        data: {
+      await db.webhook.upsert({
+        where: {
+          api_ref: job?.data?.payload?.api_ref ?? job?.data?.payload?.tracking_id,
+        },
+        update: {
+          state: job?.data?.payload?.state ?? job?.data?.payload?.status,
+          charges: job?.data?.payload?.charges,
+          net_amount: job?.data?.payload?.net_amount,
+          account: job?.data?.payload?.account,
+        },
+        create: {
           url: job.data.url,
           job_id: String(job.id),
           invoice_id: job?.data?.payload?.invoice_id,
@@ -73,7 +73,13 @@ webhookQueue.process(async (job) => {
     }
 
   try {
-    const response = await axios.post(job.data.url, job.data.payload, {
+    const instance = axios.create({
+      httpsAgent: new (require('https')).Agent({ 
+        rejectUnauthorized: false  // Disable certificate verification
+      })
+    });
+
+    const response = await instance.post(job.data.url, job.data.payload, {
       headers: { "Content-Type": "application/json" },
     });
     console.log("Webhook processed successfully:", response.status);

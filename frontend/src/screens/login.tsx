@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BACKEND_URL } from "../constants/routes";
 import { useGlobalStore } from "../contexts/global.context";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -127,14 +128,14 @@ export default function Login() {
               >
                 Login
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don’t Have a Account?{" "}
-                <a
-                  href="/signup"
+              <p className="text-sm font-light flex gap-2 text-gray-500 dark:text-gray-400">
+                Don’t Have an Account?
+                <Link
+                  to="/signup"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Sign Up
-                </a>
+                </Link>
               </p>
             </div>
           </div>

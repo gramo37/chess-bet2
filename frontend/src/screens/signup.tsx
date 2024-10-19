@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import { useGlobalStore } from "../contexts/global.context";
-
+import { Link } from "react-router-dom";
 export default function SignUP() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -149,14 +149,14 @@ export default function SignUP() {
               >
                 Sign Up
               </button>
-              <p className="text-sm font-light text-white dark:text-gray-400">
+              <p className="text-sm font-light  flex gap-2 text-white dark:text-gray-400">
                 Already Have an Account?
-                <a
-                  href="/login"
+                <Link
+                  to="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Log In
-                </a>
+                </Link>
               </p>
             </div>
           </div>

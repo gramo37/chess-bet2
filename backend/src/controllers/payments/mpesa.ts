@@ -139,11 +139,6 @@ export const getURL = async (req: Request, res: Response) => {
         });
       }
 
-      // await processCommissionDeposit(
-      //   user.id,
-      //   finalamountInUSD - platform_charges
-      // ); //for referal commission it should work when payment is successful
-
       res.status(200).json({
         message: "Payment request successful",
         paymentDetails: resp.url,
@@ -241,7 +236,7 @@ export const successTransaction = async (req: Request, res: Response) => {
       }),
       ...((await processCommissionDeposit(
         transaction.userId,
-        transaction.finalamountInUSD - transaction.platform_charges
+        transaction.finalamountInUSD
       )) || []), // Process the commission if there's a referrer
     ]);
 
@@ -279,8 +274,6 @@ export const processCommissionDeposit = async (
     const referrerId = user.referredBy[0].referredUserId;
     const referalId = user.referredBy[0].id;
     const commission = amount * 0.03;
-    const finalamountInUSD = await getFinalAmountInUSD(amount, "KES");
-    if (!finalamountInUSD) return;
 
     await db.user.update({
       where: { id: referrerId },
@@ -498,7 +491,12 @@ export const validateTransaction = async (req: Request, res: Response) => {
 
     try {
       if (state === "FAILED") {
-        console.log("Updating DB..", "Transaction", transaction.id, "has been CANCELLED")
+        console.log(
+          "Updating DB..",
+          "Transaction",
+          transaction.id,
+          "has been CANCELLED"
+        );
 
         await db.transaction.update({
           where: { id: transaction.id },
@@ -535,7 +533,13 @@ export const validateTransaction = async (req: Request, res: Response) => {
       }
 
       // Update transaction it as successful
-      console.log("Updating DB and balance by", transaction.finalamountInUSD, "Transaction", transaction.id, "has been COMPLETED")
+      console.log(
+        "Updating DB and balance by",
+        transaction.finalamountInUSD,
+        "Transaction",
+        transaction.id,
+        "has been COMPLETED"
+      );
       await db.$transaction([
         db.user.update({
           where: {
@@ -654,9 +658,14 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
     console.log("Transaction for withdrawal found -> ", transaction);
 
     try {
-      if(status === "Cancelled") {
+      if (status === "Cancelled") {
         console.log("Payment is", status);
-        console.log("Updating DB..", "Transaction", transaction.id, "has been CANCELLED");
+        console.log(
+          "Updating DB..",
+          "Transaction",
+          transaction.id,
+          "has been CANCELLED"
+        );
 
         await db.transaction.update({
           where: {
@@ -696,7 +705,12 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
       }
 
       // Update the status to Success
-      console.log("Updating DB..", "Transaction", transaction.id, "has been COMPLETED")
+      console.log(
+        "Updating DB..",
+        "Transaction",
+        transaction.id,
+        "has been COMPLETED"
+      );
       await db.transaction.update({
         where: {
           // email: user.email,

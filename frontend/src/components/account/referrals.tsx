@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "../spinner";
 import { FaCopy } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 export default function ReferralComponent() {
   const { user, transactions } = usePersonStore();
   const [referralDetails, setReferralDetails] = useState<any>(null);
@@ -177,7 +177,10 @@ export default function ReferralComponent() {
             You can withdraw your referral earnings to your account balance once
             they total $50 or more, with withdrawals available at the end of
             each month. For further details, please{" "}
-            <a href="#">read more here</a>.
+            <Link to="/affliate" className="text-blue-500 hover:underline">
+              read more here
+            </Link>
+            .
           </p>
         </div>
 

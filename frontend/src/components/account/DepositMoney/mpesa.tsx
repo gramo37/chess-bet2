@@ -95,7 +95,7 @@ const Mpesa = ({ paymentMethod }: { paymentMethod: string }) => {
         <div className="p-2">
           <p>
             Kindly note that {["card", "apple"].includes(paymentMethod) ? "$" : "KES "}{0.03 * Number(amount)} will be considered as
-            instasend fees. Therefore the final amount will be {["card", "apple"].includes(paymentMethod) ? "$" : "KES "}
+            IntaSend fees. Therefore the final amount will be {["card", "apple"].includes(paymentMethod) ? "$" : "KES "}
             {1.03 * Number(amount)}. Your balance will be updated by $
             {finalBalance}.
           </p>

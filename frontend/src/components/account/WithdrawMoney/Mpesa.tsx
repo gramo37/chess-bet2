@@ -108,7 +108,7 @@ const Mpesa = () => {
         <div className="p-2">
           <p>
             Kindly note that KES {0.03 * Number(amount)} will be considered as
-            instasend fees. Therefore you will receive KES{" "}
+            IntaSend fees. Therefore you will receive KES{" "}
             {0.97 * Number(amount)}. Your balance will be reduced by $
             {finalBalance}.
           </p>

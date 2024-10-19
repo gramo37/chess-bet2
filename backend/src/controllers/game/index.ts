@@ -18,6 +18,9 @@ export const getUserGameHistory = async (req: Request, res: Response) => {
     const games = await db.game.findMany({
       where: {
         OR: [{ whitePlayerId: userId }, { blackPlayerId: userId }],
+        gameOutCome: {
+          not: "ABANDON"
+        }
       },
       include: {
         whitePlayer: { select: { id: true, name: true } },
@@ -33,6 +36,9 @@ export const getUserGameHistory = async (req: Request, res: Response) => {
     const totalGames = await db.game.count({
       where: {
         OR: [{ whitePlayerId: userId }, { blackPlayerId: userId }],
+        gameOutCome: {
+          not: "ABANDON"
+        }
       },
     });
 

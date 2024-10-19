@@ -3,6 +3,7 @@ import { BACKEND_URL } from "../../../constants/routes";
 import usePersonStore from "../../../contexts/auth";
 import { useState } from "react";
 import { useGlobalStore } from "../../../contexts/global.context";
+import { capitalizeFirstLetter } from "../../../types/utils/utils";
 
 const Mpesa = ({ paymentMethod }: { paymentMethod: string }) => {
   const user = usePersonStore((state) => state.user);
@@ -109,7 +110,7 @@ const Mpesa = ({ paymentMethod }: { paymentMethod: string }) => {
 
   return (
     <div>
-      <h3>Deposit Money using Mpesa</h3>
+      <h3>Deposit Money using {capitalizeFirstLetter(paymentMethod)}</h3>
       <div className="flex gap-2 mt-2 mb-4">
         <input
           type="number"

@@ -498,6 +498,8 @@ export const validateTransaction = async (req: Request, res: Response) => {
 
     try {
       if (state === "FAILED") {
+        console.log("Updating DB..", "Transaction", transaction.id, "has been CANCELLED")
+
         await db.transaction.update({
           where: { id: transaction.id },
           data: {
@@ -533,6 +535,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
       }
 
       // Update transaction it as successful
+      console.log("Updating DB and balance by", transaction.finalamountInUSD, "Transaction", transaction.id, "has been COMPLETED")
       await db.$transaction([
         db.user.update({
           where: {
@@ -651,6 +654,26 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
     console.log("Transaction for withdrawal found -> ", transaction);
 
     try {
+      if(status === "Cancelled") {
+        console.log("Payment is", status);
+        console.log("Updating DB..", "Transaction", transaction.id, "has been CANCELLED");
+
+        await db.transaction.update({
+          where: {
+            // email: user.email,
+            id: transaction.id,
+          },
+          data: {
+            status: "CANCELLED",
+          },
+        });
+
+        return res.status(200).json({
+          message: `Payment is ${status}`,
+          status: "success",
+        });
+      }
+
       // Check if transaction is completed on instasend side or not
       if (status !== "Completed") {
         console.log("Payment is", status);
@@ -673,6 +696,7 @@ export const updateWithdrawal = async (req: Request, res: Response) => {
       }
 
       // Update the status to Success
+      console.log("Updating DB..", "Transaction", transaction.id, "has been COMPLETED")
       await db.transaction.update({
         where: {
           // email: user.email,

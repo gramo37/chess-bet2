@@ -32,14 +32,15 @@ export default function Game() {
   } = useSocketHandler();
   useGameLogic();
 
-  const { setChatVisibility } = useChatStore();
+const { setChatVisibility, isTawkLoaded } = useChatStore();
+  
   useEffect(() => {
     setChatVisibility(false);
     return () => {
       setChatVisibility(true);
-    };
-  }, []);
-
+    }
+}, [isTawkLoaded, setChatVisibility]);
+  
   return (
     <div className="min-h-screen flex flex-col max-w-full m-auto items-center justify-center bg-black p-0 sm:p-4">
       <div className="flex flex-col lg:flex-row bg-gray rounded-lg shadow-lg overflow-hidden w-full">

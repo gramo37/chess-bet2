@@ -67,12 +67,16 @@ const usePersonStore = create<State & Action>((set) => ({
 
 type ChatStore = {
   isChatVisible: boolean;
+  isTawkLoaded: boolean,
+  setTawkLoaded: (visible: boolean) => void;
   toggleChat: () => void;
   setChatVisibility: (visible: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>((set) => ({
   isChatVisible: true,
+  isTawkLoaded: false,
+  setTawkLoaded:(visible:boolean)=>set({isTawkLoaded:visible}),
   toggleChat: () => set((state) => ({ isChatVisible: !state.isChatVisible })),
   setChatVisibility: (visible: boolean) => set({ isChatVisible: visible }),
 }));

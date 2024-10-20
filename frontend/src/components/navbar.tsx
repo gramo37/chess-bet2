@@ -18,15 +18,15 @@ export default function NavBar() {
   return (
     <nav className="bg-white w-full shadow-md" id="nav">
       <div className="flex justify-between items-center max-w-7xl mx-auto py-3 px-4">
-        <a
-          href="/"
+        <Link
+          to="/"
           className="relative text-black hover:text-yellow-500 transition-colors duration-300"
         >
           <span className="text-2xl font-extrabold">ProChesser</span>
           <span className="block text-sm font-medium absolute -bottom-3 -right-3 text-gray-500">
             Gamer
           </span>
-        </a>
+        </Link>
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -172,13 +172,13 @@ export default function NavBar() {
                       </Link>
                     </li>
                     <li>
-                      <a
-                        href="/signup"
+                      <Link
+                        to="/signup"
                         className="block text-black hover:text-yellow-500"
                         onClick={() => setSubmenuOpen(false)}
                       >
                         Gamers Account
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </div>
@@ -290,13 +290,13 @@ export default function NavBar() {
                     </Link>
                   </li>
                   <li>
-                    <a
-                      href="/login"
+                    <Link
+                      to="/login"
                       className="block text-black hover:text-yellow-500"
                       onClick={toggleMenu}
                     >
                       Gamers
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               )}

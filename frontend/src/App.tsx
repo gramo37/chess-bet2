@@ -19,7 +19,7 @@ import PopUp from "./components/popup";
 import NavBar from "./components/navbar";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 import usePersonStore, { useChatStore } from "./contexts/auth";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import HowItWorks from "./components/howitworks";
 import Rules from "./components/rules";
 import HomePage from "./components/learners/Homepage";
@@ -38,32 +38,19 @@ import ScrollToTop from "./components/scrolltop";
 const queryClient = new QueryClient();
 
 function App() {
-  const { isChatVisible, setChatVisibility } = useChatStore();
+  const { isChatVisible,isTawkLoaded,setTawkLoaded} = useChatStore();
   const tawkMessengerRef = useRef(null);
-  const [tawkLoaded, setTawkLoaded] = useState(false);
   const user = usePersonStore((state) => state.user);
 
-  // Listen for the Tawk.to widget load event
   useEffect(() => {
-    const handleLoad = () => {
-      setTawkLoaded(true);
-    };
-    window.addEventListener("tawkLoad", handleLoad);
-  }, []);
-
-  useEffect(() => {
-    if (tawkLoaded && window.Tawk_API) {
-      if (isChatVisible) {
-        window.Tawk_API.showWidget();
-      } else {
-        window.Tawk_API.hideWidget();
-      }
-    }
-  }, [isChatVisible, setChatVisibility]);
+    if (!isTawkLoaded) return;
+    if (isChatVisible) window.Tawk_API.showWidget()
+    else window.Tawk_API.hideWidget();
+  }, [isChatVisible, isTawkLoaded]);
 
   function LiveChatMaximize() {
-    if (tawkLoaded && window.Tawk_API) {
-      window.Tawk_API.maximize();
+    if (isTawkLoaded && window.Tawk_API) {
+      window.Tawk_API.toggle();
     }
   }
 
@@ -73,7 +60,7 @@ function App() {
         <TawkMessengerReact
           propertyId="6706978802d78d1a30eefdb7"
           widgetId="1i9s2li2d"
-          onLoad={() => window.dispatchEvent(new Event("tawkLoad"))}
+          onLoad={() => setTawkLoaded(true)}
           ref={tawkMessengerRef}
         />
         <PopUp />

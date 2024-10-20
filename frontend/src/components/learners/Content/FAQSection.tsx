@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const FaqsSection = () => {
   const faqs = [
     {
@@ -65,9 +67,9 @@ const FaqsSection = () => {
         ))}
       </div>
       <div className="text-center mt-8">
-        <a href="/signup" className="bg-yellow-600 text-white py-2 px-4 rounded-full hover:text-white hover:bg-yellow-700 transition duration-300">
+        <Link to="/signup" className="bg-yellow-600 text-white py-2 px-4 rounded-full hover:text-white hover:bg-yellow-700 transition duration-300">
           Sign Up and Start Your Journey Today
-        </a>
+        </Link>
       </div>
     </section>
   );

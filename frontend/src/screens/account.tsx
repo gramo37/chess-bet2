@@ -3,14 +3,18 @@ import Account from "../components/account";
 import { useChatStore } from "../contexts/auth";
 
 const AccountPage = () => {
-  const { setChatVisibility } = useChatStore();
+  
+  
+const { setChatVisibility, isTawkLoaded } = useChatStore();
+  
   useEffect(() => {
     setChatVisibility(false);
     return () => {
       setChatVisibility(true);
-    };
-  }, []);
-
+    }
+}, [isTawkLoaded, setChatVisibility]);
+  
+  
   return <Account />;
 };
 

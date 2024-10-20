@@ -2,19 +2,21 @@ import { useEffect, useState } from "react";
 import { ReportsList } from "../admin/component/report";
 import { Users } from "../admin/component/users";
 import fetchData  from "../admin/fetch/fetchdata";
+import { useChatStore } from "../../contexts/auth";
 
 
 export default function ModratorDashboard(){
     const [users, setUsers] = useState([])
     const [activeTab, setActiveTab] = useState<string>("reports");
   const [reports, setReports] = useState([]);
-        
+  const { setChatVisibility } = useChatStore();      
   useEffect(() => {
     async function getdata() {
       const fetchedReports = await fetchData('reports');
       const fetchedUsers = await fetchData('users');
       setReports(fetchedReports);
       setUsers(fetchedUsers)
+      setChatVisibility(false);
     }
 
     getdata();

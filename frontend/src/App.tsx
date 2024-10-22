@@ -19,7 +19,7 @@ import PopUp from "./components/popup";
 import NavBar from "./components/navbar";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 import usePersonStore, { useChatStore } from "./contexts/auth";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import HowItWorks from "./components/howitworks";
 import Rules from "./components/rules";
 import HomePage from "./components/learners/Homepage";
@@ -34,23 +34,37 @@ import AffiliateProgram from "./components/learners/AffiliateProgram";
 import PrivacyPolicy from "./components/learners/privacy";
 import TermsOfService from "./components/learners/termsofservices";
 import ScrollToTop from "./components/scrolltop";
+// import PaypalPage from "./components/account/DepositMoney/paypal";
 
 const queryClient = new QueryClient();
 
 function App() {
-  const { isChatVisible,isTawkLoaded,setTawkLoaded} = useChatStore();
+  const { isChatVisible, setChatVisibility } = useChatStore();
   const tawkMessengerRef = useRef(null);
+  const [tawkLoaded, setTawkLoaded] = useState(false);
   const user = usePersonStore((state) => state.user);
 
+  // Listen for the Tawk.to widget load event
   useEffect(() => {
-    if (!isTawkLoaded) return;
-    if (isChatVisible) window.Tawk_API.showWidget()
-    else window.Tawk_API.hideWidget();
-  }, [isChatVisible, isTawkLoaded]);
+    const handleLoad = () => {
+      setTawkLoaded(true);
+    };
+    window.addEventListener("tawkLoad", handleLoad);
+  }, []);
+
+  useEffect(() => {
+    if (tawkLoaded && window.Tawk_API) {
+      if (isChatVisible) {
+        window.Tawk_API.showWidget();
+      } else {
+        window.Tawk_API.hideWidget();
+      }
+    }
+  }, [isChatVisible, setChatVisibility]);
 
   function LiveChatMaximize() {
-    if (isTawkLoaded && window.Tawk_API) {
-      window.Tawk_API.toggle();
+    if (tawkLoaded && window.Tawk_API) {
+      window.Tawk_API.maximize();
     }
   }
 
@@ -60,7 +74,7 @@ function App() {
         <TawkMessengerReact
           propertyId="6706978802d78d1a30eefdb7"
           widgetId="1i9s2li2d"
-          onLoad={() => setTawkLoaded(true)}
+          onLoad={() => window.dispatchEvent(new Event("tawkLoad"))}
           ref={tawkMessengerRef}
         />
         <PopUp />
@@ -139,6 +153,7 @@ function App() {
               />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/" element={<HomePage />} />
+              {/* <Route path="/payment" element={<PaypalPage />} /> */}
               <Route path="/about" element={<About />} />
               <Route path="/faqs" element={<FAQ />} />
               <Route path="/blog" element={<Blog />} />

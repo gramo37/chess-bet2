@@ -17,6 +17,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@paypal/react-paypal-js": "^8.7.0",
     "@tanstack/react-query": "^5.35.1",
     "@tawk.to/tawk-messenger-react": "^2.0.2",
     "axios": "^1.6.8",

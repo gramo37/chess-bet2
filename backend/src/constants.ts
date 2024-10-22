@@ -26,6 +26,11 @@ export const CRYPTO_PAYMENT_API_KEY = process.env.CRYPTO_PAYMENT_API_KEY ?? ""
 export const CRYPTO_PAYOUT_API_KEY = process.env.CRYPTO_PAYOUT_API_KEY ?? ""
 export const CRYTPOMUS_URI = process.env.CRYTPOMUS_URI ?? "https://api.cryptomus.com/v1"
 
+// Paypal related constants
+export const PAYPAL_BASE = process.env.PAYPAL_BASE ?? "https://api-m.sandbox.paypal.com"
+export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID ?? "12348564523212"
+export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET ?? "7784412123"
+
 export const BINANCE_SECRET_KEY = process.env.BINANCE_SECRET_KEY ?? "";
 export const BINANCE_API_KEY = process.env.BINANCE_API_KEY ?? ""
 

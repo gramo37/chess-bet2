@@ -342,6 +342,7 @@ export class Game {
           color: this.gameId ? this.player1.getPlayerColor() : WHITE,
           opponent: {
             name: this.getPlayer2().getPlayerName(),
+            rating: this.getPlayer2().getPlayerRating()
           },
           player: {
             name: this.getPlayer1().getPlayerName(),
@@ -361,6 +362,7 @@ export class Game {
           color: this.gameId ? this.player2.getPlayerColor() : BLACK,
           opponent: {
             name: this.getPlayer1().getPlayerName(),
+            rating: this.getPlayer1().getPlayerRating()
           },
           player: {
             name: this.getPlayer2().getPlayerName(),
@@ -387,6 +389,7 @@ export class Game {
         sans: this.sans,
         opponent: {
           name: this.getPlayer2().getPlayerName(),
+          rating: this.getPlayer2().getPlayerRating()
         },
         player: {
           name: this.getPlayer1().getPlayerName(),
@@ -409,6 +412,7 @@ export class Game {
         sans: this.sans,
         opponent: {
           name: this.getPlayer1().getPlayerName(),
+          rating: this.getPlayer1().getPlayerRating()
         },
         player: {
           name: this.getPlayer2().getPlayerName(),

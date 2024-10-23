@@ -18,9 +18,9 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple regex for email valid
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { username, name, password, referral } = req.body;
+    const { username, name, password, referral, email, country } = req.body;
 
-    if (!emailRegex.test(username)) {
+    if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format." });
     }
     console.log(password);
@@ -34,12 +34,16 @@ export const signup = async (req: Request, res: Response) => {
     }
     const existingUser = await db.user.findFirst({
       where: {
-        email: username.toLowerCase(),
+        OR: [{ email: email.toLowerCase() }, { username }],
       },
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      if(existingUser.email === email)
+        return res.status(400).json({ message: "Email already exists" });
+
+      if(existingUser.username === username)
+        return res.status(400).json({ message: "Username already exists" });
     }
 
     let referrer: any;
@@ -60,10 +64,12 @@ export const signup = async (req: Request, res: Response) => {
       const referalToken = await generateReferralTokenUrlFriendly();
       const newUser = await db.user.create({
         data: {
-          email: username.toLowerCase(),
+          email: email.toLowerCase(),
           password: hashPassword,
           name: name,
           referralId: referalToken,
+          username,
+          country,
         },
       });
 
@@ -96,7 +102,7 @@ export const signup = async (req: Request, res: Response) => {
     });
 
     const token = generateToken({ id: result.id, email: result.email });
-    EmailVerification(username, name);
+    EmailVerification(email, name);
     res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error:", error);

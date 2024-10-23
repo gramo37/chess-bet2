@@ -16,6 +16,8 @@ model User {
   id                 String              @id @default(cuid())
   name               String
   email              String              @unique
+  username           String?             @unique
+  country            String?             @default("United States")
   emailVerified      DateTime?
   password           String
   gamesAsWhite       Game[]              @relation("GamesAsWhite")
@@ -74,10 +76,10 @@ model Transaction {
   @@index([userId])
 }
 
-model NewsletterSubscriber{
-  id            String  @id @default(cuid())
-  email         String  @unique
-  date          DateTime  @default(now())
+model NewsletterSubscriber {
+  id    String   @id @default(cuid())
+  email String   @unique
+  date  DateTime @default(now())
 }
 
 model Webhook {

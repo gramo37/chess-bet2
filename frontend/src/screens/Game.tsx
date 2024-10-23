@@ -47,7 +47,7 @@ const { setChatVisibility, isTawkLoaded } = useChatStore();
         <div className="w-full relative lg:w-1/2 p-16 lg:p-20 flex flex-col items-center">
           <div className="flex justify-between w-full items-end">
             <h2 className="text-xl font-bold text-gray-300">
-              {opponent?.name ?? ""} <span className="text-sm italic text-gray-100">( {opponent?.rating ?? ""} )</span>
+              {opponent?.name ?? ""} {opponent?.rating && <span className="text-sm italic text-gray-100">( {opponent?.rating ?? ""} )</span>}
             </h2>
             <TimeLeft
               timeLeft={

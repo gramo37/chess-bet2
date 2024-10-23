@@ -25,6 +25,7 @@ type Move = TMove & {
 
 type Player = {
   name: string;
+  rating: string;
 };
 
 type TAction = {

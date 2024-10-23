@@ -22,10 +22,15 @@ export default function NavBar() {
           to="/"
           className="relative text-black hover:text-yellow-500 transition-colors duration-300"
         >
-          <span className="text-2xl font-extrabold">ProChesser</span>
-          <span className="block text-sm font-medium absolute -bottom-3 -right-3 text-gray-500">
-            Gamer
-          </span>
+          <div className="flex">
+            <img width={50} height={50} src="/piece.png" />
+            <div className="flex flex-col items-end justify-center relative">
+              <span className="text-2xl font-extrabold mr-3">ProChesser</span>
+              <span className="text-sm font-medium text-gray-500 absolute bottom-1">
+                Gamer
+              </span>
+            </div>
+          </div>
         </Link>
 
         <button

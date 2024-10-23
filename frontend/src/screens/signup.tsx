@@ -3,15 +3,24 @@ import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import { useGlobalStore } from "../contexts/global.context";
 import { Link } from "react-router-dom";
+
+const countries = ["United States", "Kenya"];
+
 export default function SignUP() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [username, setUserName] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [password, setPassword] = useState("");
   const [referral, setReferral] = useState("");
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
 
+  const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCountry(event.target.value);
+  };
+
   async function onclick() {
-    if (!email || !name || !password) {
+    if (!email || !name || !password || !selectedCountry || !username) {
       alertPopUp({
         message: "Error",
         type: "Error",
@@ -26,10 +35,12 @@ export default function SignUP() {
       const response = await axios.post(
         url,
         {
-          username: email.toLowerCase(),
+          email: email.toLowerCase(),
           name: name,
           password: password,
           referral: referral,
+          country: selectedCountry,
+          username,
         },
         {
           headers: {
@@ -67,7 +78,7 @@ export default function SignUP() {
 
   return (
     <section className="w-full bg-black py-5 text-black mx-auto">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[500px] lg:py-0">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
         <div className="w-full rounded-lg  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-2xl font-bold mb-6 text-center text-yellow-500">
@@ -93,7 +104,41 @@ export default function SignUP() {
               </div>
               <div className="mb-3">
                 <label
+                  htmlFor="password"
+                  className="block text-white text-sm font-bold mb-2"
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <label
                   htmlFor="username"
+                  className="block text-white text-sm font-bold mb-2"
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  placeholder="Username"
+                  required
+                  value={username}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <label
+                  htmlFor="name"
                   className="block text-white text-sm font-bold mb-2"
                 >
                   Your Name
@@ -110,20 +155,33 @@ export default function SignUP() {
               </div>
               <div className="mb-3">
                 <label
-                  htmlFor="password"
+                  htmlFor="country"
                   className="block text-white text-sm font-bold mb-2"
                 >
-                  Password
+                  Country
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
+                <select
+                  id="country"
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  className="border p-2 rounded-md"
+                >
+                  <option value="">-- Select a Country --</option>
+                  {countries.map((country, index) => (
+                    <option key={index} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
+                {/* <input
+                  type="text"
+                  name="country"
                   className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:border-yellow-500"
+                  placeholder="Username"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                /> */}
               </div>
               <div className="mb-3">
                 <label

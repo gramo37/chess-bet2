@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../spinner";
 
-const BLOG_API_LINK = "https://chess-bet2.onrender.com";
-const TEST_API_LINK = "https://cfg8st-3002.csb.app";
+const deploy = true;
+const BLOG_API_LINK = deploy
+  ? "https://chess-bet2.onrender.com"
+  : "https://cfg8st-3002.csb.app";
 
-export default function BlogPost() {
-  const { id } = useParams();
+const BlogContent = () => {
+  const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,23 +29,28 @@ export default function BlogPost() {
     fetchPost();
   }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="bg-black">
+      <div className="flex justify-center items-center h-screen bg-black">
         <Spinner />
       </div>
     );
-  if (error) return <div className="text-center text-red-500">{error}</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>;
+  }
+
   if (!post) return null;
 
   return (
-    <div className="max-w-[95$] w-[700px] mx-auto p-6 border rounded-lg shadow-lg">
+    <div className="max-w-[70%] mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow-lg">
       <img
         src={`${BLOG_API_LINK}${post.postImage.url}`}
         alt={post.postImage.alt || "Blog Post Image"}
-        className="w-full h-auto max-h-[500px] rounded-md mb-4"
+        className="w-full max-h-[500px] rounded-md mb-4"
       />
-      <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+      <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
       <p className="text-gray-600 mb-4">{post.postMeta.description}</p>
       <p className="text-gray-500 mb-4 italic">
         Keywords: {post.postMeta.keywords}
@@ -68,47 +75,94 @@ export default function BlogPost() {
           ))}
         </div>
       ))}
+
+      <OtherBlogs />
     </div>
   );
-}
+};
+
+const OtherBlogs = () => {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get(`${BLOG_API_LINK}/api/posts?limit=3`);
+        setPosts(response.data.docs);
+      } catch (error: any) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  if (loading) return <Spinner />;
+  if (error) return <div className="text-red-500">{error}</div>;
+
+  return (
+    <div className="mt-10">
+      <h2 className="text-2xl font-bold mb-4">Recent Posts</h2>
+      <div className="flex flex-wrap justify-center  gap-4">
+        {posts.map((post, i) => (
+          <ContainerBlog key={i} post={post} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ContainerBlog: React.FC<{ post: any }> = ({ post }) => {
+  return (
+    <a href={`/blog/${post.id}`} className="w-[330px]">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 mb-4">
+        <img
+          className="w-full h-48 object-cover"
+          src={`${BLOG_API_LINK}${post.postImage.url}`}
+          alt={post.postImage.alt}
+        />
+        <div className="p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            {post.title}
+          </h2>
+          <p className="text-gray-600 mb-2">
+            {post.postMeta.description.length > 70
+              ? `${post.postMeta.description.substring(0, 70)}...`
+              : post.postMeta.description}
+          </p>
+          <p className="text-sm text-gray-500">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+    </a>
+  );
+};
 
 const Type = ({ child, childIndex }: { child: any; childIndex: number }) => {
-  console.log(child.type);
-
   const renderChildren = () =>
     child.children.map((c: any, i: number) => (
       <Layout key={i} child={c} childIndex={i + childIndex} />
     ));
 
-  const renderIndent = () => {
-    console.log(child);
-    return child.children.map((children: any, i: number) =>
-      children.children.map((c: any, j: number) => (
-        <Layout key={`${i}-${j}`} child={c} childIndex={j + childIndex} />
-      ))
-    );
-  };
-
   switch (child.type) {
     case "upload":
       return (
         <img
-          src={`https://cfg8st-3002.csb.app${child.value.url}`}
+          src={`${BLOG_API_LINK}${child.value.url}`}
           alt={child.value.alt || "Image"}
           className="w-full h-auto max-w-full max-h-[300px] rounded-md mb-4"
         />
       );
     case "h1":
-      return (
-        <h1 className="text-3xl font-bold text-normal mb-4">
-          {renderChildren()}
-        </h1>
-      );
+      return <h1 className="text-3xl font-bold mb-4">{renderChildren()}</h1>;
     case "h2":
       return (
-        <h2 className="text-2xl font-semibold text-normal mb-3">
-          {renderChildren()}
-        </h2>
+        <h2 className="text-2xl font-semibold mb-3">{renderChildren()}</h2>
       );
     case "h3":
       return <h3 className="text-xl font-medium mb-2">{renderChildren()}</h3>;
@@ -129,7 +183,7 @@ const Type = ({ child, childIndex }: { child: any; childIndex: number }) => {
         </ol>
       );
     case "indent":
-      return <div className="w-full pl-6 mb-4">{renderIndent()}</div>;
+      return <div className="w-full pl-6 mb-4">{renderChildren()}</div>;
     default:
       return null;
   }
@@ -139,7 +193,6 @@ const Layout = ({ child, childIndex }: { child: any; childIndex: number }) => {
   if (child.type === "link" && child.url) {
     return (
       <a
-        key={childIndex}
         href={child.url}
         target="_blank"
         rel="noopener noreferrer"
@@ -171,15 +224,12 @@ const BlogText = ({ child }: { child: any }) => {
   if (child.bold) {
     content = <strong>{content}</strong>;
   }
-
   if (child.italic) {
     content = <em>{content}</em>;
   }
-
   if (child.strikethrough) {
     content = <s>{content}</s>;
   }
-
   if (child.code) {
     content = (
       <code className="bg-gray-100 text-red-500 p-1 rounded-md break-words">
@@ -190,3 +240,5 @@ const BlogText = ({ child }: { child: any }) => {
 
   return <>{content}</>;
 };
+
+export default BlogContent;

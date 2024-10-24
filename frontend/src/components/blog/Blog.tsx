@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Spinner from "../spinner";
 
 const BlogPost = ({ post }: { post: any }) => {
   return (
@@ -45,7 +46,12 @@ const Blog = () => {
       });
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className="bg-black">
+        <Spinner />
+      </div>
+    );
   if (error) return <p>Error loading posts: {error.message}</p>;
 
   return (

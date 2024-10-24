@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Spinner from "../spinner";
 
+const BLOG_API_LINK = "https://chess-bet2.onrender.com";
+const TEST_API_LINK = "https://cfg8st-3002.csb.app";
 const BlogPost = ({ post }: { post: any }) => {
   return (
     <a href={`blog/${post.id}`}>
       <div className="bg-white border border-gray-200 max-w-full w-[330px] hover:cursor-pointer  rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105 mb-4">
         <img
           className="w-full h-48 object-cover"
-          src={`https://cfg8st-3002.csb.app${post.postImage.url}`}
+          src={`${BLOG_API_LINK}${post.postImage.url}`}
           alt={post.postImage.alt}
         />
         <div className="p-6">
@@ -34,7 +36,7 @@ const Blog = () => {
   useEffect(() => {
     // Update this URL to match your server's address
     axios
-      .get("https://cfg8st-3002.csb.app/api/posts")
+      .get(`${BLOG_API_LINK}/api/posts`)
       .then((response: any) => {
         console.log(response.data);
         setPosts(response.data);

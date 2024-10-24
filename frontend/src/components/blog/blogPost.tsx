@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../spinner";
 
+const BLOG_API_LINK = "https://chess-bet2.onrender.com";
+const TEST_API_LINK = "https://cfg8st-3002.csb.app";
+
 export default function BlogPost() {
   const { id } = useParams();
   const [post, setPost] = useState<any>(null);
@@ -12,9 +15,7 @@ export default function BlogPost() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(
-          `https://cfg8st-3002.csb.app/api/posts/${id}`
-        );
+        const response = await axios.get(`${BLOG_API_LINK}/api/posts/${id}`);
         setPost(response.data);
       } catch (err) {
         setError("Failed to fetch post.");
@@ -38,7 +39,7 @@ export default function BlogPost() {
   return (
     <div className="max-w-[95$] w-[700px] mx-auto p-6 border rounded-lg shadow-lg">
       <img
-        src={`https://cfg8st-3002.csb.app${post.postImage.url}`}
+        src={`${BLOG_API_LINK}${post.postImage.url}`}
         alt={post.postImage.alt || "Blog Post Image"}
         className="w-full h-auto max-h-[500px] rounded-md mb-4"
       />

@@ -3,8 +3,7 @@ import { BACKEND_URL } from "../constants/routes";
 import axios from "axios";
 import { useGlobalStore } from "../contexts/global.context";
 import { Link } from "react-router-dom";
-
-const countries = ["United States", "Kenya"];
+import { getNames } from 'country-list';
 
 export default function SignUP() {
   const [email, setEmail] = useState("");
@@ -14,6 +13,7 @@ export default function SignUP() {
   const [password, setPassword] = useState("");
   const [referral, setReferral] = useState("");
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
+  const countries = getNames();
 
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCountry(event.target.value);
@@ -164,7 +164,7 @@ export default function SignUP() {
                   id="country"
                   value={selectedCountry}
                   onChange={handleCountryChange}
-                  className="border p-2 rounded-md"
+                  className="border p-2 rounded-md w-full"
                 >
                   <option value="">-- Select a Country --</option>
                   {countries.map((country, index) => (

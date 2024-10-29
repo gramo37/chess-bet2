@@ -6,41 +6,46 @@ const MainOptions = () => {
     "setType",
     "setGameId",
   ]);
+
   return (
-    <>
-      <div className="space-y-2">
-        <button
-          onClick={() => setType("friend")}
-          className={`btn m-2 p-2 ${
-            type === "friend" ? "bg-yellow-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          Friendly Match
-        </button>
-        <button
-          onClick={() => {
-            setType("random");
-            setGameId("");
-          }}
-          className={`btn m-2 p-2 ${
-            type === "random" ? "bg-yellow-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          Play Random
-        </button>
-        <button
-          onClick={() => {
-            setType("lobby");
-            setGameId("");
-          }}
-          className={`btn m-2 p-2 ${
-            type === "lobby" ? "bg-yellow-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          Choose Your Opponent
-        </button>
-      </div>
-    </>
+    <div className="flex flex-col md:flex-row justify-around w-full gap-3 rounded-lg">
+      <button
+        onClick={() => setType("friend")}
+        className={`py-2 px-4 rounded-lg w-full md:w-auto transition-colors duration-200 ${
+          type === "friend"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-300 text-black hover:bg-gray-400"
+        }`}
+      >
+        Friendly Match
+      </button>
+      <button
+        onClick={() => {
+          setType("random");
+          setGameId("");
+        }}
+        className={`py-2 px-4 rounded-lg w-full md:w-auto transition-colors duration-200 ${
+          type === "random"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-300 text-black hover:bg-gray-400"
+        }`}
+      >
+        Play Random
+      </button>
+      <button
+        onClick={() => {
+          setType("lobby");
+          setGameId("");
+        }}
+        className={`py-2 px-4 rounded-lg w-full md:w-auto transition-colors duration-200 ${
+          type === "lobby"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-300 text-black hover:bg-gray-400"
+        }`}
+      >
+        Choose Your Opponent
+      </button>
+    </div>
   );
 };
 

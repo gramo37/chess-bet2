@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useState } from "react";
 import { useGameStore } from "../../../contexts/game.context";
 import { useMutation } from "@tanstack/react-query";
@@ -33,7 +31,6 @@ const Lobby = () => {
 
   const { isPending, isError, isSuccess, mutate } = useMutation({
     mutationFn: async () => {
-      // TODO: Send token and stake
       const res = await axios.get(`${WS_BACKEND_URL}/open_games`, {
         params: {
           token: user?.token,
@@ -43,10 +40,10 @@ const Lobby = () => {
       if (res && res?.data && res?.data?.games) setOpponents(res.data.games);
     },
   });
+
   const getOpponents = () => {
     setGameId(null);
     setStake(10);
-    // Make an API call to get all players matching current users rating, stake and type should not be friendly
     mutate();
   };
 
@@ -55,7 +52,7 @@ const Lobby = () => {
     setIsGameStarted(true);
     setResult(null);
     setColor(null);
-    socket?.send(
+    socket.send(
       JSON.stringify({
         type: INIT_GAME,
       })
@@ -65,10 +62,13 @@ const Lobby = () => {
   return (
     <>
       <button
-        className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
-          socket === null && "bg-gray-500"
-        }`}
         onClick={getOpponents}
+        className={`w-full py-2 px-4 rounded focus:outline-none mb-4
+          ${
+            socket
+              ? "bg-yellow-700 hover:bg-yellow-600 focus:bg-yellow-600 text-gray-300"
+              : "bg-gray-500 cursor-not-allowed text-gray-400"
+          }`}
       >
         Find Opponents
       </button>
@@ -78,37 +78,33 @@ const Lobby = () => {
         {isError && <p className="text-white">Something went wrong</p>}
         {!isPending && opponents.length > 0 && (
           <div className="flex flex-col items-start w-full">
-            <h3 className="text-white text-lg text-left mb-2">
-              Select Your Opponent
-            </h3>
+            <h3 className="text-white text-lg mb-2">Select Your Opponent</h3>
             <div className="w-full">
-              {opponents.map((opponent: any) => {
-                return (
-                  <div
-                    key={opponent.id}
-                    className="flex items-center justify-between p-4 border rounded-lg shadow-sm w-full my-2"
-                  >
-                    <div className="flex justify-center items-center w-full">
-                      <input
-                        type="radio"
-                        className="form-checkbox h-5 w-5 cursor-pointer text-indigo-600 mr-3"
-                        checked={opponent.gameId === gameId}
-                        onChange={() => {
-                          setGameId(opponent.gameId);
-                          setStake(opponent.stake);
-                        }}
-                      />
-                      <div className="flex justify-center items-center gap-3 w-full text-white">
-                        <p className="font-medium">{opponent.player1.name}</p>
-                        <p className="text-sm ">
-                          Rating: {opponent.player1.rating}
-                        </p>
-                        <p className="text-sm ">Stake: ${opponent.stake}</p>
-                      </div>
+              {opponents.map((opponent: any) => (
+                <div
+                  key={opponent.id}
+                  className="flex items-center justify-between p-4 border rounded-lg shadow-sm w-full mb-2"
+                >
+                  <div className="flex items-center w-full">
+                    <input
+                      type="radio"
+                      className="form-checkbox h-5 w-5 text-indigo-600 mr-3 cursor-pointer"
+                      checked={opponent.gameId === gameId}
+                      onChange={() => {
+                        setGameId(opponent.gameId);
+                        setStake(opponent.stake);
+                      }}
+                    />
+                    <div className="text-white flex-1">
+                      <p className="font-medium">{opponent.player1.name}</p>
+                      <p className="text-sm">
+                        Rating: {opponent.player1.rating}
+                      </p>
+                      <p className="text-sm">Stake: ${opponent.stake}</p>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -118,11 +114,14 @@ const Lobby = () => {
       </div>
       {gameId && (
         <button
-          disabled={socket === null}
           onClick={startGame}
-          className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
-            socket === null && "bg-gray-500"
-          }`}
+          className={`w-full py-2 px-4 rounded focus:outline-none mt-4
+            ${
+              socket
+                ? "bg-yellow-700 hover:bg-yellow-600 focus:bg-yellow-600 text-gray-300"
+                : "bg-gray-500 cursor-not-allowed text-gray-400"
+            }`}
+          disabled={!socket}
         >
           Play
         </button>

@@ -59,7 +59,7 @@ const INITIAL_STATE = {
   stake: 10,
   type: "random",
   gameId: "",
-  gameTime: 300
+  gameTime: 300,
 };
 
 // Create your store, which includes both state and (optionally) actions
@@ -102,8 +102,8 @@ export const useStore = create<TGameState>((set) => ({
     set({ gameId });
   },
   setGameTime: (gameTime: number) => {
-    set({gameTime})
-  }
+    set({ gameTime });
+  },
 }));
 
 export const useGameStore = (value?: Array<keyof TGameState>) => {

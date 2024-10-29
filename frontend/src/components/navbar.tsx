@@ -17,7 +17,7 @@ export default function NavBar() {
 
   return (
     <nav className="bg-white w-full shadow-md" id="nav">
-      <div className="flex justify-between items-center max-w-7xl mx-auto py-3 px-4">
+      <div className="flex justify-between items-center max-w-7xl mx-auto py-1 px-4">
         <Link
           to="/"
           className="relative text-black hover:text-yellow-500 transition-colors duration-300"

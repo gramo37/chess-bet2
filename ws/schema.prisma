@@ -87,6 +87,9 @@ model Webhook {
   job_id        String?
   url           String?
   invoice_id    String?
+  checkout_id   String?
+  actually_paid String?
+  pay_address   String?
   state         String?
   provider      String?
   charges       String?

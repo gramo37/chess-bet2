@@ -154,7 +154,7 @@ function App() {
               />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/" element={<HomePage />} />
-              {/* <Route path="/payment" element={<PaypalPage />} /> */}
+              {/* <Route path="/paypal" element={<PaypalPage />} /> */}
               <Route path="/about" element={<About />} />
               <Route path="/faqs" element={<FAQ />} />
               <Route path="/blog" element={<Blog />} />

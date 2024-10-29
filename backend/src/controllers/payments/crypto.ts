@@ -90,6 +90,7 @@ function matchTransactions(dbTransactions: any[], transactions: any[]) {
   return dbTransactions;
 }
 
+// Cron to check status every 15 minutes
 export const checkTransactionStatus = async () => {
   try {
     // Get all successful transactions for past 15 mins
@@ -184,6 +185,122 @@ export const checkTransactionStatus = async () => {
   } catch (error) {
     console.error("Currency conversion error:", error);
     throw new Error("Unable to convert currency.");
+  }
+};
+
+export const checkTransactionStatus2 = async (req: Request, res: Response) => {
+  try {
+    const { txId } = req.body;
+    const user: any = (req?.user as any)?.user;
+
+    if (!txId)
+      return res.status(400).json({
+        status: "error",
+        message: "Please provide a transaction id",
+      });
+    // Get all successful transactions for past 15 mins
+    const currentTime = Date.now();
+    // Set the start time to 1 day ago
+    const dayAgo = currentTime - 24 * 60 * 60 * 1000;
+
+    if (NODE_ENV === "development")
+      console.log("Secret Token", BINANCE_API_KEY, BINANCE_SECRET_KEY);
+
+    const Binance = require("binance-api-node").default;
+    const client = Binance({
+      apiKey: BINANCE_API_KEY,
+      apiSecret: BINANCE_SECRET_KEY,
+    });
+
+    const dayTransactions = await client.depositHistory({
+      status: 1,
+      startTime: dayAgo,
+      endTime: currentTime,
+    });
+    const transactions = await client.depositHistory({
+      status: 1,
+    });
+    console.log("Today's transaction", dayTransactions)
+
+    console.log(
+      `Success Transactions between ${new Date(dayAgo)} and ${new Date(
+        currentTime
+      )}`
+    );
+    console.log(transactions);
+    console.log("Transaction Count: ", transactions.length);
+
+    if (!transactions || transactions.length === 0) {
+      return;
+    }
+
+    const isSuccess = transactions.find((transaction: any) => {
+      return transaction.txId === txId;
+    });
+
+    if (!isSuccess)
+      return res.status(400).json({
+        status: "error",
+        message: "Transaction not found",
+      });
+
+    // Update the balance
+    const finalamountInUSD = await convertCryptoToUSD(
+      isSuccess.coin,
+      Number(isSuccess.amount)
+    );
+
+    if (!finalamountInUSD)
+      return res
+        .status(500)
+        .json({ message: "Invalid currency", status: "error" });
+
+    console.log("Updating balance by ", isSuccess.amount, isSuccess.coin);
+
+    console.log(user, "Lavda");
+
+    await db.$transaction([
+      db.transaction.create({
+        data: {
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+          amount: Number(isSuccess.amount),
+          type: "DEPOSIT",
+          status: "COMPLETED",
+          signature: "",
+          checkout_id: "",
+          mode: "crypto",
+          currency: isSuccess.coin,
+          platform_charges: finalamountInUSD * PLATFORM_FEES,
+          finalamountInUSD,
+          api_ref: txId,
+        },
+      }),
+      db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          balance: {
+            increment: finalamountInUSD,
+          },
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      message: "Balance has been updated successfully",
+      status: "success",
+    });
+  } catch (error) {
+    console.error("Crypto transaction fetch failed:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Something went wrong",
+    });
   }
 };
 

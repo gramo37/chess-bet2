@@ -450,7 +450,7 @@ export const validateTransaction = async (req: Request, res: Response) => {
     const { api_ref, challenge, state } = req.body;
 
     console.log(
-      "--------------------------------------------------------------------------------Triggering webhook for deposits--------------------------------------------------------------------------------------------"
+      "--------------------------------------------------------------------------------Triggering webhook for mpesa deposits--------------------------------------------------------------------------------------------"
     );
 
     console.log(challenge, api_ref, state, INSTASEND_CHALLENGE);

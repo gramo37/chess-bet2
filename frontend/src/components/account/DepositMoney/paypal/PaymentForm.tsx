@@ -8,10 +8,11 @@ import {
   PayPalButtons,
   usePayPalHostedFields,
 } from "@paypal/react-paypal-js";
+import { BACKEND_URL } from "../../../../constants/routes";
 
 async function createOrderCallback() {
   try {
-    const response = await fetch("/api/orders", {
+    const response = await fetch(`${BACKEND_URL}/payments/paypal/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -21,8 +22,8 @@ async function createOrderCallback() {
       body: JSON.stringify({
         cart: [
           {
-            id: "YOUR_PRODUCT_ID",
-            quantity: "YOUR_PRODUCT_QUANTITY",
+            id: 1,
+            quantity: 1,
           },
         ],
       }),
@@ -48,7 +49,7 @@ async function createOrderCallback() {
 
 async function onApproveCallback(data: any, actions?: any) {
   try {
-    const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+    const response = await fetch(`${BACKEND_URL}/api/orders/${data.orderID}/capture`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

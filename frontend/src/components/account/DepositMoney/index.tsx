@@ -64,7 +64,7 @@ export default function DepositMoney() {
       >
         Mpesa
       </button>
-      {/* <button
+      <button
         onClick={() => {
           if (user&&!user.emailVerified) {
             alert("Please verify your email to use Crypto.");
@@ -80,7 +80,7 @@ export default function DepositMoney() {
         disabled={!user||!user.emailVerified} // Optional: Disable button if not verified
       >
         Crypto
-      </button> */}
+      </button>
     </div>
   </div>
   {user&&!user.emailVerified && (

@@ -37,6 +37,11 @@ export const BINANCE_API_KEY = process.env.BINANCE_API_KEY ?? ""
 // Currency related constants
 export const CURRENCY_RATE_URL = "https://open.er-api.com/v6/latest"
 
+// NOW Payments related constants
+export const NOWPAYMENTS_API_KEY = process.env.NOWPAYMENTS_API_KEY ?? "";
+export const NOWPAYMENTS_IPN_KEY = process.env.NOWPAYMENTS_IPN_KEY ?? "";
+export const NOWPAYMENTS_API_URL = process.env.NOWPAYMENTS_API_URL ?? "";
+
 // Nodemailer constants
 export const NODEMAILER_MAIL = process.env.NODEMAILER_MAIL ?? "";
 export const NODEMAILER_PASS = process.env.NODEMAILER_PASS ?? "";

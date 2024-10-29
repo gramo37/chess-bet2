@@ -8,6 +8,7 @@ export const WS_URL = `${import.meta.env.VITE_WS_URL ?? "ws://localhost:8000"}`;
 export const WS_BACKEND_URL = `${
   import.meta.env.VITE_WS_REST_URL ?? "httpj://localhost:8000"
 }/${WS_ROUTE}`;
+export const PAYPALCLIENTID = "test"
 
 // // // Deployment routes
 // export const BACKEND_URL = "https://prochesser.com/api";

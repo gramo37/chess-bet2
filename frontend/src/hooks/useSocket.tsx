@@ -207,6 +207,7 @@ export const useSocketHandler = () => {
     };
     return () => {
       socket.onmessage = null;
+      socket.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setBoard, setColor, setIsGameStarted, setMoves, setResult, socket]);

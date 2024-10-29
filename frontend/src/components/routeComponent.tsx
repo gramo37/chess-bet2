@@ -4,7 +4,6 @@ import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
 import ModratorDashboard from "./modrator";
 import Spinner from "./spinner";
-import LiveChat from "./liveChat";
 interface RouteProps {
   children: ReactNode;
 }
@@ -38,7 +37,6 @@ export const PublicRoute = ({ children }: RouteProps) => {
   ) : (
     <>
       {children}
-      <LiveChat />
     </>
   );
 };

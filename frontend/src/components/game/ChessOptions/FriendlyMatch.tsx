@@ -18,7 +18,7 @@ const FriendlyMatch = () => {
     setResult,
     setColor,
     gameTime,
-    setGameTime
+    setGameTime,
   } = useGameStore([
     "setGameId",
     "gameId",
@@ -29,12 +29,12 @@ const FriendlyMatch = () => {
     "setResult",
     "setColor",
     "gameTime",
-    "setGameTime"
+    "setGameTime",
   ]);
 
   const handleFriendlyOptionChange = (option: FriendlyOption) => {
     setFriendlyOption(option);
-    setGameId(""); // Clear game code on changing option
+    setGameId("");
   };
 
   const startGame = () => {
@@ -42,91 +42,96 @@ const FriendlyMatch = () => {
     setIsGameStarted(true);
     setResult(null);
     setColor(null);
-    socket?.send(
-      JSON.stringify({
-        type: INIT_GAME,
-      })
-    );
+    socket?.send(JSON.stringify({ type: INIT_GAME }));
   };
 
   return (
-    <>
-      <div className="flex flex-col items-center space-y-2 mt-4">
-        <h3 className="text-white text-xl font-semibold">
-          Friendly Match Options:
-        </h3>
-        <div>
-          <button
-            onClick={() => handleFriendlyOptionChange("Create Game")}
-            className={`btn p-2 ${
-              friendlyOption === "Create Game"
-                ? "bg-green-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            Create Game
-          </button>
-          <button
-            onClick={() => handleFriendlyOptionChange("Join Game")}
-            className={`btn ml-2 p-2 ${
-              friendlyOption === "Join Game"
-                ? "bg-green-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            Join Game
-          </button>
-        </div>
+    <div className="flex flex-col items-center space-y-4   rounded-lg w-full w-full shadow-lg">
+      <h3 className="text-white text-xl font-semibold mb-1">
+        Friendly Match Options:
+      </h3>
+      <div className="flex gap-4">
+        <button
+          onClick={() => handleFriendlyOptionChange("Create Game")}
+          className={`py-2 px-3 rounded-lg transition-colors ${
+            friendlyOption === "Create Game"
+              ? "bg-green-600 text-white"
+              : "bg-gray-300 text-black"
+          }`}
+        >
+          Create Game
+        </button>
+        <button
+          onClick={() => handleFriendlyOptionChange("Join Game")}
+          className={`py-2 px-3 rounded-lg transition-colors ${
+            friendlyOption === "Join Game"
+              ? "bg-green-600 text-white"
+              : "bg-gray-300 text-black"
+          }`}
+        >
+          Join Game
+        </button>
+      </div>
 
-        {friendlyOption === "Join Game" && (
-          <div className="mt-4">
-            <input
-              type="text"
-              value={gameId ?? ""}
-              onChange={(e) => setGameId(e.target.value)}
-              placeholder="Enter Game Code"
-              className="border p-2 rounded"
-            />
-          </div>
-        )}
+      {friendlyOption === "Join Game" && (
+        <input
+          type="text"
+          value={gameId ?? ""}
+          onChange={(e) => setGameId(e.target.value)}
+          placeholder="Enter Game Code"
+          className="border border-gray-400 p-2 rounded w-full mt-3 text-black"
+        />
+      )}
 
-        {friendlyOption === "Create Game" && (
-          <div className="flex flex-col gap-2">
-            <div>
-              <label className="text-white mr-2">Enter Stake</label>
-              <span className="bg-white p-[0.57rem] pr-0 text-black">$</span>
-              <input
-                type="number"
-                className="p-2 outline-none pl-0"
-                value={stake}
-                onChange={(e) => setStake(Number(e.target.value))}
-              />
+      {friendlyOption === "Create Game" && (
+        <div className="flex flex-col w-full  gap-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="w-full sm:w-1/2">
+              <label className="block text-white text-sm font-medium mb-1">
+                Enter Stake
+              </label>
+              <div className="flex items-center border border-gray-500 rounded-lg overflow-hidden">
+                <span className="bg-gray-200 px-3 py-2 text-black font-semibold border-r border-gray-400">
+                  $
+                </span>
+                <input
+                  type="number"
+                  className="flex-1 p-2 text-black outline-none focus:ring-2 focus:ring-yellow-500"
+                  value={stake}
+                  onChange={(e) => setStake(Number(e.target.value))}
+                  placeholder="0.00"
+                />
+              </div>
             </div>
-            <div>
-              <label className="text-white mr-2">Enter Time</label>
+            <div className="w-full sm:w-1/2">
+              <label className="block text-white text-sm font-medium mb-1">
+                Select Game Time
+              </label>
               <select
-                name="currency"
                 value={gameTime}
                 onChange={(e) => setGameTime(Number(e.target.value))}
-                className="px-4 py-2 rounded outline-none"
+                className="w-full px-4 py-2 border border-gray-500 rounded-lg bg-gray-200 text-black focus:ring-2 focus:ring-yellow-500"
               >
                 <option value={300}>5 min</option>
                 <option value={600}>10 min</option>
               </select>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
       <button
-        disabled={socket === null}
+        disabled={!socket}
         onClick={startGame}
-        className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
-          socket === null && "bg-gray-500"
+        className={`w-full mt-6 py-2 px-4 rounded-lg font-semibold text-white transition-all ${
+          socket
+            ? "bg-yellow-600 hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-400"
+            : "bg-gray-500 cursor-not-allowed"
         }`}
       >
         Play
       </button>
-    </>
+    </div>
   );
 };
 

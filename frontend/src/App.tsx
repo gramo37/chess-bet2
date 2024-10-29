@@ -17,9 +17,8 @@ import GameProfile from "./components/admin/component/gameprofile";
 import ResetPassword from "./screens/resetPassword";
 import PopUp from "./components/popup";
 import NavBar from "./components/navbar";
-import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 import usePersonStore, { useChatStore } from "./contexts/auth";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import HowItWorks from "./components/howitworks";
 import Rules from "./components/rules";
 import HomePage from "./components/learners/Homepage";
@@ -41,7 +40,6 @@ const queryClient = new QueryClient();
 
 function App() {
   const { isChatVisible, setChatVisibility } = useChatStore();
-  const tawkMessengerRef = useRef(null);
   const [tawkLoaded, setTawkLoaded] = useState(false);
   const user = usePersonStore((state) => state.user);
 
@@ -72,16 +70,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className=" min-h-screen w-screen">
-        <TawkMessengerReact
-          propertyId="6706978802d78d1a30eefdb7"
-          widgetId="1i9s2li2d"
-          onLoad={() => window.dispatchEvent(new Event("tawkLoad"))}
-          ref={tawkMessengerRef}
-        />
         <PopUp />
         <BrowserRouter>
           <ScrollToTop />
-
+  
           <RecoilRoot>
             <NavBar />
             <Routes>

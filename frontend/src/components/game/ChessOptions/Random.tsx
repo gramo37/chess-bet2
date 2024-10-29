@@ -19,34 +19,42 @@ const Random = () => {
     setIsGameStarted(true);
     setResult(null);
     setColor(null);
-    socket?.send(
+    socket.send(
       JSON.stringify({
         type: INIT_GAME,
       })
     );
   };
+
   return (
-    <>
-      <label className="text-white">Enter Stake</label>
-      <div className="flex items-center">
-        <span className="bg-white p-[0.5rem] pr-0 text-black">$</span>
+    <div className=" w-full rounded-lg shadow-lg  mx-auto">
+      <label className="block text-white text-sm font-medium mb-2">
+        Enter Stake
+      </label>
+      <div className="flex items-center mb-6 border border-gray-500 rounded-lg overflow-hidden">
+        <span className="bg-gray-300 px-3 py-2 text-black border-r border-gray-400 font-semibold">
+          $
+        </span>
         <input
           type="number"
-          className="p-2 outline-none pl-0"
+          className="flex-1 p-2 text-black outline-none focus:ring-2 focus:ring-yellow-500"
           value={stake}
           onChange={(e) => setStake(Number(e.target.value))}
         />
       </div>
       <button
-        disabled={socket === null}
+        disabled={!socket}
         onClick={startGame}
-        className={`w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ${
-          socket === null && "bg-gray-500"
-        }`}
+        className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-150
+          ${
+            socket
+              ? "bg-yellow-700 text-gray-100 hover:bg-yellow-600 focus:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
+              : "bg-gray-500 cursor-not-allowed text-gray-400"
+          }`}
       >
         Play
       </button>
-    </>
+    </div>
   );
 };
 

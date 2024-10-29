@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Spinner from "../spinner";
 
-const deploy = true;
+const deploy = false;
 const BLOG_API_LINK = deploy
   ? "https://chess-bet2.onrender.com"
   : "https://cfg8st-3002.csb.app";

@@ -341,11 +341,12 @@ export class Game {
         payload: {
           color: this.gameId ? this.player1.getPlayerColor() : WHITE,
           opponent: {
-            name: this.getPlayer2().getPlayerName(),
+            name: await this.getPlayer2().getPlayerUserName(),
             rating: this.getPlayer2().getPlayerRating()
           },
           player: {
-            name: this.getPlayer1().getPlayerName(),
+            name: await this.getPlayer1().getPlayerUserName(),
+            rating: this.getPlayer1().getPlayerRating()
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
@@ -361,11 +362,12 @@ export class Game {
         payload: {
           color: this.gameId ? this.player2.getPlayerColor() : BLACK,
           opponent: {
-            name: this.getPlayer1().getPlayerName(),
+            name: await this.getPlayer1().getPlayerUserName(),
             rating: this.getPlayer1().getPlayerRating()
           },
           player: {
-            name: this.getPlayer2().getPlayerName(),
+            name: await this.getPlayer2().getPlayerUserName(),
+            rating: this.getPlayer2().getPlayerRating()
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
@@ -388,11 +390,12 @@ export class Game {
         color: this.gameId ? this.player1.getPlayerColor() : WHITE,
         sans: this.sans,
         opponent: {
-          name: this.getPlayer2().getPlayerName(),
+          name: await this.getPlayer2().getPlayerUserName(),
           rating: this.getPlayer2().getPlayerRating()
         },
         player: {
-          name: this.getPlayer1().getPlayerName(),
+          name: await this.getPlayer1().getPlayerUserName(),
+          rating: this.getPlayer1().getPlayerRating()
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,
@@ -411,11 +414,12 @@ export class Game {
         color: this.gameId ? this.player2.getPlayerColor() : BLACK,
         sans: this.sans,
         opponent: {
-          name: this.getPlayer1().getPlayerName(),
+          name: await this.getPlayer1().getPlayerUserName(),
           rating: this.getPlayer1().getPlayerRating()
         },
         player: {
-          name: this.getPlayer2().getPlayerName(),
+          name: await this.getPlayer2().getPlayerUserName(),
+          rating: this.getPlayer2().getPlayerRating()
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,

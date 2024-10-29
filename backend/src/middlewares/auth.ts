@@ -35,6 +35,7 @@ export const authenticateJWT = async (
         referredBy: true,
         referredUsers: true,
         totalcommission: true,
+        country: true
       },
     });
 

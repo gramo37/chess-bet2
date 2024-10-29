@@ -1,4 +1,5 @@
 import { WebSocket } from "ws";
+import { db } from "./db";
 
 export class Player {
   private id: string;
@@ -42,6 +43,23 @@ export class Player {
 
   getPlayerName() {
     return this.name;
+  }
+
+  async getPlayerUserName() {
+    try {
+      const user = await db.user.findFirst({
+        where: {
+          id: this.id,
+        },
+        select: {
+          username: true
+        },
+      });
+      return user?.username ?? null;
+    } catch (error) {
+      console.log("Error fetching user name")
+      return null
+    }
   }
 
   getPlayerId() {

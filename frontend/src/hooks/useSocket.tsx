@@ -15,6 +15,7 @@ import {
   MOVESUCCESS,
   OFFER_DRAW,
   REJECT_DRAW,
+  RESTART_SERVER,
   SEND_MESSAGE,
   SHOW_ERROR,
 } from "../constants";
@@ -168,25 +169,29 @@ export const useSocketHandler = () => {
           message: "Draw Request",
           type: "confirm",
           showPopUp: true,
-          body: <div className="p-2">Opponent wants a draw. Do you want to draw ?</div>,
+          body: (
+            <div className="p-2">
+              Opponent wants a draw. Do you want to draw ?
+            </div>
+          ),
           success: acceptDraw,
-          failure: rejectDraw
-        })
+          failure: rejectDraw,
+        });
       } else if (message.type === REJECT_DRAW) {
         alertPopUp({
           message: "Draw Rejected",
           type: "info",
           showPopUp: true,
-          body: <div className="p-2">Opponent rejected the offer of draw</div>
-        })
+          body: <div className="p-2">Opponent rejected the offer of draw</div>,
+        });
       } else if (message.type === INVALID_MOVE) {
-        console.log("Invalid move")
+        console.log("Invalid move");
         setLoading(false);
         alertPopUp({
           message: message.payload.message ?? "Something went wrong",
           type: "error",
-          showPopUp: true
-        })
+          showPopUp: true,
+        });
       } else if (message.type === GAMEABORTED) {
         setIsGameStarted(false);
       } else if (message.type === GET_TIME) {
@@ -201,8 +206,16 @@ export const useSocketHandler = () => {
         alertPopUp({
           message: message.payload.message ?? "Something went wrong",
           type: "error",
-          showPopUp: true
-        })
+          showPopUp: true,
+        });
+      } else if (message.type === RESTART_SERVER) {
+        alert(
+          "Server has restarted. Restarting the browser in 5 secs. Kindly click on play game to restart your game!"
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
+        window.location.reload();
       }
     };
     return () => {

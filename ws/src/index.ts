@@ -10,7 +10,7 @@ import { extractUser } from "./auth";
 const PORT = process.env.WEBSOCKET_PORT ?? 8080;
 
 const app = express();
-const server = http.createServer(app);
+export const server = http.createServer(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -91,3 +91,27 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+const gracefulShutdown = (signal: NodeJS.Signals) => {
+  console.log(`Received ${signal}. Shutting down gracefully...`);
+  gameManager.gracefulRestart();
+
+  // Stop accepting new requests
+  server.close(() => {
+    console.log('Closed remaining connections.');
+    // Close database connections or other clean-up here
+
+    // Exit process after clean-up
+    process.exit(0);
+  });
+
+  // Force exit if connections aren't closed after a timeout
+  setTimeout(() => {
+    console.error('Could not close connections in time, forcefully shutting down.');
+    process.exit(1);
+  }, 10000); // 10 seconds timeout
+};
+
+// Listen for termination signals
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);

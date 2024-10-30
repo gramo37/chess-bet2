@@ -136,14 +136,17 @@ model Game {
 }
 
 model Move {
-  id         String  @id @default(cuid())
-  gameId     String
-  Game       Game    @relation(fields: [gameId], references: [id])
-  moveNumber Int
-  from       String
-  to         String
-  san        String
-  promotion  String?
+  id              String   @id @default(cuid())
+  gameId          String
+  Game            Game     @relation(fields: [gameId], references: [id])
+  moveNumber      Int
+  from            String
+  to              String
+  san             String
+  promotion       String?
+  player1TimeLeft Int?
+  player2TimeLeft Int?
+  createdAt       DateTime @default(now())
 
   @@index([gameId])
 }

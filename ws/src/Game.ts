@@ -40,8 +40,8 @@ export class Game {
   private gameId: string;
   private status: TGameStatus;
   private chess: Chess;
-  private player1TimeLeft: number;
-  private player2TimeLeft: number;
+  public player1TimeLeft: number;
+  public player2TimeLeft: number;
   public isFriendly: boolean;
   public stake: string;
   public gameTime: number;
@@ -233,6 +233,8 @@ export class Game {
         to: move.to,
         san,
         promotion: move.promotion,
+        player1TimeLeft: this.player1TimeLeft,
+        player2TimeLeft: this.player2TimeLeft
       });
     } catch (error) {
       console.log(error);

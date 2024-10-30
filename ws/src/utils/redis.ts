@@ -10,6 +10,8 @@ type TGame = {
     to: string,
     san: string,
     promotion?: string
+    player1TimeLeft: number
+    player2TimeLeft: number
 }
 
 export const addMoveToRedis = async (game: TGame) => {

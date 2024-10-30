@@ -29,5 +29,6 @@ export const GETFRIENDLYMATCHID = "GETFRIENDLYMATCHID";
 export const SEND_MESSAGE = "SEND_MESSAGE";
 export const SHOW_ERROR = "SHOW_ERROR";
 export const ABANDON = "ABANDON";
+export const RESTART_SERVER = "RESTART_SERVER";
 
 export const CHESS_GAME_APP_URL = "https://prochesser.com";

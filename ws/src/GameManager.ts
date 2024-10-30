@@ -16,6 +16,7 @@ import {
   GETFRIENDLYMATCHID,
   SEND_MESSAGE,
   SHOW_ERROR,
+  RESTART_SERVER,
 } from "./constants";
 import { Game } from "./Game";
 import { Player } from "./Player";
@@ -525,6 +526,12 @@ export class GameManager {
       newGame.setSans(
         game.Move.map((move: TMove & { san: string }) => move.san)
       );
+      // Set Timerleft for each player 
+      const lastPlayedMove = game.Move.find((move: any) => {
+        return move.moveNumber === game.Move.length
+      })
+      newGame.player1TimeLeft = lastPlayedMove.player1TimeLeft
+      newGame.player2TimeLeft = lastPlayedMove.player2TimeLeft
       this.games.push(newGame);
     });
   }
@@ -544,6 +551,9 @@ export class GameManager {
               to: true,
               san: true,
               promotion: true,
+              player1TimeLeft: true,
+              player2TimeLeft: true,
+              moveNumber: true
             },
           },
           id: true,
@@ -572,5 +582,23 @@ export class GameManager {
         // game.stake === stake
       );
     });
+  }
+
+  async gracefulRestart() {
+    let allPlayers = this.games.map((game) => {
+      if([NOT_YET_STARTED, IN_PROGRESS].includes(game.getGameStatus())) {
+        return [game.getPlayer1(), game.getPlayer2()]
+      }
+    }).filter((player) => player !== undefined).flat();
+
+    allPlayers.forEach((player) => {
+      if(player) {
+        sendMessage(player?.getPlayer(), {
+          type: RESTART_SERVER
+        })
+      }
+    })
+
+    this.games = []
   }
 }

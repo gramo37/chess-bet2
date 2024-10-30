@@ -80,7 +80,7 @@ const Blog: React.FC = () => {
 
   if (loading)
     return (
-      <div className="bg-black flex justify-center items-center h-screen">
+      <div className="bg-black flex justify-center items-center h-[400px]">
         <Spinner />
       </div>
     );
@@ -88,6 +88,10 @@ const Blog: React.FC = () => {
     return (
       <p className="text-red-500 text-center">Error loading posts: {error}</p>
     );
+    if (!posts || posts.length === 0) {
+      return <p className=" text-center">No blogs available at the moment.</p>;
+    }
+    
 
   return (
     <div className="w-full p-4 bg-black">

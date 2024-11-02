@@ -13,12 +13,13 @@ const processMoves = (moves: string[]) => {
 };
 
 const Moves = () => {
-  const { color, sans, socket, result, isGameStarted } = useGameStore([
+  const { color, sans, socket, result, isGameStarted, type } = useGameStore([
     "color",
     "socket",
     "sans",
     "isGameStarted",
     "result",
+    "type",
   ]);
   const processedMoves = processMoves(sans);
 
@@ -99,7 +100,7 @@ const Moves = () => {
           </button>
         </>
       )}
-      {!color && (
+      {!color && type !== "random" && (
         <button
           onClick={abortGame}
           className="w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600"

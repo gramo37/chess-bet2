@@ -35,6 +35,7 @@ import TermsOfService from "./components/learners/termsofservices";
 import ScrollToTop from "./components/scrolltop";
 import BlogPost from "./components/blog/blogPost";
 import LiveChat from "./components/liveChat";
+import VirtualAccount from "./components/virtualAccount";
 // import PaypalPage from "./components/account/DepositMoney/paypal";
 
 const queryClient = new QueryClient();
@@ -74,7 +75,7 @@ function App() {
         <PopUp />
         <BrowserRouter>
           <ScrollToTop />
-  
+
           <RecoilRoot>
             <NavBar />
             <Routes>
@@ -95,6 +96,14 @@ function App() {
                 }
               />
               <Route
+                path="/virtualaccount"
+                element={
+                  <PrivateRoute>
+                    <VirtualAccount />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/payment/:secret_token/:api_ref/:mode"
                 element={
                   <PublicRoute>
@@ -109,8 +118,8 @@ function App() {
                 element={
                   <PublicRoute>
                     <>
-                    <Login />
-                    <LiveChat/>
+                      <Login />
+                      <LiveChat />
                     </>
                   </PublicRoute>
                 }
@@ -120,8 +129,8 @@ function App() {
                 element={
                   <PublicRoute>
                     <>
-                    <Signup />
-                    <LiveChat/>
+                      <Signup />
+                      <LiveChat />
                     </>
                   </PublicRoute>
                 }
@@ -142,24 +151,115 @@ function App() {
                   </AdminPrivateRoute>
                 }
               />
-              <Route path="/how-it-works" element={<>
-              <HowItWorks />
-              <LiveChat/>
-              </>} />
-              <Route path="/" element={<><HomePage />
-                <LiveChat/>
-              </>} />
+              <Route
+                path="/how-it-works"
+                element={
+                  <>
+                    <HowItWorks />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/"
+                element={
+                  <>
+                    <HomePage />
+                    <LiveChat />
+                  </>
+                }
+              />
               {/* <Route path="/paypal" element={<PaypalPage />} /> */}
-              <Route path="/about" element={<><About /><LiveChat/></>} />
-              <Route path="/faqs" element={<><FAQ /><LiveChat/></>} />
-              <Route path="/blog" element={<><Blog /><LiveChat/></>} />
-              <Route path="/blog/:id" element={<><BlogPost /><LiveChat/></>} />
-              <Route path="/learnchess" element={<><Content /><LiveChat/></>} />
-              <Route path="/subscribe" element={<><Newsletter /><LiveChat/></>} />
-              <Route path="/affliate" element={<><LiveChat/><AffiliateProgram /></>} />
-              <Route path="/privacy-policy" element={<><PrivacyPolicy /><LiveChat/></>} />
-              <Route path="/terms" element={<><TermsOfService /><LiveChat/></>} />
-              <Route path="/rules" element={<><Rules /><LiveChat/></>} />
+              <Route
+                path="/about"
+                element={
+                  <>
+                    <About />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/faqs"
+                element={
+                  <>
+                    <FAQ />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/blog"
+                element={
+                  <>
+                    <Blog />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/blog/:id"
+                element={
+                  <>
+                    <BlogPost />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/learnchess"
+                element={
+                  <>
+                    <Content />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/subscribe"
+                element={
+                  <>
+                    <Newsletter />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/affliate"
+                element={
+                  <>
+                    <LiveChat />
+                    <AffiliateProgram />
+                  </>
+                }
+              />
+              <Route
+                path="/privacy-policy"
+                element={
+                  <>
+                    <PrivacyPolicy />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/terms"
+                element={
+                  <>
+                    <TermsOfService />
+                    <LiveChat />
+                  </>
+                }
+              />
+              <Route
+                path="/rules"
+                element={
+                  <>
+                    <Rules />
+                    <LiveChat />
+                  </>
+                }
+              />
               <Route path="/player/:id" element={<PlayerProfile />} />
               <Route path="/game/:id" element={<GameProfile />} />
               <Route path="/reset-password/:id" element={<ResetPassword />} />

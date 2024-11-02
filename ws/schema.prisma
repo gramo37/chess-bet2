@@ -23,6 +23,7 @@ model User {
   gamesAsWhite       Game[]              @relation("GamesAsWhite")
   gamesAsBlack       Game[]              @relation("GamesAsBlack")
   rating             Int                 @default(800)
+  virtualBalance     Float               @default(100.0)
   balance            Float               @default(0.0)
   commissionBalance  Float               @default(0.0)
   transactions       Transaction[]
@@ -96,7 +97,7 @@ model Webhook {
   net_amount    String?
   currency      String?
   account       String?
-  api_ref       String? @unique
+  api_ref       String  @unique
   host          String?
   failed_reason String?
   failed_code   String?
@@ -130,6 +131,7 @@ model Game {
   stake              String       @default("")
   isFriendly         Boolean      @default(false)
   areBalancesUpdated Boolean      @default(false)
+  isVirtual          Boolean      @default(false) // to track virtual or real game
 
   @@index([blackPlayerId])
   @@index([whitePlayerId])

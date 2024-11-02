@@ -24,13 +24,13 @@ import useTimer from "./useTimer";
 import { useGlobalStore } from "../contexts/global.context";
 
 export const useInitSocket = () => {
-  const user = usePersonStore((state) => state.user);
+  const { user, isVirtualAccount } = usePersonStore();
   const { setSocket, stake, type, gameId, gameTime } = useGameStore([
     "setSocket",
     "stake",
     "type",
     "gameId",
-    "gameTime"
+    "gameTime",
   ]);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export const useSocketHandler = () => {
   const [message, setMessage] = useState("");
   const [localGameId, setGameIdLocally] = useState("");
   const [loading, setLoading] = useState(false);
-  const { alertPopUp } = useGlobalStore(["alertPopUp"])
+  const { alertPopUp } = useGlobalStore(["alertPopUp"]);
   const {
     timeLeft: player1timeLeft,
     start: startPlayer1Timer,

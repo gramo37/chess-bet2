@@ -2,23 +2,29 @@ import usePersonStore from "../../../contexts/auth";
 import Refresh from "../../Refresh";
 
 const UserDetails = () => {
-  const user = usePersonStore((state) => state.user);
+  const { user, isVirtualAccount } = usePersonStore();
+  const balance = isVirtualAccount
+    ? user?.virtualBalance ?? "0.00"
+    : user?.balance ?? "0.00";
+  const rating = user?.rating ?? 0;
 
   return (
-    <div className="flex flex-col items-center text-center text-white space-y-2 rounded-lg p-4 w-full">
-      <h2 className="text-xl md:text-2xl font-bold whitespace-nowrap mb-2">
+    <div className="flex flex-col items-center text-center text-white space-y-4 rounded-lg p-4 w-full">
+      <h2 className="text-xl md:text-2xl font-bold mb-4">
         Choose How To Play Chess:
       </h2>
-      <div className="inline-flex gap-3 text-lg">
-        <h2 className="font-bold">
-          Balance: ${user?.balance ? user.balance : "0.00"}
-        </h2>
+
+      <div className="flex items-center gap-3 text-lg font-bold">
+        <span>Balance: ${balance}</span>
         <Refresh />
       </div>
-      <div className="inline-flex gap-3 text-lg">
-        <h2 className="font-bold">Your Rating: {user?.rating ?? 0}</h2>
-        <Refresh />
-      </div>
+
+      {!isVirtualAccount && (
+        <div className="flex items-center gap-3 text-lg font-bold">
+          <span>Your Rating: {rating}</span>
+          <Refresh />
+        </div>
+      )}
     </div>
   );
 };

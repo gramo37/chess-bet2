@@ -4,6 +4,7 @@ import {
   depositChecks,
   generateSignature,
   withdrawalChecks,
+  withdrawCryptonoumusToUser,
   withdrawCryptoToUser,
 } from "../../utils/payment";
 import {
@@ -60,6 +61,7 @@ export async function convertCryptoToUSD(symbol: string, amount: number) {
     return usdValue;
   } catch (error: any) {
     console.error("Error fetching price:", error.message);
+    return amount;
   }
 }
 
@@ -739,7 +741,7 @@ export const withdraw = async (req: Request, res: Response) => {
       },
     });
 
-    const withdrawSuccess = await withdrawCryptoToUser(
+    const withdrawSuccess = await withdrawCryptonoumusToUser(
       amount,
       account,
       user,

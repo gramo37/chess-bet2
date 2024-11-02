@@ -9,6 +9,8 @@ import {
   INSTASEND_WITHDRAWAL_LIMIT,
   NOWPAYMENTS_API_URL,
   NOWPAYMENTS_API_KEY,
+  NOWPAYMENTS_EMAIL,
+  NOWPAYMENTS_PASS,
 } from "../constants";
 import crypto from "crypto";
 import { db } from "../db";
@@ -121,7 +123,7 @@ export const generateSignature = (data: string) => {
   return crypto.createHash("md5").update(data).digest("hex");
 };
 
-export const withdrawCryptoToUser = async (
+export const withdrawCryptonoumusToUser = async (
   amount: number,
   account: string,
   user: TUser,
@@ -444,12 +446,15 @@ export async function updateCryptoTransactionChecks(invoice_id: string) {
       };
 
     // Add NOWpayment conditions here
-    const response = await axios.get(`${NOWPAYMENTS_API_URL}/payment/${invoice_id}`, {
-      headers: {
-        "x-api-key": NOWPAYMENTS_API_KEY,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.get(
+      `${NOWPAYMENTS_API_URL}/payment/${invoice_id}`,
+      {
+        headers: {
+          "x-api-key": NOWPAYMENTS_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const resp = response.data;
 
@@ -541,6 +546,83 @@ export async function updateCryptoTransactionChecks(invoice_id: string) {
     return {
       status: false,
       message: "Internal Server Error",
+    };
+  }
+}
+
+export async function withdrawCryptoToUser(
+  amount: number,
+  address: string,
+  currency: string,
+  user: TUser
+) {
+  try {
+    if (!user || !user?.id)
+      return {
+        status: false,
+        message: "User Not Found",
+      };
+    console.log("Deposit Money to user", amount, "Received from", user);
+
+    const url = `${NOWPAYMENTS_API_URL}/payout`;
+    const paymentData = {
+      // payout_description: "Withdrawal of Money by User",
+      // ipn_callback_url: "https://nowpayments.io",
+      withdrawals: [
+        {
+          address,
+          currency,
+          amount,
+          // ipn_callback_url: "https://nowpayments.io",
+        },
+      ],
+    };
+
+    // Get token
+    const { data: auth } = await axios.post(
+      `${NOWPAYMENTS_API_URL}/auth`,
+      {
+        email: NOWPAYMENTS_EMAIL,
+        password: NOWPAYMENTS_PASS,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!auth || !auth?.token)
+      return {
+        status: false,
+        message: `Error in getting user token`,
+      };
+
+    const { data } = await axios.post(url, paymentData, {
+      headers: {
+        "x-api-key": NOWPAYMENTS_API_KEY,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${auth?.token}`,
+      },
+    });
+
+    if (!data || !data?.id || !data?.withdrawals) {
+      console.error("Data not received from NOWPayments");
+      return {
+        status: false,
+        message: `Data not received from NOWPayments`,
+      };
+    }
+
+    return {
+      status: true,
+      message: data,
+    };
+  } catch (error) {
+    console.log("Error in payment to user", error, "" + error);
+    return {
+      status: false,
+      message: `Error in payment to user. ${"" + error}`,
     };
   }
 }

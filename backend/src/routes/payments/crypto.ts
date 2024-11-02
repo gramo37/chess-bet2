@@ -12,11 +12,12 @@ import {
   getNOWPaymentsURL,
   addWebhook,
   validateTransaction,
+  withdraw
 } from "../../controllers/payments/crypto2";
 
 const router = express.Router();
 
-// router.post("/get-url", authenticateJWT, getURL);  // Not used
+// router.post("/get-url2", authenticateJWT, getURL);  // Not used
 // router.post("/success/transaction", successTransaction);  // Not used
 // // router.post("/withdraw", authenticateJWT, withdraw);
 // router.post("/approve/withdraw", approveWithdrawal);  // Not used
@@ -35,5 +36,7 @@ router.post("/validate/transaction", addWebhook);
 // The webhook will call this periodically.
 // Flow remains similar to mpesa
 router.post("/validate/transaction/webhook", validateTransaction);
+
+router.post("/withdraw", authenticateJWT, withdraw);
 
 export default router;

@@ -183,7 +183,8 @@ export async function sendUserBannedNotification(
 
 export async function sendWithdrawalRequestNotification(
   amount: number,
-  requestId: string
+  requestId: string,
+  html?: string
 ) {
   try {
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
@@ -192,7 +193,7 @@ export async function sendWithdrawalRequestNotification(
       from: NODEMAILER_MAIL,
       to: email,
       subject: "Withdrawal Request Notification",
-      html: `
+      html: html ?? `
         <p>A new withdrawal request has been submitted with the following details:</p>
         <p>Request ID: <strong>${requestId}</strong></p>
         <p>Amount: <strong>${amount}</strong></p>

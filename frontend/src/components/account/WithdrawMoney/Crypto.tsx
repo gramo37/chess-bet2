@@ -3,27 +3,29 @@ import { BACKEND_URL } from "../../../constants/routes";
 import axios from "axios";
 import usePersonStore from "../../../contexts/auth";
 import { useGlobalStore } from "../../../contexts/global.context";
-import CurrencyConverter from "../../CryptoCurrencyConverter";
+// import CurrencyConverter from "../../CryptoCurrencyConverter";
 import { roundTo8Decimals } from "../../../types/utils/game";
 
 const Crypto = () => {
   const [amount, setAmount] = useState("");
   const [walletId, setWalletId] = useState("");
   const [currency, setCurrency] = useState("BTC");
+
   const user = usePersonStore((state) => state.user);
   const { alertPopUp } = useGlobalStore(["alertPopUp"]);
   const [loading, setLoading] = useState(false);
 
   const successPayment = async () => {
     try {
-      const url = `${BACKEND_URL}/payments/crypto/withdraw`;
+      const url = `${BACKEND_URL}/v2/payments/crypto/withdraw`;
       setLoading(true);
       const response = await axios.post(
         url,
         {
-          amount: Number(amount),
           address: walletId, // Wallet Address
-          currency,
+          coin: currency,
+          platform_charges: roundTo8Decimals(0.03 * Number(amount)),
+          finalamountInUSD: Number(amount) 
         },
         {
           headers: {
@@ -64,15 +66,7 @@ const Crypto = () => {
   };
 
   const handleCryptoWithdrawal = async () => {
-    const url = `${BACKEND_URL}/payments/get-crypto-in-USD`;
-    const finalamountInUSD = await axios.post(url, {
-      currency,
-      amount: Number(amount),
-    });
-
-    const amtInUSD = finalamountInUSD.data.finalamountInUSD;
-    let finalBalance = amtInUSD;
-    finalBalance = Number(finalBalance.toFixed(2));
+    const finalBalance = Number(Number(amount).toFixed(2));
 
     if (!amount)
       return alertPopUp({
@@ -82,7 +76,7 @@ const Crypto = () => {
         body: <div className="p-2">{"Please provide a amount"}</div>,
       });
 
-    if (amtInUSD < 5)
+    if (finalBalance < 5)
       return alertPopUp({
         message: "Final amount less than the required limit.",
         type: "error",
@@ -120,14 +114,14 @@ const Crypto = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-white"
-            placeholder="Enter amount"
+            placeholder={`Enter amount in USD`}
           />
           <input
             type="text"
             value={walletId}
             onChange={(e) => setWalletId(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 text-white"
-            placeholder="Enter Wallet ID"
+            placeholder={`Enter ${currency === "USD" ? "Binanace" : "Wallet"} ID`}
           />
           <select
             name="currency"
@@ -137,6 +131,7 @@ const Crypto = () => {
           >
             <option value="BTC">BTC</option>
             <option value="ETH">ETH</option>
+            <option value="USD">Binance</option>
           </select>
         </div>
         <button
@@ -146,7 +141,7 @@ const Crypto = () => {
           {loading ? "Loading..." : "Withdraw"}
         </button>
       </div>
-      <CurrencyConverter />
+      {/* <CurrencyConverter /> */}
     </>
   );
 };

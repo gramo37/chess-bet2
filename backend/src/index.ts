@@ -10,10 +10,11 @@ import game from "./routes/game";
 import mpesa from "./routes/payments/mpesa";
 import paypal from "./routes/payments/paypal";
 import crypto from "./routes/payments/crypto";
+import crypto2 from "./routes/payments/crypto2";
 import payment from "./routes/payments";
 import report from "./routes/report";
 import admin from "./routes/admin";
-import { checkTransactionStatus } from "./controllers/payments/crypto";
+// import { checkTransactionStatus } from "./controllers/payments/crypto";
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
 app.use(`/${BACKEND_ROUTE}/payments`, payment);
 app.use(`/${BACKEND_ROUTE}/payments/crypto`, crypto);
+app.use(`/${BACKEND_ROUTE}/v2/payments/crypto`, crypto2);
 app.use(`/${BACKEND_ROUTE}/payments/mpesa`, mpesa);
 app.use(`/${BACKEND_ROUTE}/payments/paypal`, paypal);
 app.use(`/${BACKEND_ROUTE}/game/`, game);

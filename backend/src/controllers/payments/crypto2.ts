@@ -12,9 +12,17 @@ import {
 } from "../../constants";
 import { BACKEND_ROUTE } from "../..";
 import { processWebhook } from "../../queue/cryptoWebhookQueue";
-import { createTransaction, depositChecks, updateCryptoTransactionChecks } from "../../utils/payment";
+import {
+  createTransaction,
+  depositChecks,
+  updateCryptoTransactionChecks,
+  withdrawalChecks,
+  withdrawCryptoToUser,
+} from "../../utils/payment";
 import { db } from "../../db";
 import { processCommissionDeposit } from "./mpesa";
+import { generateUniqueId } from "../../utils";
+import { sendWithdrawalRequestNotification } from "../auth/verify";
 
 export const createPaymentUrl = async (coin: string, amount: number) => {
   const paymentData = {
@@ -27,12 +35,16 @@ export const createPaymentUrl = async (coin: string, amount: number) => {
 
   console.log(NOWPAYMENTS_API_KEY, NOWPAYMENTS_API_URL, paymentData);
 
-  const response = await axios.post(`${NOWPAYMENTS_API_URL}/invoice`, paymentData, {
-    headers: {
-      "x-api-key": NOWPAYMENTS_API_KEY,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await axios.post(
+    `${NOWPAYMENTS_API_URL}/invoice`,
+    paymentData,
+    {
+      headers: {
+        "x-api-key": NOWPAYMENTS_API_KEY,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   return response.data;
 };
@@ -113,7 +125,7 @@ export const getNOWPaymentsURL = async (req: Request, res: Response) => {
       res.json({
         message: "Payment request successful",
         paymentDetails: resp.invoice_url,
-        resp
+        resp,
       });
     } catch (error) {
       console.log(error);
@@ -160,7 +172,11 @@ export const addWebhook = async (req: Request, res: Response) => {
     const body = req.body;
 
     if (!verifySignature(body, signature)) {
-      console.log("Webhook addition Failed: Invalid signature", body, signature);
+      console.log(
+        "Webhook addition Failed: Invalid signature",
+        body,
+        signature
+      );
       return res.status(401).json({ error: "Invalid signature" });
     }
 
@@ -339,4 +355,142 @@ export const updateTransaction = async (req: Request, res: Response) => {
     console.error("Error Fetching Transaction:", error);
     res.status(500).json({ message: "Internal server error", status: "error" });
   }
-}
+};
+
+export const withdraw = async (req: Request, res: Response) => {
+  try {
+    let { amount, address, coin, platform_charges } = req.body;
+    amount = Number(amount);
+    const user: any = (req?.user as any)?.user;
+    const currentBalance = user?.balance;
+    const finalamountInUSD = amount;
+
+    const withdrawalCheck = await withdrawalChecks(
+      amount,
+      finalamountInUSD,
+      address,
+      currentBalance,
+      user
+    );
+
+    if (!withdrawalCheck.status) {
+      return res.status(400).json({
+        status: false,
+        message: withdrawalCheck.message,
+      });
+    }
+
+    // Check for balance in user's account
+    // const url = `${NOWPAYMENTS_API_URL}/balance`;
+
+    // const { data } = await axios.get(url, {
+    //   headers: {
+    //     "x-api-key": NOWPAYMENTS_API_KEY,
+    //     "Content-Type": "application/json",
+    //   },
+    // });
+
+    // console.log("Pending balance ->", data)
+    // if(data.amount < amount) {
+    //   return res.status(400).json({ message: "NOWPayments balance are insufficient. Kindly connect the support.", status: "error" })
+    // }
+
+    // Validate address
+    try {
+      const url = `${NOWPAYMENTS_API_URL}/payout/validate-address`;
+  
+      const { data } = await axios.post(url, {
+        address,
+        currency: coin
+      }, {
+        headers: {
+          "x-api-key": NOWPAYMENTS_API_KEY,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      console.log("Address validation", data)
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json({
+        success: "error",
+        message: "Wrong wallet address given"
+      })
+    }
+
+    const checkout_id = generateUniqueId();
+    const transaction = await db.transaction.create({
+      data: {
+        userId: user.id,
+        amount: amount,
+        type: "WITHDRAWAL",
+        status: "PENDING",
+        // TODO: Temporary change
+        signature: "",
+        checkout_id,
+        finalamountInUSD: finalamountInUSD - platform_charges,
+        platform_charges,
+        mode: "crypto",
+        api_ref: checkout_id, // Prevent api_ref should be unique error
+        currency: coin,
+      },
+    });
+
+    // Attempt to send the amount to the user's account
+    const withdrawSuccess = await withdrawCryptoToUser(
+      amount,
+      address,
+      coin,
+      user
+    );
+
+    if (!withdrawSuccess.status) {
+      // If sending to the user failed, update transaction status to 'CANCELLED'
+      await db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "CANCELLED",
+        },
+      });
+      return res.status(500).json({
+        message:
+          "Something went wrong when sending money to the user's account",
+      });
+    }
+
+    // If sending to the user succeeded, update balance and mark transaction as 'COMPLETED'
+    await db.$transaction([
+      db.user.update({
+        where: {
+          email: user.email,
+        },
+        data: {
+          balance: currentBalance - finalamountInUSD,
+        },
+      }),
+      db.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: "COMPLETED",
+          api_ref: withdrawSuccess.message.tracking_id,
+        },
+      }),
+    ]);
+
+    // try {
+    //   sendWithdrawalRequestNotification(
+    //     transaction.finalamountInUSD,
+    //     transaction.id
+    //   );
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    res.status(200).json({
+      message: "Your money withdrawal is successful",
+      transaction, // Return the transaction object
+    });
+  } catch (error) {
+    console.error("Error Fetching Transaction:", error);
+    res.status(500).json({ message: "Internal server error", status: "error" });
+  }
+};

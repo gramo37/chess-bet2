@@ -25,6 +25,8 @@ export const CRYPTO_MERCHANT_ID = process.env.CRYPTO_MERCHANT_ID ?? ""
 export const CRYPTO_PAYMENT_API_KEY = process.env.CRYPTO_PAYMENT_API_KEY ?? ""
 export const CRYPTO_PAYOUT_API_KEY = process.env.CRYPTO_PAYOUT_API_KEY ?? ""
 export const CRYTPOMUS_URI = process.env.CRYTPOMUS_URI ?? "https://api.cryptomus.com/v1"
+export const NOWPAYMENTS_EMAIL = process.env.NOWPAYMENTS_EMAIL ?? ""
+export const NOWPAYMENTS_PASS = process.env.NOWPAYMENTS_PASS ?? ""
 
 // Paypal related constants
 export const PAYPAL_BASE = process.env.PAYPAL_BASE ?? "https://api-m.sandbox.paypal.com"

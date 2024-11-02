@@ -134,7 +134,7 @@ router.post(
       });
 
       res.status(200).json({
-        message: "Money withdrawal is successful",
+        message: "Money withdrawal is approved",
         success: "true",
       });
     } catch (error) {

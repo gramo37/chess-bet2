@@ -2,6 +2,8 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { Transaction } from "../schema";
 import fetchData from "../fetch/fetchdata";
+import { BACKEND_URL } from "../../../constants/routes";
+import axios from "axios";
 
 type TransactionsListProps = {
   transactions: Transaction[];
@@ -117,6 +119,48 @@ const TransactionsComponent = ({ transaction }: TransactionsProps) => {
     window.location.href = `/player/${id}`;
   }
 
+  async function approve() {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/v2/payments/crypto/withdraw/success`,
+        {
+          txId: transaction.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure the token is passed
+          },
+        }
+      );
+      alert(response.data.message);
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong");
+    }
+  }
+
+  async function reject() {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/v2/payments/crypto/withdraw/failure`,
+        {
+          txId: transaction.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure the token is passed
+          },
+        }
+      );
+      alert(response.data.message);
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong");
+    }
+  }
+
   return (
     <li
       key={transaction.id}
@@ -147,6 +191,14 @@ const TransactionsComponent = ({ transaction }: TransactionsProps) => {
             <p className="text-sm text-gray-600">
               Email: {transaction.user.email}
             </p>
+          </div>
+          <div className="mt-1">
+            <button onClick={approve} className="bg-blue-300 px-2 py-1 mx-2">
+              Approve
+            </button>
+            <button onClick={reject} className="bg-blue-300 px-2 py-1 mx-2">
+              Reject
+            </button>
           </div>
         </div>
       </div>

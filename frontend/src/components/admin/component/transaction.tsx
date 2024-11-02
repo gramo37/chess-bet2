@@ -192,14 +192,14 @@ const TransactionsComponent = ({ transaction }: TransactionsProps) => {
               Email: {transaction.user.email}
             </p>
           </div>
-          <div className="mt-1">
+          {transaction.type === "WITHDRAWAL" && transaction.mode === "" && <div className="mt-1">
             <button onClick={approve} className="bg-blue-300 px-2 py-1 mx-2">
               Approve
             </button>
             <button onClick={reject} className="bg-blue-300 px-2 py-1 mx-2">
               Reject
             </button>
-          </div>
+          </div>}
         </div>
       </div>
       <p

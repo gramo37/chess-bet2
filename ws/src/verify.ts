@@ -7,44 +7,60 @@ dotenv.config();
 const NODEMAILER_MAIL = process.env.NODEMAILER_MAIL ?? "";
 const NODEMAILER_PASS = process.env.NODEMAILER_PASS ?? "";
 
-
 const transporter = nodemailer.createTransport({
-  host: 'mail.privateemail.com',
-  port: 465 ,
-  secure:true,
+  host: "mail.privateemail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: NODEMAILER_MAIL,
-    pass: NODEMAILER_PASS
-  }
+    pass: NODEMAILER_PASS,
+  },
 });
-
 
 export async function SendRandomPlayNotificationToAdmin(gameId: string) {
   try {
-    const admins = await db.user.findMany({
+    // Fetch active ActiveUsers with USER role
+    const ActiveUsers = await db.user.findMany({
       where: {
-        role: { in: ['ADMIN', 'MODRATOR'] }
-      }
+        role: "USER",
+        status: "ACTIVE",
+      },
     });
 
-     const createMailConfig = (email: string) => ({
+    if (ActiveUsers.length === 0) {
+      console.log("No active Active Users found to notify.");
+      return;
+    }
+
+    // Function to create the email configuration
+    const createMailConfig = (email: string) => ({
       from: NODEMAILER_MAIL,
       to: email,
-      subject: 'New Random Play Created',
+      subject: "New Random Play Created",
       html: `
-        <p>A new random game has been initiated. Game ID: <strong>${gameId}</strong></p>
-        <p>Please review the game at your earliest convenience.</p>
-        <p>Thank you,</p>
+        <p>A new random game has been created. You can also join it!</p>
+        <p>If you have any questions or need assistance, feel free to reach out to our support team at support@prochessser.com<p>
+        <p>Thank you for choosing ProChesser!</p>
+        <p>Sincerely,</p>
         <p>The ProChesser Team</p>
+        <a href="https://www.prochesser.com/">https://www.prochesser.com/</a>   
       `,
     });
 
-    admins.forEach((admin: any) => {
-      transporter.sendMail(createMailConfig(admin.email));
-    });
+    // Send email notifications to each admin
+    await Promise.all(
+      ActiveUsers.map(async (admin) => {
+        try {
+          await transporter.sendMail(createMailConfig(admin.email));
+          console.log(`Email sent successfully to admin: ${admin.email}`);
+        } catch (emailError) {
+          console.error(`Error sending email to ${admin.email}:`, emailError);
+        }
+      })
+    );
 
-    console.log('Emails sent successfully to admins');
+    console.log("All notification emails have been processed.");
   } catch (error) {
-    console.error('Error sending emails:', error);
+    console.error("Error sending notifications to ActiveUsers:", error);
   }
 }

@@ -86,7 +86,7 @@ const FriendlyMatch = () => {
       {friendlyOption === "Create Game" && (
         <div className="flex flex-col w-full  gap-3">
           <div className="flex items-center justify-between gap-4">
-            <div className="w-full sm:w-1/2">
+            <div className="w-[49%]">
               <label className="block text-white text-sm font-medium mb-1">
                 Enter Stake
               </label>
@@ -103,7 +103,7 @@ const FriendlyMatch = () => {
                 />
               </div>
             </div>
-            <div className="w-full sm:w-1/2">
+            <div className="w-[49%]">
               <label className="block text-white text-sm font-medium mb-1">
                 Select Game Time
               </label>

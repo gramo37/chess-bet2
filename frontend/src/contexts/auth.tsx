@@ -9,8 +9,9 @@ type TUser = {
   email?: string | undefined;
   role?: string | undefined;
   totalEarnings?: string | undefined;
-  emailVerified?:string | undefined;
-  referralId?:string | undefined
+  emailVerified?: string | undefined;
+  referralId?: string | undefined;
+  virtualBalance?: string | undefined;
 };
 
 export type Transaction = {
@@ -41,12 +42,14 @@ type State = {
   user: TUser | null;
   transactions: Transaction[] | null;
   games: Game[] | null;
+  isVirtualAccount: boolean;
 };
 
 type Action = {
   updateUser: (user: State["user"]) => void;
   setTransactions: (transactions: Transaction[]) => void;
   setGames: (games: Game[]) => void;
+  setIsVirtualAccount: (bool: boolean) => void;
 };
 
 const usePersonStore = create<State & Action>((set) => ({
@@ -54,12 +57,12 @@ const usePersonStore = create<State & Action>((set) => ({
   isLoading: false,
   transactions: null,
   games: null,
-
+  isVirtualAccount: false,
   updateUser: (user) => {
     if (user?.balance) set({ user: { ...user, balance: user?.balance } });
     else set({ user });
   },
-
+  setIsVirtualAccount: (bool) => set(() => ({ isVirtualAccount: bool })),
   setTransactions: (transactions) => set(() => ({ transactions })),
 
   setGames: (games) => set(() => ({ games })),
@@ -67,16 +70,16 @@ const usePersonStore = create<State & Action>((set) => ({
 
 type ChatStore = {
   isChatVisible: boolean;
-  isTawkLoaded: boolean,
+  isTawkLoaded: boolean;
   setTawkLoaded: (visible: boolean) => void;
   toggleChat: () => void;
   setChatVisibility: (visible: boolean) => void;
-}
+};
 
 export const useChatStore = create<ChatStore>((set) => ({
   isChatVisible: true,
   isTawkLoaded: false,
-  setTawkLoaded:(visible:boolean)=>set({isTawkLoaded:visible}),
+  setTawkLoaded: (visible: boolean) => set({ isTawkLoaded: visible }),
   toggleChat: () => set((state) => ({ isChatVisible: !state.isChatVisible })),
   setChatVisibility: (visible: boolean) => set({ isChatVisible: visible }),
 }));

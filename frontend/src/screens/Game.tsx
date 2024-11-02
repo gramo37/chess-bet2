@@ -89,6 +89,7 @@ export default function Game() {
             />
           </div>
         </div>
+
         <div className="w-full lg:w-1/2 flex flex-col items-center">
           <Results loading={loading} />
           <div className="w-full">

@@ -1,6 +1,6 @@
 export default function ProChesserRules() {
   return (
-    <section className="max-w-7xl mx-auto px-4 py-8 bg-black">
+    <section className="w-full mx-auto px-4 py-8 bg-black">
       <h1 className="text-4xl font-extrabold text-center text-yellow-600 mb-6">
         ProChesser Rules
       </h1>

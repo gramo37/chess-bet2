@@ -175,9 +175,11 @@ export const getUser = async (req: Request, res: Response) => {
         rating: true,
         status: true,
         gamesAsWhite: {
+          where: { isVirtual: false },
           select: { id: true, status: true, result: true, stake: true },
         },
         gamesAsBlack: {
+          where: { isVirtual: false },
           select: { id: true, status: true, result: true, stake: true },
         },
         transactions: {
@@ -261,6 +263,9 @@ export const getGames = async (req: Request, res: Response) => {
     const pageNumber = parseInt(page as string) || 1; // Default to page 1 if not provided
     const pageSize = 8; // Number of games per page
     const games = await db.game.findMany({
+      where: {
+        isVirtual: false,
+      },
       select: {
         id: true,
         status: true,

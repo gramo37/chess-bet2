@@ -28,7 +28,7 @@ import { TEndGamePayload } from "./types";
 import { seedBoard } from "./utils/game";
 import { SendRandomPlayNotificationToAdmin } from "./verify";
 
-export class GameManager {
+export class VirtualGameManager {
   private games: Game[];
   private users: Player[];
 
@@ -252,13 +252,35 @@ export class GameManager {
     if (!user || !user.name || !user.id) return;
     // Check for pending games in db for the player
     // if a game is already present for the player we will restart that game
+
+    const virtualGameCount = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+        status: "COMPLETED",
+        isVirtual: true,
+      },
+    });
+    if (virtualGameCount >= 20) {
+      sendMessage(socket, {
+        type: GAMEABORTED,
+      });
+      sendMessage(socket, {
+        type: SHOW_ERROR,
+        payload: {
+          message: "Maximum 20 virtual games can be played",
+        },
+      });
+      return;
+    }
+
     let db_game = await db.game.findFirst({
       where: {
         OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
         status: IN_PROGRESS,
-        isVirtual: false,
+        isVirtual: true,
       },
     });
+
     if (db_game) {
       console.log("Game is present in DB, recreating it");
       // Check for the game locally
@@ -283,7 +305,7 @@ export class GameManager {
 
     // Check for balance and stake here
     // Don't proceed if balance is less than stake
-    if (Number(stake) > user.balance) {
+    if (Number(stake) > user.virtualBalance) {
       sendMessage(socket, {
         type: GAMEABORTED,
       });
@@ -345,10 +367,10 @@ export class GameManager {
             // Check if the balance of the player 2 is greater than stake
             console.log(
               "User balance and game stake comparison",
-              user.balance,
+              user.virtualBalance,
               Number(game.stake)
             );
-            if (user.balance > Number(game.stake)) {
+            if (user.virtualBalance > Number(game.stake)) {
               const player2 = game?.getPlayer2();
               player2?.setPlayerToken(token);
               player2?.setPlayerSocket(socket);
@@ -386,7 +408,8 @@ export class GameManager {
           stake,
           undefined,
           undefined,
-          Number(gameTime)
+          Number(gameTime),
+          true
         );
         console.log("Creating a friendly match -> ", game.getGameId());
         this.games.push(game);
@@ -426,10 +449,19 @@ export class GameManager {
           user.rating
         );
         const player2 = new Player(null, BLACK, null, "", "", 0);
-        const game = new Game(player1, player2, false, stake);
+        const game = new Game(
+          player1,
+          player2,
+          false,
+          stake,
+          undefined,
+          undefined,
+          undefined,
+          true
+        );
         console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
-        SendRandomPlayNotificationToAdmin(game.getGameId()); //sends notification to the admin that player has created random play
+        // SendRandomPlayNotificationToAdmin(game.getGameId()); //sends notification to the admin that player has created random play
       } else {
         // match the opponent and start the game
 
@@ -507,7 +539,9 @@ export class GameManager {
         game.isFriendly,
         game.stake,
         game.id,
-        game.status
+        game.status,
+        undefined,
+        true
       );
       const chess = seedBoard(
         game.Move.map((move: TMove) => ({
@@ -543,7 +577,7 @@ export class GameManager {
       .findMany({
         where: {
           status: "IN_PROGRESS",
-          isVirtual: false,
+          isVirtual: true,
         },
         select: {
           board: true,

@@ -1,4 +1,3 @@
-
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -22,11 +21,13 @@ const app = express();
 const PORT = process.env.BACKEND_PORT ?? 5000;
 export const BACKEND_ROUTE = "api";
 
-app.use(express.json({
-  verify: (req: any, _, buf) => {
-    req.rawBody = buf.toString();
-  }
-}));
+app.use(
+  express.json({
+    verify: (req: any, _, buf) => {
+      req.rawBody = buf.toString();
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 connectToRedis();
 
@@ -36,13 +37,7 @@ const allowedHosts = process.env.ALLOWED_HOSTS
 
 console.log(allowedHosts);
 
-app.use(
-  cors({
-    origin: allowedHosts,
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-)
+app.use(cors());
 
 app.use(`/${BACKEND_ROUTE}`, user);
 app.use(`/${BACKEND_ROUTE}/auth`, auth);
@@ -69,12 +64,11 @@ app.listen(PORT, () => {
   console.log("Connected to PORT: ", PORT);
 });
 
-
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
   // Optionally, gracefully shutdown the server
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });

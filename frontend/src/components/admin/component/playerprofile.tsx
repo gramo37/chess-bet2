@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { IoMdArrowBack } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import Spinner from "../../spinner";
@@ -16,271 +16,229 @@ const PlayerProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   useGetUser(); // Fetch and set the user on component mount
   const user = usePersonStore((state) => state.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(id);
-    const data = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        if (!id) throw Error("Player not found");
-        const player = await fetchPlayer(id);
-        setPlayer(player);
+        if (!id) throw new Error("Player not found");
+        const playerData = await fetchPlayer(id);
+        setPlayer(playerData);
       } catch (e: any) {
-        setError(e);
+        setError(e.message || "Error loading player data");
       } finally {
         setIsLoading(false);
       }
     };
-    data();
+    fetchData();
   }, [id]);
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  if (isLoading) return <Spinner />;
+  if (error) return <p className="text-xl text-center text-white">{error}</p>;
+  if (!player)
+    return <p className="text-center text-gray-500">Player not found</p>;
 
-  if (error) {
-    return <p className="text-xl text-center text-white">{error}</p>;
-  }
-
-  if (!player) {
-    return <p>Player not found</p>;
-  }
-
-  async function Edit(type: string) {
+  const handleEdit = async (type: string) => {
     if (!id) return;
     if (type === "suspend" || type === "active") {
-      updateUser(type, id);
+      await updateUser(type, id);
       return;
     }
-    const a = Number(prompt(`Enter the amount you want to change ${type}:`));
-    if (isNaN(a) || a < 0) {
-      alert("Please enter a valid amount that is zero or greater.");
-    } else {
-      console.log(`You entered: ${a}`);
+    const amount = parseFloat(
+      prompt(`Enter the amount to adjust ${type}:`) || ""
+    );
+    if (isNaN(amount) || amount < 0) {
+      alert("Please enter a valid amount (0 or greater).");
+      return;
     }
-    updateUser(type, id, a);
-  }
+    await updateUser(type, id, amount);
+  };
 
-  function onViewProfile(id: string): void {
-    console.log(id);
-
-    window.location.href = `/game/${id}`;
-  }
-
-  function DeleteUser() {
+  const handleBanUser = () => {
     if (!id) return;
 
-    const confirmation = prompt(
-      "ARE YOU SURE TO BAN THIS USER PERMANENTLY? THEN TYPE 'YES'"
-    );
+    const confirmation = prompt("Type 'YES' to confirm permanent ban.");
     if (confirmation !== "YES") return;
 
-    const reason = prompt("WHY DO U WANT TO PERMANENTLY BAN THIS USER?");
+    const reason = prompt("Provide a reason for banning the user:");
     if (!reason) return;
 
     bannedUser(id, reason);
-  }
+  };
+
+  const handleViewGame = (gameId: string) => {
+    window.location.href = `/game/${gameId}`;
+  };
 
   return (
-    <div className="flex flex-col relative w-full items-center p-8 min-h-screen ">
-      <a className="absolute top-10 left-10 text-white" href="/dashboard">
-        <IoMdArrowBack />
-      </a>
-      <div className="p-6 bg-gray-50 rounded-lg shadow-lg w-full max-w-2xl">
-        <div className="">
+    <div className="bg-black w-full">
+      <button
+        className="text-gray-700 absolute top-6 left-6"
+        onClick={() => navigate("/dashboard")}
+        aria-label="Go back"
+      >
+        <IoMdArrowBack size={24} />
+      </button>
+      <div className="flex flex-col items-center p-8 min-h-screen w-full relative">
+        <div className="bg-gray-50 p-6 rounded-lg shadow-lg w-full max-w-2xl">
           <h1 className="text-3xl font-bold mb-6 text-gray-800 capitalize">
             {player.name}'s Profile
           </h1>
 
-          {user && user.role === "ADMIN" && player.status !== "BANNED" && (
-            <div>
-              {player.status === "ACTIVE" && (
-                <button
-                  className="bg-yellow-500 rounded-lg text-white px-3 py-1 m-2"
-                  onClick={() => Edit("suspend")}
-                >
-                  Suspend
-                </button>
-              )}
-              {player.status !== "ACTIVE" && (
-                <button
-                  className="bg-green-500 rounded-lg text-white px-3 py-1 m-2"
-                  onClick={() => Edit("active")}
-                >
-                  ACTIVATE
-                </button>
-              )}
-              {player.status !== "BANNED" && (
-                <button
-                  className="bg-red-500 px-3 rounded-lg text-white py-1 m-2"
-                  onClick={DeleteUser}
-                >
-                  Ban
-                </button>
-              )}
+          {user?.role === "ADMIN" && player.status !== "BANNED" && (
+            <div className="flex gap-2 mb-4">
+              <button
+                className={`${
+                  player.status === "ACTIVE" ? "bg-yellow-500" : "bg-green-500"
+                } text-white rounded-lg px-3 py-1`}
+                onClick={() =>
+                  handleEdit(player.status === "ACTIVE" ? "suspend" : "active")
+                }
+              >
+                {player.status === "ACTIVE" ? "Suspend" : "Activate"}
+              </button>
+              <button
+                className="bg-red-500 text-white rounded-lg px-3 py-1"
+                onClick={handleBanUser}
+              >
+                Ban
+              </button>
             </div>
           )}
-        </div>
-        <div className="flex justify-between">
-          <div>
-            <div className="text-gray-600 text-lg">
-              <span className="font-semibold text-gray-700">Email:</span>{" "}
-              {player.email}
+
+          <div className="flex flex-wrap justify-between text-lg">
+            <div className="text-gray-600">
+              <p>
+                <span className="font-semibold text-gray-700">Email:</span>{" "}
+                {player.email}
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700">Status:</span>{" "}
+                {player.status}
+              </p>
             </div>
-            <div className="text-gray-600 text-lg">
-              <span className="font-semibold text-gray-700">Status:</span>{" "}
-              {player.status}
-            </div>
-          </div>
-          <div>
-            <div className="text-gray-600 text-lg ">
-              <span className="font-semibold text-gray-700">
-                Total Earnings:{" "}
-              </span>
-              {player.totalEarnings} $
-            </div>
-            <div className="flex gap-1 cursor-pointer items-center text-gray-600 text-lg">
-              <span className="font-semibold text-gray-700">Balance:</span>{" "}
-              <span className="text-green-600">
-                ${player.balance.toFixed(2)}
-              </span>
-              {user && user.role === "ADMIN" && (
-                <div onClick={() => Edit("balance")}>
-                  <MdEdit />
-                </div>
-              )}
-            </div>
-            <div className="flex gap-1 items-center cursor-pointer text-gray-600 text-lg ">
-              <span className="font-semibold text-gray-700">Rating:</span>{" "}
-              <span className="text-indigo-600">{player.rating}</span>
-              <div onClick={() => Edit("rating")}>
-                <MdEdit />
+            <div className="text-gray-600">
+              <p>
+                <span className="font-semibold text-gray-700">
+                  Total Earnings:
+                </span>{" "}
+                {player.totalEarnings} $
+              </p>
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-gray-700">Balance:</span>
+                <span className="text-green-600">
+                  ${player.balance.toFixed(2)}
+                </span>
+                {user?.role === "ADMIN" && (
+                  <MdEdit
+                    className="cursor-pointer"
+                    onClick={() => handleEdit("balance")}
+                  />
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-gray-700">Rating:</span>
+                <span className="text-indigo-600">{player.rating}</span>
+                <MdEdit
+                  className="cursor-pointer"
+                  onClick={() => handleEdit("rating")}
+                />
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Games as White */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
-            Games Played
-          </h2>
-          {player.gamesAsWhite.length > 0 || player.gamesAsBlack.length > 0 ? (
-            <ul className="space-y-2">
-              {[
-                ...player.gamesAsWhite.map((game: any) => ({
-                  ...game,
-                  color: "White",
-                })),
-                ...player.gamesAsBlack.map((game: any) => ({
-                  ...game,
-                  color: "Black",
-                })),
-              ].map((game: any) => (
-                <li
-                  key={game.id}
-                  className="bg-gray-100 p-4 flex justify-between rounded-md shadow-sm"
-                >
-                  <div>
-                    <p className="text-gray-800">
-                      <span className="font-semibold">Game ID:</span> {game.id}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-semibold">Result:</span>
-                      {game.result ? (
-                        game.result === "WHITE_WINS" ? (
-                          <span
-                            className={
-                              game.color === "White"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }
-                          >
-                            {game.result} (
-                            {game.color === "White" ? "Won" : "Lost"})
-                          </span>
-                        ) : game.result === "BLACK_WINS" ? (
-                          <span
-                            className={
-                              game.color === "Black"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }
-                          >
-                            {game.result} (
-                            {game.color === "Black" ? "Won" : "Lost"})
-                          </span>
-                        ) : (
-                          <span>{game.result}</span>
-                        )
-                      ) : (
-                        "N/A"
-                      )}
-                    </p>
-
-                    {user && user.role === "ADMIN" && (
-                      <p
-                        className="font-semibold cursor-pointer inline text-blue-500 hover:underline"
-                        onClick={() => onViewProfile(game.id)}
-                      >
-                        Game Report
+          {/* Games Played */}
+          <section className="mt-6">
+            <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
+              Games Played
+            </h2>
+            {player.gamesAsWhite.length > 0 ||
+            player.gamesAsBlack.length > 0 ? (
+              <ul className="space-y-2">
+                {[
+                  ...player.gamesAsWhite.map((game: any) => ({
+                    ...game,
+                    color: "White",
+                  })),
+                  ...player.gamesAsBlack.map((game: any) => ({
+                    ...game,
+                    color: "Black",
+                  })),
+                ].map((game: any) => (
+                  <li
+                    key={game.id}
+                    className="bg-gray-100 p-4 rounded-md shadow-sm flex justify-between"
+                  >
+                    <div>
+                      <p className="text-gray-800 font-semibold">
+                        Game ID: {game.id}
                       </p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-gray-600">
-                      <span className="font-semibold">Color:</span> {game.color}
-                    </p>
+                      <p className="text-gray-600">
+                        <span className="font-semibold">Result:</span>{" "}
+                        {game.result || "N/A"}
+                      </p>
+                      {user?.role === "ADMIN" && (
+                        <p
+                          className="text-blue-500 cursor-pointer"
+                          onClick={() => handleViewGame(game.id)}
+                        >
+                          Game Report
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-gray-600">
+                        <span className="font-semibold">Color:</span>{" "}
+                        {game.color}
+                      </p>
+                      <p className="text-gray-600">
+                        <span className="font-semibold">Status:</span>{" "}
+                        {game.status}
+                      </p>
+                      <p className="text-gray-600">
+                        <span className="font-semibold">Stake:</span>{" "}
+                        {game.stake}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 italic">No games played.</p>
+            )}
+          </section>
 
+          {/* Transactions */}
+          <section className="mt-6">
+            <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
+              Transactions
+            </h2>
+            {player.transactions.length > 0 ? (
+              <ul className="space-y-2">
+                {player.transactions.map((transaction: any) => (
+                  <li
+                    key={transaction.id}
+                    className="bg-gray-100 p-4 rounded-md shadow-sm"
+                  >
+                    <p className="text-gray-800 font-semibold">
+                      Transaction ID: {transaction.id}
+                    </p>
+                    <p className="text-gray-600">
+                      <span className="font-semibold">Amount:</span>{" "}
+                      {transaction.currency} {transaction.amount.toFixed(2)}
+                    </p>
                     <p className="text-gray-600">
                       <span className="font-semibold">Status:</span>{" "}
-                      {game.status}
+                      {transaction.status}
                     </p>
-
-                    <p className="text-gray-600">
-                      <span className="font-semibold">Stake:</span> {game.stake}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">
-              No games played as White or Black player.
-            </p>
-          )}
-        </div>
-
-        {/* Transactions */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-semibold mb-3 text-indigo-600">
-            Transactions
-          </h2>
-          {player.transactions.length > 0 ? (
-            <ul className="space-y-2">
-              {player.transactions.map((transaction: any) => (
-                <li
-                  key={transaction.id}
-                  className="bg-gray-100 p-4 rounded-md shadow-sm"
-                >
-                  <p className="text-gray-800">
-                    <span className="font-semibold">Transaction ID:</span>
-                    {transaction.id}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Amount:</span>{" "}
-                    {transaction.currency + " " + transaction.amount.toFixed(2)}
-                  </p>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">Status:</span>{" "}
-                    {transaction.status}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">No transactions available.</p>
-          )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 italic">No transactions available.</p>
+            )}
+          </section>
         </div>
       </div>
     </div>

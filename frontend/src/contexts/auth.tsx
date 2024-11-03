@@ -12,6 +12,7 @@ type TUser = {
   emailVerified?: string | undefined;
   referralId?: string | undefined;
   virtualBalance?: string | undefined;
+  virtualGameCount?: string | undefined;
 };
 
 export type Transaction = {

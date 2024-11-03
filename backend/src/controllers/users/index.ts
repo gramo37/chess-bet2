@@ -6,6 +6,7 @@ export async function getActiveUsers(req: Request, res: Response) {
     const games = await db.game.count({
       where: {
         status: "IN_PROGRESS",
+        isVirtual: false,
       },
     });
     res.status(200).json({

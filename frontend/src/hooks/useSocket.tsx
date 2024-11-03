@@ -35,7 +35,7 @@ export const useInitSocket = () => {
 
   useEffect(() => {
     const ws = new WebSocket(
-      `${WS_URL}?token=${user?.token}&type=${type}&stake=${stake}&gameId=${gameId}&gameTime=${gameTime}`
+      `${WS_URL}?token=${user?.token}&type=${type}&stake=${stake}&gameId=${gameId}&gameTime=${gameTime}&isVirtual=${isVirtualAccount}`
     );
     ws.onopen = () => {
       setSocket(ws);
@@ -48,7 +48,7 @@ export const useInitSocket = () => {
     return () => {
       ws.close();
     };
-  }, [gameId, gameTime, setSocket, stake, type, user?.token]);
+  }, [gameId, gameTime, setSocket, stake, type, user?.token, isVirtualAccount]);
 };
 
 export const useSocketHandler = () => {

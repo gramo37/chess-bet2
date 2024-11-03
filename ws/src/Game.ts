@@ -45,6 +45,7 @@ export class Game {
   public isFriendly: boolean;
   public stake: string;
   public gameTime: number;
+  public isVirtual = false;
 
   private timer1: any;
   private timer2: any;
@@ -56,7 +57,8 @@ export class Game {
     stake: string,
     gameId?: string,
     status?: TGameStatus,
-    gameTime?: number
+    gameTime?: number,
+    isVirtual?: boolean
   ) {
     this.player1 = player1;
     this.player2 = player2;
@@ -76,6 +78,7 @@ export class Game {
     this.stake = stake;
     this.gameTime =
       !gameTime || Number.isNaN(gameTime) ? INITIAL_TIME : gameTime;
+    this.isVirtual = isVirtual ? isVirtual : this.isVirtual;
   }
 
   getPlayer1() {
@@ -190,7 +193,7 @@ export class Game {
       });
       return;
     }
-    
+
     if (this.moveCount % 2 === 1 && socket === player1) {
       sendMessage(socket, {
         type: INVALID_MOVE,
@@ -234,7 +237,7 @@ export class Game {
         san,
         promotion: move.promotion,
         player1TimeLeft: this.player1TimeLeft,
-        player2TimeLeft: this.player2TimeLeft
+        player2TimeLeft: this.player2TimeLeft,
       });
     } catch (error) {
       console.log(error);
@@ -263,9 +266,9 @@ export class Game {
     // Check for draw or checkmate
     let result: "WHITE_WINS" | "BLACK_WINS" | "DRAW" | null = null;
     const winner =
-        this.player1.getPlayer() === socket ? this.player1 : this.player2;
-      const loser =
-        this.player1.getPlayer() === socket ? this.player2 : this.player1;
+      this.player1.getPlayer() === socket ? this.player1 : this.player2;
+    const loser =
+      this.player1.getPlayer() === socket ? this.player2 : this.player1;
     if (chess.isGameOver()) {
       result = sendGameOverMessage(winner, loser, CHECKMATE);
       this.stopPlayer1Timer();
@@ -290,7 +293,8 @@ export class Game {
     // Update the result of game in DB
     if (result) {
       let areBalancesUpdated = false;
-      if(result !== "DRAW") areBalancesUpdated = await this.updateBalances(winner, loser);
+      if (result !== "DRAW")
+        areBalancesUpdated = await this.updateBalances(winner, loser);
       else areBalancesUpdated = true;
       await db.game.update({
         data: {
@@ -299,7 +303,7 @@ export class Game {
           gameOutCome: result === DRAW ? DRAW : CHECKMATE,
           board: this.board,
           endTime: new Date(Date.now()),
-          areBalancesUpdated
+          areBalancesUpdated,
         },
         where: {
           id: this.gameId,
@@ -330,6 +334,7 @@ export class Game {
               id: this.player2.getPlayerId(),
             },
           },
+          isVirtual: this.isVirtual,
         },
       });
       // this.gameId = db_game.id;
@@ -344,11 +349,11 @@ export class Game {
           color: this.gameId ? this.player1.getPlayerColor() : WHITE,
           opponent: {
             name: await this.getPlayer2().getPlayerUserName(),
-            rating: this.getPlayer2().getPlayerRating()
+            rating: this.getPlayer2().getPlayerRating(),
           },
           player: {
             name: await this.getPlayer1().getPlayerUserName(),
-            rating: this.getPlayer1().getPlayerRating()
+            rating: this.getPlayer1().getPlayerRating(),
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
@@ -365,11 +370,11 @@ export class Game {
           color: this.gameId ? this.player2.getPlayerColor() : BLACK,
           opponent: {
             name: await this.getPlayer1().getPlayerUserName(),
-            rating: this.getPlayer1().getPlayerRating()
+            rating: this.getPlayer1().getPlayerRating(),
           },
           player: {
             name: await this.getPlayer2().getPlayerUserName(),
-            rating: this.getPlayer2().getPlayerRating()
+            rating: this.getPlayer2().getPlayerRating(),
           },
           player1TimeLeft: this.player1TimeLeft,
           player2TimeLeft: this.player2TimeLeft,
@@ -393,11 +398,11 @@ export class Game {
         sans: this.sans,
         opponent: {
           name: await this.getPlayer2().getPlayerUserName(),
-          rating: this.getPlayer2().getPlayerRating()
+          rating: this.getPlayer2().getPlayerRating(),
         },
         player: {
           name: await this.getPlayer1().getPlayerUserName(),
-          rating: this.getPlayer1().getPlayerRating()
+          rating: this.getPlayer1().getPlayerRating(),
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,
@@ -417,11 +422,11 @@ export class Game {
         sans: this.sans,
         opponent: {
           name: await this.getPlayer1().getPlayerUserName(),
-          rating: this.getPlayer1().getPlayerRating()
+          rating: this.getPlayer1().getPlayerRating(),
         },
         player: {
           name: await this.getPlayer2().getPlayerUserName(),
-          rating: this.getPlayer2().getPlayerRating()
+          rating: this.getPlayer2().getPlayerRating(),
         },
         player1TimeLeft: this.player1TimeLeft,
         player2TimeLeft: this.player2TimeLeft,
@@ -446,7 +451,8 @@ export class Game {
       console.log(`Game is ended. Result: ${result}.`);
       // const areBalancesUpdated = await this.updateBalances(winner, loser);
       let areBalancesUpdated = false;
-      if(result !== "DRAW") areBalancesUpdated = await this.updateBalances(winner, loser);
+      if (result !== "DRAW")
+        areBalancesUpdated = await this.updateBalances(winner, loser);
       else areBalancesUpdated = true;
       await db.game.update({
         data: {
@@ -455,7 +461,7 @@ export class Game {
           gameOutCome: payload.status,
           board: this.board,
           endTime: new Date(Date.now()),
-          areBalancesUpdated
+          areBalancesUpdated,
         },
         where: {
           id: this.gameId,
@@ -512,35 +518,62 @@ export class Game {
         "Rating -> ",
         loser.getPlayerRating()
       );
-      await db.$transaction([
-        db.user.update({
-          where: {
-            id: loser.getPlayerId(),
-          },
-          data: {
-            balance: {
-              decrement: Number(this.stake),
+      if (this.isVirtual) {
+        await db.$transaction([
+          db.user.update({
+            where: {
+              id: loser.getPlayerId(),
             },
-            rating: {
-              decrement: 10,
+            data: {
+              virtualBalance: {
+                decrement: Number(this.stake),
+              },
             },
-          },
-        }),
-        // Increase 85 % of the stake amount (this.stake) from winner's account
-        db.user.update({
-          where: {
-            id: winner.getPlayerId(),
-          },
-          data: {
-            balance: {
-              increment: 0.85 * Number(this.stake),
+          }),
+          // Increase 85 % of the stake amount (this.stake) from winner's account
+          db.user.update({
+            where: {
+              id: winner.getPlayerId(),
             },
-            rating: {
-              increment: 10,
+            data: {
+              virtualBalance: {
+                increment: 0.85 * Number(this.stake),
+              },
             },
-          },
-        }),
-      ]);
+          }),
+        ]);
+      } else {
+        await db.$transaction([
+          db.user.update({
+            where: {
+              id: loser.getPlayerId(),
+            },
+            data: {
+              balance: {
+                decrement: Number(this.stake),
+              },
+              rating: {
+                decrement: 10,
+              },
+            },
+          }),
+          // Increase 85 % of the stake amount (this.stake) from winner's account
+          db.user.update({
+            where: {
+              id: winner.getPlayerId(),
+            },
+            data: {
+              balance: {
+                increment: 0.85 * Number(this.stake),
+              },
+              rating: {
+                increment: 10,
+              },
+            },
+          }),
+        ]);
+      }
+
       return true;
     } catch (error) {
       console.log("Error updating balance for ", this.gameId, error);

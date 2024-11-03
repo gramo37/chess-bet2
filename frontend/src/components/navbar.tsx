@@ -3,11 +3,10 @@ import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
 import { Link } from "react-router-dom";
 import { ACADEMY_FRONTEND_URL } from "../constants/learner";
-import { FiUser, FiUserCheck } from "react-icons/fi";
 
 export default function NavBar() {
   useGetUser();
-  const { user, isVirtualAccount, setIsVirtualAccount } = usePersonStore();
+  const { user } = usePersonStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false); // Submenu state for account creation
@@ -208,17 +207,6 @@ export default function NavBar() {
                   >
                     Account
                   </Link>
-                  <button
-                    onClick={() => setIsVirtualAccount(!isVirtualAccount)}
-                    className="flex items-center gap-1 text-lg font-medium text-black hover:text-yellow-500 transition duration-300"
-                  >
-                    {isVirtualAccount ? (
-                      <FiUserCheck className="text-green-500" />
-                    ) : (
-                      <FiUser className="text-gray-500" />
-                    )}{" "}
-                    {isVirtualAccount ? "Virtual Mode" : "Switch to Virtual"}
-                  </button>
                 </>
               )}
               <button
@@ -362,17 +350,6 @@ export default function NavBar() {
                   >
                     Account
                   </Link>
-                  <button
-                    onClick={() => setIsVirtualAccount(!isVirtualAccount)}
-                    className="flex items-center gap-1 text-lg font-medium text-black hover:text-yellow-500 transition duration-300"
-                  >
-                    {isVirtualAccount ? (
-                      <FiUserCheck className="text-green-500" />
-                    ) : (
-                      <FiUser className="text-gray-500" />
-                    )}{" "}
-                    {isVirtualAccount ? "Virtual Mode" : "Switch to Virtual"}
-                  </button>
                 </>
               )}
               <button

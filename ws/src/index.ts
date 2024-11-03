@@ -1,5 +1,6 @@
 import { WebSocketServer } from "ws";
 import { GameManager } from "./GameManager";
+import { VirtualGameManager } from "./VirtualGameManager";
 import url from "url";
 import { connect } from "./db/redis";
 import express from "express";
@@ -21,17 +22,11 @@ const allowedHosts = process.env.ALLOWED_HOSTS
 
 console.log(allowedHosts);
 
-app.use(
-  cors({
-    origin: allowedHosts,
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  })
-)
-
+app.use(cors());
 
 const wss = new WebSocketServer({ server });
 const gameManager = new GameManager();
+const virtualGameManager = new VirtualGameManager();
 gameManager.initServer();
 
 wss.on("connection", async function connection(ws, req) {
@@ -40,24 +35,49 @@ wss.on("connection", async function connection(ws, req) {
   let type = req?.url ? url.parse(req.url, true).query.type : null;
   let stake = req?.url ? url.parse(req.url, true).query.stake : null;
   let gameTime = req?.url ? url.parse(req.url, true).query.gameTime : null;
+  let isVirtual = req?.url ? url.parse(req.url, true).query.isVirtual : null;
 
   if (gameId && typeof gameId !== "string") gameId = null;
   if (type && typeof type !== "string") type = null;
   if (stake && typeof stake !== "string") stake = null;
   if (token && typeof token !== "string") token = null;
   if (gameTime && typeof gameTime !== "string") gameTime = null;
+  if (isVirtual && typeof isVirtual !== "string") isVirtual = null;
 
-  let isAuthorizedUser = await extractUser(token)
-  if (!isAuthorizedUser) return ws.send(JSON.stringify({ "message": "Unauthorized user!" }))
+  let isAuthorizedUser = await extractUser(token);
+  if (!isAuthorizedUser)
+    return ws.send(JSON.stringify({ message: "Unauthorized user!" }));
 
-  console.log("isAuthorizedUser", isAuthorizedUser)
-  console.log(token, stake, type, gameId);
+  console.log("isAuthorizedUser", isAuthorizedUser);
+  console.log(token, stake, type, gameId, isVirtual);
 
-  if (token && stake && type)
-    await gameManager.addUser({ socket: ws, token, type, stake, gameId, gameTime });
+  if (token && stake && type) {
+    if (!isVirtual || (isVirtual && isVirtual == "false")) {
+      await gameManager.addUser({
+        socket: ws,
+        token,
+        type,
+        stake,
+        gameId,
+        gameTime,
+      });
+    } else {
+      console.log("create virtual game");
+      await virtualGameManager.addUser({
+        socket: ws,
+        token,
+        type,
+        stake,
+        gameId,
+        gameTime,
+      });
+    }
+  }
 
   ws.on("close", () => {
-    gameManager.removeUser(ws);
+    if (!isVirtual || (isVirtual && isVirtual == "false"))
+      gameManager.removeUser(ws);
+    else virtualGameManager.removeUser(ws);
   });
 });
 
@@ -68,10 +88,17 @@ app.get("/ws", (req, res) => {
 });
 
 app.get("/ws/open_games", async (req, res) => {
-  let { token, stake } = req.query;
+  let { token, stake, isVirtual } = req.query;
   if (token && typeof token !== "string") token = "";
   if (stake && typeof stake !== "string") stake = "";
-  const games = (token && stake) ? await gameManager.getAllGames(token, stake) : [];
+  if (isVirtual && typeof isVirtual !== "string") isVirtual = "";
+  let games;
+
+  if (!isVirtual || (isVirtual && isVirtual == "false"))
+    games = token && stake ? await gameManager.getAllGames(token, stake) : [];
+  else
+    games =
+      token && stake ? await virtualGameManager.getAllGames(token, stake) : [];
   res.status(200).json({
     games,
   });
@@ -83,35 +110,11 @@ server.listen(PORT, () => {
 
 console.log("Done");
 
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
   // Optionally, gracefully shutdown the server
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
-
-const gracefulShutdown = (signal: NodeJS.Signals) => {
-  console.log(`Received ${signal}. Shutting down gracefully...`);
-  gameManager.gracefulRestart();
-
-  // Stop accepting new requests
-  server.close(() => {
-    console.log('Closed remaining connections.');
-    // Close database connections or other clean-up here
-
-    // Exit process after clean-up
-    process.exit(0);
-  });
-
-  // Force exit if connections aren't closed after a timeout
-  setTimeout(() => {
-    console.error('Could not close connections in time, forcefully shutting down.');
-    process.exit(1);
-  }, 10000); // 10 seconds timeout
-};
-
-// Listen for termination signals
-process.on('SIGTERM', gracefulShutdown);
-process.on('SIGINT', gracefulShutdown);

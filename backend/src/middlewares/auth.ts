@@ -45,9 +45,15 @@ export const authenticateJWT = async (
       return res
         .status(404)
         .json({ message: "Your account has been suspended" });
-
-    user = { ...user, balance: user.balance };
-    req.user = { user, token };
+    const virtualGameCount = await db.game.count({
+      where: {
+        OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
+        isVirtual: true,
+        status: "COMPLETED",
+      },
+    });
+    let u = { ...user, balance: user.balance, virtualGameCount };
+    req.user = { user: u, token };
     next();
   } catch (error) {
     console.log(error);

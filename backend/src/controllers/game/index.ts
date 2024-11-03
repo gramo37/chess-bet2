@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../../db"; 
+import { db } from "../../db";
 
 export const getUserGameHistory = async (req: Request, res: Response) => {
   const { page } = req.params; // Use query params to pass page number
@@ -7,7 +7,7 @@ export const getUserGameHistory = async (req: Request, res: Response) => {
   const pageSize = 8; // Number of games per page
 
   try {
-    const userId = ((req?.user) as any)?.user?.id;
+    const userId = (req?.user as any)?.user?.id;
 
     if (!userId) {
       return res.status(400).json({
@@ -19,8 +19,9 @@ export const getUserGameHistory = async (req: Request, res: Response) => {
       where: {
         OR: [{ whitePlayerId: userId }, { blackPlayerId: userId }],
         gameOutCome: {
-          not: "ABANDON"
-        }
+          not: "ABANDON",
+        },
+        isVirtual: false,
       },
       include: {
         whitePlayer: { select: { id: true, name: true } },
@@ -37,8 +38,9 @@ export const getUserGameHistory = async (req: Request, res: Response) => {
       where: {
         OR: [{ whitePlayerId: userId }, { blackPlayerId: userId }],
         gameOutCome: {
-          not: "ABANDON"
-        }
+          not: "ABANDON",
+        },
+        isVirtual: false,
       },
     });
 

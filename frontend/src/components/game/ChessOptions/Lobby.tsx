@@ -27,7 +27,7 @@ const Lobby = () => {
     "setStake",
   ]);
   const [opponents, setOpponents] = useState([]);
-  const user = usePersonStore((state) => state.user);
+  const { user, isVirtualAccount } = usePersonStore();
 
   const { isPending, isError, isSuccess, mutate } = useMutation({
     mutationFn: async () => {
@@ -35,8 +35,10 @@ const Lobby = () => {
         params: {
           token: user?.token,
           stake,
+          isVirtual: isVirtualAccount,
         },
       });
+      console.log(res.data);
       if (res && res?.data && res?.data?.games) setOpponents(res.data.games);
     },
   });

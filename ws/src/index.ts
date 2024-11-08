@@ -52,8 +52,9 @@ wss.on("connection", async function connection(ws, req) {
   console.log(token, stake, type, gameId, isVirtual);
 
   if (token && stake && type) {
-    if (!isVirtual || (isVirtual && isVirtual == "false")) {
-      await gameManager.addUser({
+    if (isVirtual && isVirtual == "true") {
+      console.log("create virtual game", isVirtual);
+      await virtualGameManager.addUser({
         socket: ws,
         token,
         type,
@@ -62,8 +63,8 @@ wss.on("connection", async function connection(ws, req) {
         gameTime,
       });
     } else {
-      console.log("create virtual game");
-      await virtualGameManager.addUser({
+      console.log("real", isVirtual);
+      await gameManager.addUser({
         socket: ws,
         token,
         type,
@@ -93,12 +94,14 @@ app.get("/ws/open_games", async (req, res) => {
   if (stake && typeof stake !== "string") stake = "";
   if (isVirtual && typeof isVirtual !== "string") isVirtual = "";
   let games;
-
-  if (!isVirtual || (isVirtual && isVirtual == "false"))
-    games = token && stake ? await gameManager.getAllGames(token, stake) : [];
-  else
+  if (isVirtual && isVirtual == "true") {
+    console.log("isVirtual");
     games =
       token && stake ? await virtualGameManager.getAllGames(token, stake) : [];
+  } else {
+    console.log("real");
+    games = token && stake ? await gameManager.getAllGames(token, stake) : [];
+  }
   res.status(200).json({
     games,
   });

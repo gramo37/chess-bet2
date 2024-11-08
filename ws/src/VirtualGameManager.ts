@@ -610,16 +610,14 @@ export class VirtualGameManager {
   async getAllGames(token: string, stake: string) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return [];
+    console.log(this.games.length, "gjj");
     return this.games.filter((game) => {
       return (
         game.getGameStatus() === NOT_YET_STARTED &&
-        !game.isFriendly &&
-        game.matchRating(user?.rating)
-        // game.stake === stake
+        !game.isFriendly
       );
     });
   }
-
   async gracefulRestart() {
     let allPlayers = this.games
       .map((game) => {

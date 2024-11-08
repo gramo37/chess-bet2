@@ -17,7 +17,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function SendRandomPlayNotificationToAdmin(gameId: string) {
+export async function SendRandomPlayNotificationToAdmin(
+  gameId: string,
+  email: string
+) {
   try {
     // Fetch active ActiveUsers with USER role
     const ActiveUsers = await db.user.findMany({
@@ -49,12 +52,12 @@ export async function SendRandomPlayNotificationToAdmin(gameId: string) {
 
     // Send email notifications to each admin
     await Promise.all(
-      ActiveUsers.map(async (admin) => {
+      ActiveUsers.map(async (user) => {
         try {
-          await transporter.sendMail(createMailConfig(admin.email));
-          console.log(`Email sent successfully to admin: ${admin.email}`);
+          if (user.email !== email)
+            await transporter.sendMail(createMailConfig(user.email));
         } catch (emailError) {
-          console.error(`Error sending email to ${admin.email}:`, emailError);
+          console.error(`Error sending email to ${user.email}:`, emailError);
         }
       })
     );

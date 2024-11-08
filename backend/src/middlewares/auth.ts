@@ -52,6 +52,7 @@ export const authenticateJWT = async (
         status: "COMPLETED",
       },
     });
+
     let u = { ...user, balance: user.balance, virtualGameCount };
     req.user = { user: u, token };
     next();

@@ -429,7 +429,7 @@ export class GameManager {
         const game = new Game(player1, player2, false, stake);
         console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
-        SendRandomPlayNotificationToAdmin(game.getGameId()); //sends notification to the admin that player has created random play
+        SendRandomPlayNotificationToAdmin(game.getGameId(), user.email); //sends notification to the admin that player has created random play
       } else {
         // match the opponent and start the game
 
@@ -576,6 +576,7 @@ export class GameManager {
   async getAllGames(token: string, stake: string) {
     const user = await extractUser(token);
     if (!user || !user.name || !user.id) return [];
+    console.log(this.games, "gjj");
     return this.games.filter((game) => {
       return (
         game.getGameStatus() === NOT_YET_STARTED &&

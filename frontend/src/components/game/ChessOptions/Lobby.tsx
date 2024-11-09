@@ -76,8 +76,12 @@ const Lobby = () => {
       </button>
 
       <div className="w-full">
-        {isPending && <p className="text-white">Fetching Opponents...</p>}
-        {isError && <p className="text-white">Something went wrong</p>}
+        {isPending && (
+          <p className="text-white text-center">Fetching Opponents...</p>
+        )}
+        {isError && (
+          <p className="text-white text-center">Something went wrong</p>
+        )}
         {!isPending && opponents.length > 0 && (
           <div className="flex flex-col items-start w-full">
             <h3 className="text-white text-lg mb-2">Select Your Opponent</h3>
@@ -93,6 +97,7 @@ const Lobby = () => {
                       className="form-checkbox h-5 w-5 text-indigo-600 mr-3 cursor-pointer"
                       checked={opponent.gameId === gameId}
                       onChange={() => {
+                        console.log(opponent.player1.name);
                         setGameId(opponent.gameId);
                         setStake(opponent.stake);
                       }}
@@ -111,7 +116,7 @@ const Lobby = () => {
           </div>
         )}
         {!isPending && !isError && isSuccess && opponents.length === 0 && (
-          <p className="text-white">No Opponents</p>
+          <p className="text-white text-center">No Opponents</p>
         )}
       </div>
       {gameId && (

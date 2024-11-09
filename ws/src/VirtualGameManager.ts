@@ -362,6 +362,7 @@ export class VirtualGameManager {
         console.log("Game Found -> ", game?.getGameId());
         if (game) {
           const player1 = game?.getPlayer1();
+          console.log(player1);
           // Avoid creating game between the same player.
           if (player1?.getPlayerId() !== user.id) {
             // Check if the balance of the player 2 is greater than stake
@@ -425,18 +426,28 @@ export class VirtualGameManager {
     } else if (["lobby", "random"].includes(type ?? "")) {
       // Check for ratings and match the players
       // Also check for all non friendly matches
-      const game = this.games.find((game) => {
-        return (
-          game.getGameStatus() === NOT_YET_STARTED &&
-          !game.isFriendly &&
-          // Check nearest rating only if type === "random"
-          game.matchRating(user.rating) &&
-          (type === "lobby" || (type === "random" && game.stake === stake))
-          // (type === "lobby" ||
-          //   (type === "random" && game.matchRating(user.rating))) &&
-          // game.stake === stake
+      let game;
+      if (Boolean(gameId)) {
+        // Check for gameId in then case of user select game from lobby
+        game = this.games.find(
+          (item) =>
+            item.getGameStatus() === NOT_YET_STARTED &&
+            item.getGameId() === gameId
         );
-      });
+      } else {
+        game = this.games.find((game) => {
+          return (
+            game.getGameStatus() === NOT_YET_STARTED &&
+            !game.isFriendly &&
+            // Check nearest rating only if type === "random"
+            game.matchRating(user.rating) &&
+            (type === "lobby" || (type === "random" && game.stake === stake))
+            // (type === "lobby" ||
+            //   (type === "random" && game.matchRating(user.rating))) &&
+            // game.stake === stake
+          );
+        });
+      }
       console.log("Matched Games -> ", game?.getGameId());
       if (!game) {
         // Push the game in this.games with a null player 2
@@ -466,6 +477,7 @@ export class VirtualGameManager {
         // match the opponent and start the game
 
         const player1 = game.getPlayer1();
+        console.log(player1.getPlayerName());
         // Avoid creating game between the same player.
         if (player1.getPlayerId() !== user.id) {
           const player2 = game?.getPlayer2();
@@ -612,10 +624,7 @@ export class VirtualGameManager {
     if (!user || !user.name || !user.id) return [];
     console.log(this.games.length, "gjj");
     return this.games.filter((game) => {
-      return (
-        game.getGameStatus() === NOT_YET_STARTED &&
-        !game.isFriendly
-      );
+      return game.getGameStatus() === NOT_YET_STARTED && !game.isFriendly;
     });
   }
   async gracefulRestart() {

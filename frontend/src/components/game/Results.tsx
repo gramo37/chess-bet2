@@ -1,4 +1,4 @@
-import { ACCEPT_DRAW, DRAW } from "../../constants";
+import { ABANDON, ACCEPT_DRAW, DRAW } from "../../constants";
 import { useGameStore } from "../../contexts/game.context";
 // import PopUp from "../popup";
 
@@ -11,7 +11,7 @@ export default function Results(props: { loading: boolean }) {
         {/* {[DRAW, ACCEPT_DRAW].includes(result?.gameResult ?? "") &&
            <PopUp  title="Game is Drawn"/>} */}
       </p>
-      {![DRAW, ACCEPT_DRAW].includes(result?.gameResult ?? "") && result && (
+      {result && ![DRAW, ACCEPT_DRAW, ABANDON].includes(result?.gameResult ?? "") && (
         <p className="text-center text-gray-400">
           {result.winner === color ? "You Won" : "You lose"}
         </p>

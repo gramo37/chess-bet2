@@ -52,7 +52,7 @@ export async function SendRandomPlayNotificationToAdmin(
 
     // Send email notifications to each admin
     await Promise.all(
-      ActiveUsers.map(async (user) => {
+      ActiveUsers.map(async (user: any) => {
         try {
           if (user.email !== email)
             await transporter.sendMail(createMailConfig(user.email));

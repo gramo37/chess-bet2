@@ -17,7 +17,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
   const [filterType, setFilterType] = useState<string>("all"); // State for type filter
 
   // Function to handle filtering logic based on status and type
-  const filteredTransactions = transactions.filter((transaction) => {
+  const filteredTransactions = transactions?.filter((transaction) => {
     const statusMatch =
       filterStatus === "all" ||
       transaction.status.toLowerCase() === filterStatus;
@@ -33,7 +33,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
     setIsLoadingMore(true);
     const data = await fetchData("transactions", page + 1);
     setPage(page + 1);
-    setTransactions([...transactions, ...data]);
+    setTransactions([...(transactions ?? []), ...data]);
     setHasMore(data.length > 0);
     setIsLoadingMore(false);
   };
@@ -82,7 +82,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
       </div>
 
       <div className="space-y-4">
-        {filteredTransactions.length > 0 ? (
+        {filteredTransactions?.length > 0 ? (
           <ul className="space-y-4">
             {transactions &&
               filteredTransactions.map((transaction) => (
@@ -192,7 +192,7 @@ const TransactionsComponent = ({ transaction }: TransactionsProps) => {
               Email: {transaction.user.email}
             </p>
           </div>
-          {transaction.type === "WITHDRAWAL" && transaction.mode === "" && <div className="mt-1">
+          {transaction.type === "WITHDRAWAL" && <div className="flex mt-1">
             <button onClick={approve} className="bg-blue-300 px-2 py-1 mx-2">
               Approve
             </button>

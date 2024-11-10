@@ -130,6 +130,8 @@ const Crypto = () => {
           >
             <option value="BTC">BTC</option>
             <option value="ETH">ETH</option>
+            {/* <option value="USDT">USDT</option> */}
+            <option value="LTC">LTC</option>
           </select>
         </div>
         <button

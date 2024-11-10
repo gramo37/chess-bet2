@@ -19,14 +19,14 @@ async function createOrderCallback() {
       },
       // use the "body" param to optionally pass additional order information
       // like product ids and quantities
-      body: JSON.stringify({
-        cart: [
-          {
-            id: 1,
-            quantity: 1,
-          },
-        ],
-      }),
+      // body: JSON.stringify({
+      //   cart: [
+      //     {
+      //       id: 1,
+      //       quantity: 1,
+      //     },
+      //   ],
+      // }),
     });
 
     const orderData = await response.json();
@@ -141,7 +141,7 @@ const Message = ({ content }: { content: any }) => {
 export const PaymentForm = () => {
   const [message, setMessage] = useState("");
   return (
-    <div className="form">
+    <div className="form w-[376px]">
       <PayPalButtons
         style={{
           shape: "rect",

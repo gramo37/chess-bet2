@@ -2,6 +2,7 @@ import { useState } from "react";
 import Mpesa from "./mpesa";
 import Crypto from "./crypto";
 import usePersonStore from "../../../contexts/auth";
+// import PaypalPage from "./paypal/PaypalPage";
 
 export default function DepositMoney() {
   const [paymentMethod, setPaymentMethod] = useState("mpesa");
@@ -81,6 +82,23 @@ export default function DepositMoney() {
       >
         Crypto
       </button>
+      {/* <button
+        onClick={() => {
+          if (user&&!user.emailVerified) {
+            alert("Please verify your email to use Crypto.");
+            return;
+          }
+          setPaymentMethod("paypal");
+        }}
+        className={`btn m-2 p-2 ${
+          paymentMethod === "paypal"
+            ? "bg-yellow-500 text-white"
+            : "bg-gray-200 text-blue-800"
+        }`}
+        disabled={!user||!user.emailVerified} // Optional: Disable button if not verified
+      >
+        Paypal
+      </button> */}
     </div>
   </div>
   {user&&!user.emailVerified && (
@@ -90,6 +108,7 @@ export default function DepositMoney() {
   )}
   {["apple", "mpesa", "card"].includes(paymentMethod) && user && user.emailVerified && <Mpesa paymentMethod={paymentMethod}/>}
   {paymentMethod === "crypto" && user && user.emailVerified && <Crypto />}
+  {/* {paymentMethod === "paypal" && user && user.emailVerified && <PaypalPage />} */}
 </div>
 
   );

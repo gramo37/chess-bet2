@@ -37,6 +37,7 @@ import BlogPost from "./components/blog/blogPost";
 import LiveChat from "./components/liveChat";
 import VirtualAccount from "./components/virtualAccount";
 // import PaypalPage from "./components/account/DepositMoney/paypal";
+// import PaypalPage from "./components/account/DepositMoney/paypal";
 
 const queryClient = new QueryClient();
 

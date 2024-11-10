@@ -13,6 +13,7 @@ const PaypalPage = () => {
     "dataSdkIntegrationSource": "integrationbuilder_ac",
     "dataClientToken": clientToken,
     components: "hosted-fields,buttons",
+    currency: "USD"
   };
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const PaypalPage = () => {
     })();
   }, []);
   return (
-    <>
+    <div style={{width: "100%", margin:"18px 0px ", display: "flex", justifyContent: "center", alignItems: "center"}}>
       {clientToken ? (
         <PayPalScriptProvider options={initialOptions}>
           <PaymentForm />
@@ -33,7 +34,7 @@ const PaypalPage = () => {
       ) : (
         <h4>WAITING ON CLIENT TOKEN</h4>
       )}
-    </>
+    </div>
   );
 };
 

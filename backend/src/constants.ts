@@ -32,6 +32,8 @@ export const NOWPAYMENTS_PASS = process.env.NOWPAYMENTS_PASS ?? ""
 export const PAYPAL_BASE = process.env.PAYPAL_BASE ?? "https://api-m.sandbox.paypal.com"
 export const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID ?? "12348564523212"
 export const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET ?? "7784412123"
+export const WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID ?? "T720405L4933954F"
+export const CACHE_DIR = process.env.PAYPAL_CACHE_DIR ?? ""
 
 export const BINANCE_SECRET_KEY = process.env.BINANCE_SECRET_KEY ?? "";
 export const BINANCE_API_KEY = process.env.BINANCE_API_KEY ?? ""

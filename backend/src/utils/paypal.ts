@@ -63,6 +63,8 @@ export const createOrder = async (cart: any) => {
     cart
   );
 
+  if(!cart || !cart?.currency_code || !cart?.value) throw new Error("Cart values not provided")
+
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders`;
   const payload = {
@@ -70,8 +72,8 @@ export const createOrder = async (cart: any) => {
     purchase_units: [
       {
         amount: {
-          currency_code: "USD",
-          value: "100.00",
+          currency_code: cart?.currency_code ?? "USD",
+          value: cart?.value,
         },
       },
     ],

@@ -9,27 +9,26 @@ import {
   usePayPalHostedFields,
 } from "@paypal/react-paypal-js";
 import { BACKEND_URL } from "../../../../constants/routes";
+import axios from "axios";
 
-async function createOrderCallback() {
+async function createOrderCallback(value: string, currency_code: string) {
   try {
-    const response = await fetch(`${BACKEND_URL}/payments/paypal/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await axios.post(
+      `${BACKEND_URL}/payments/paypal/orders`,
+      {
+        cart: {
+          value,
+          currency_code,
+        },
       },
-      // use the "body" param to optionally pass additional order information
-      // like product ids and quantities
-      // body: JSON.stringify({
-      //   cart: [
-      //     {
-      //       id: 1,
-      //       quantity: 1,
-      //     },
-      //   ],
-      // }),
-    });
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const orderData = await response.json();
+    const orderData = await response.data;
 
     if (orderData.id) {
       return orderData.id;
@@ -49,12 +48,15 @@ async function createOrderCallback() {
 
 async function onApproveCallback(data: any, actions?: any) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/orders/${data.orderID}/capture`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${BACKEND_URL}/api/orders/${data.orderID}/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const orderData = await response.json();
     // Three cases to handle:
@@ -94,7 +96,7 @@ async function onApproveCallback(data: any, actions?: any) {
       console.log(
         "Capture result",
         orderData,
-        JSON.stringify(orderData, null, 2),
+        JSON.stringify(orderData, null, 2)
       );
       return `Transaction ${transaction.status}: ${transaction.id}. See console for all available details`;
     }
@@ -121,8 +123,8 @@ const SubmitPayment = ({ onHandleMessage }: { onHandleMessage: any }) => {
       .catch((orderData) => {
         onHandleMessage(
           `Sorry, your transaction could not be processed...${JSON.stringify(
-            orderData,
-          )}`,
+            orderData
+          )}`
         );
       });
   };
@@ -138,7 +140,13 @@ const Message = ({ content }: { content: any }) => {
   return <p>{content}</p>;
 };
 
-export const PaymentForm = () => {
+export const PaymentForm = ({
+  currency_code,
+  value,
+}: {
+  currency_code: string;
+  value: string;
+}) => {
   const [message, setMessage] = useState("");
   return (
     <div className="form w-[376px]">
@@ -149,11 +157,11 @@ export const PaymentForm = () => {
         }}
         // TODO
         // styles={{ marginTop: "4px", marginBottom: "4px" }}
-        createOrder={createOrderCallback}
+        createOrder={() => createOrderCallback(value.toString(), currency_code)}
         onApprove={async (data) => setMessage(await onApproveCallback(data))}
       />
 
-      <PayPalHostedFieldsProvider createOrder={createOrderCallback}>
+      <PayPalHostedFieldsProvider createOrder={() => createOrderCallback(value.toString(), currency_code)}>
         <div style={{ marginTop: "4px", marginBottom: "4px" }}>
           <PayPalHostedField
             id="card-number"

@@ -170,7 +170,6 @@ function App() {
                   </>
                 }
               />
-              {/* <Route path="/paypal" element={<PaypalPage />} /> */}
               <Route
                 path="/about"
                 element={

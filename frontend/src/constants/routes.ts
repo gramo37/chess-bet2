@@ -10,7 +10,11 @@ export const WS_BACKEND_URL = `${
 }/${WS_ROUTE}`;
 export const PAYPALCLIENTID = "test"
 
+
+// const HOST = "http://prochesser.com"
+// const HOST = "https://chess.gramo37.com"
+
 // // // Deployment routes
-// export const BACKEND_URL = "https://prochesser.com/api";
-// export const WS_URL = "https://prochesser.com/ws";
-// export const WS_BACKEND_URL = "https://prochesser.com/ws";
+// export const BACKEND_URL = `${HOST}/api`;
+// export const WS_URL = `${HOST}/ws`;
+// export const WS_BACKEND_URL = `${HOST}/ws`;

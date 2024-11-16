@@ -166,7 +166,7 @@ async function downloadAndCache(url?: any, cacheKey?: any) {
 export async function verifySignature(event: any, headers: any) {
   const transmissionId = headers['paypal-transmission-id']
   const timeStamp = headers['paypal-transmission-time']
-  const crc = parseInt("0x" + crc32(event).toString('hex')); // hex crc32 of raw event data, parsed to decimal form
+  const crc = parseInt("0x" + crc32(JSON.stringify(event, null, 2)).toString('hex')); // hex crc32 of raw event data, parsed to decimal form
  
   const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
   console.log(`Original signed message ${message}`);

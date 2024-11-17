@@ -37,8 +37,10 @@ export const getOrders = async (req: Request, res: Response) => {
     const { cart } = req.body;
     const user: any = (req?.user as any)?.user;
     const { jsonResponse, httpStatusCode } = await createOrder(cart);
+    console.log("jsonResponse", jsonResponse);
+    console.log("httpStatusCode", httpStatusCode);
     try {
-      const orderId = jsonResponse.data.id;
+      const orderId = jsonResponse?.id;
       const finalamountInUSD = Number(cart?.value);
       const platform_charges = parseFloat(
         (finalamountInUSD * PLATFORM_FEES).toFixed(2)
@@ -51,7 +53,7 @@ export const getOrders = async (req: Request, res: Response) => {
               id: user.id,
             },
           },
-          amount: cart?.value,
+          amount: Number(cart?.value),
           type: "DEPOSIT",
           status: "PENDING",
           signature: "",
@@ -79,6 +81,10 @@ export const getOrderStatus = async (req: Request, res: Response) => {
   try {
     const { orderID } = req.params;
     const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
+
+    console.log("jsonResponse", jsonResponse);
+    console.log("httpStatusCode", httpStatusCode);
+
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
     console.error("Failed to create order:", error);

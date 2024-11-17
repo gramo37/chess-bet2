@@ -105,7 +105,9 @@ router.post("/validate/transactions", async (req, res) => {
 
       // Check for api_ref and match it
       const capture = event.resource;
-      const orderId = capture.supplementary_data.related_ids.order_id;
+      const orderId = capture.id;
+      const status: string = (capture?.status ?? capture?.state).toString();
+      // const orderId = capture.supplementary_data.related_ids.order_id;
 
       const transaction = await db.transaction.findFirst({
         where: {
@@ -133,7 +135,9 @@ router.post("/validate/transactions", async (req, res) => {
 
       if (
         event.event_type === "PAYMENT.CAPTURE.DENIED" ||
-        event.event_type === "PAYMENT.CAPTURE.REFUNDED"
+        event.event_type === "PAYMENT.CAPTURE.REFUNDED" ||
+        event.event_type === "PAYMENT.CAPTURE.DECLINED" || 
+        ["denied", "declined"].includes(status?.toLowerCase())
       ) {
         console.log(
           "Updating DB..",

@@ -150,7 +150,7 @@ const PaypalPage = () => {
       >
         {clientToken ? (
           <PayPalScriptProvider options={initialOptions}>
-            <PaymentForm currency_code={currency} value={amount}/>
+            <PaymentForm currency_code={currency} value={roundTo8Decimals(1.03 * Number(amount)).toString()}/>
           </PayPalScriptProvider>
         ) : (
           loading && <h4>WAITING ON CLIENT TOKEN</h4>

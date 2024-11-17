@@ -61,25 +61,34 @@ router.post("/validate/transactions", async (req, res) => {
     console.log(`raw event: ${event}`);
 
     // const isSignatureValid = await verifySignature(event, headers);
+    let verificationResponse: any;
 
-    const verificationResponse = await axios.post(
-      `${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`,
-      {
-        transmission_id: transmissionId,
-        transmission_time: transmissionTime,
-        cert_url: req.headers["paypal-cert-url"],
-        auth_algo: req.headers["paypal-auth-algo"],
-        transmission_sig: signature,
-        webhook_id: webhookId,
-        webhook_event: req.body,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await generateAccessToken()}`,
+    try {
+      verificationResponse = await axios.post(
+        `${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`,
+        {
+          transmission_id: transmissionId,
+          transmission_time: transmissionTime,
+          cert_url: req.headers["paypal-cert-url"],
+          auth_algo: req.headers["paypal-auth-algo"],
+          transmission_sig: signature,
+          webhook_id: webhookId,
+          webhook_event: req.body,
         },
-      }
-    );
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${await generateAccessToken()}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.log("Error in validating response", error);
+      return res.status(500).json({
+        status: "error",
+        message: "Something went wrong while validation"
+      })
+    }
 
     console.log("verificationResponse", verificationResponse);
 

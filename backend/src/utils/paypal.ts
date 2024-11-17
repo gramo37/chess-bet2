@@ -8,6 +8,7 @@ import {
 import crypto from "crypto";
 import crc32 from "buffer-crc32";
 import fs from "fs/promises";
+import axios from "axios";
 
 const base = PAYPAL_BASE;
 
@@ -183,4 +184,46 @@ export async function verifySignature(event: any, headers: any) {
   verifier.update(message);
  
   return verifier.verify(certPem, signatureBuffer);
+}
+
+export async function createPayout(
+  recipientEmail: string,
+  amount: string,
+  currency: string
+) {
+  try {
+    const accessToken = await generateAccessToken();
+  
+    const payoutData = {
+      sender_batch_header: {
+        email_subject: 'You have a payout!',
+      },
+      items: [
+        {
+          recipient_type: 'EMAIL',
+          amount: {
+            value: amount,
+            currency: currency,
+          },
+          receiver: recipientEmail,
+        },
+      ],
+    };
+  
+    const response = await axios.post(
+      `${PAYPAL_BASE}/v1/payments/payouts`,
+      payoutData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  
+    return response?.data;
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }

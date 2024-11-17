@@ -13,6 +13,7 @@ import axios from "axios";
 
 async function createOrderCallback(value: string, currency_code: string) {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.post(
       `${BACKEND_URL}/payments/paypal/orders`,
       {
@@ -24,6 +25,7 @@ async function createOrderCallback(value: string, currency_code: string) {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       }
     );

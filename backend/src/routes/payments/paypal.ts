@@ -93,7 +93,7 @@ router.post("/validate/transactions", async (req, res) => {
     console.log("verificationResponse", verificationResponse);
 
     const isSignatureValid =
-      verificationResponse.data.verification_status === "SUCCESS";
+      verificationResponse?.data?.verification_status === "SUCCESS";
 
     console.log(isSignatureValid, "isSignatureValid");
     if (isSignatureValid) {

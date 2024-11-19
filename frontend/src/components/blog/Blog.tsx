@@ -2,11 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Spinner from "../spinner";
-
-const deploy = true;
-const BLOG_API_LINK = deploy
-  ? "https://chess-bet2.onrender.com"
-  : "https://cfg8st-3002.csb.app";
+import { BLOG_API_LINK } from "../../constants/routes";
 
 // Define types for post and pagination
 interface Post {
@@ -67,6 +63,7 @@ const Blog: React.FC = () => {
           `${BLOG_API_LINK}/api/posts?page=${page.page}`
         );
         const data = response.data;
+        console.log(data.docs);
         setPosts(data.docs);
         setPage({ page: data.page, totalPage: data.totalPages });
       } catch (error: any) {
@@ -86,12 +83,22 @@ const Blog: React.FC = () => {
     );
   if (error)
     return (
-      <p className="text-red-500 text-center">Error loading posts: {error}</p>
+      <div className="bg-black flex justify-center items-center h-[400px]">
+        <p className="text-red-500 text-lg text-center">
+          Error loading posts: {error}
+        </p>
+      </div>
     );
-    if (!posts || posts.length === 0) {
-      return <p className=" text-center">No blogs available at the moment.</p>;
-    }
-    
+  if (!posts || posts.length === 0) {
+    return (
+      <div className="bg-black flex justify-center items-center h-[400px]">
+        <p className="text-white text-lg text-center">
+          No blogs available at the moment.
+        </p>
+        ;
+      </div>
+    );
+  }
 
   return (
     <div className="w-full p-4 bg-black">

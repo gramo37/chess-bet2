@@ -1,79 +1,97 @@
-import { CollectionConfig } from 'payload/types';
-import Quote from '../blocks/Quote';
-import Content from '../blocks/Content';
-import Alert from '../blocks/Alert';
+import { CollectionConfig } from "payload/types";
+import Content from "../blocks/Content";
 
 const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   admin: {
-    defaultColumns: ['title', 'author', 'tags', 'status','category'],
-    useAsTitle: 'title',
+    defaultColumns: ["title", "tags", "category"],
+    useAsTitle: "title",
   },
   access: {
-    read: () => true,
+    read: ({ req }) => {
+      if (req.user) return true;
+      return {
+        _status: { equals: "published" }, // Ensures only published posts are accessible
+      };
+    },
+  },
+  versions: {
+    drafts: true, // Enable drafts
   },
   fields: [
     {
-      name: 'postMeta',
-      type: 'group',
+      name: "postMeta",
+      type: "group",
+      label: "SEO Metadata",
       fields: [
         {
-          name: 'title',
-          type: 'text',
+          name: "title",
+          label: "SEO Title",
+          type: "text",
           required: true,
           minLength: 20,
           maxLength: 100,
         },
         {
-          name: 'description',
-          type: 'textarea',
+          name: "description",
+          label: "Meta Description",
+          type: "textarea",
           required: true,
           minLength: 40,
           maxLength: 160,
         },
         {
-          name: 'keywords',
-          label: 'Keywords',
-          type: 'text',
+          name: "keywords",
+          type: "array",
+          labels: {
+            singular: "Keyword",
+            plural: "Keywords",
+          },
+          fields: [{ name: "keyword", type: "text" }],
         },
       ],
     },
     {
-      name: 'title',
-      type: 'text',
+      name: "title",
+      label: "Post Title",
+      type: "text",
       required: true,
     },
     {
-      type: 'tabs',
+      name: "tags",
+      label: "Tags",
+      type: "relationship",
+      relationTo: "tags", // Matches the slug of the Tags collection
+      hasMany: true,
+    },
+    {
+      type: "tabs",
       tabs: [
         {
-          label: 'Post Media',
+          label: "Media",
           fields: [
             {
-              name: 'postImage',
-              type: 'upload',
-              relationTo: 'media',
+              name: "postImage",
+              label: "Post Image",
+              type: "upload",
+              relationTo: "media",
               required: true,
             },
           ],
         },
         {
-          label: 'Post Layout',
+          label: "Content Layout",
           fields: [
             {
-              name: 'layout',
-              type: 'blocks',
-              blocks: [
-                Quote,
-                Content,
-                Alert
-              ],
+              name: "layout",
+              type: "blocks",
+              blocks: [Content],
             },
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
-// add sidebar fields here
   ],
-}
+};
+
 export default Posts;

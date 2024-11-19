@@ -8,8 +8,8 @@ export const WS_URL = `${import.meta.env.VITE_WS_URL ?? "ws://localhost:8000"}`;
 export const WS_BACKEND_URL = `${
   import.meta.env.VITE_WS_REST_URL ?? "httpj://localhost:8000"
 }/${WS_ROUTE}`;
-export const PAYPALCLIENTID = "test"
-
+export const PAYPALCLIENTID = "test";
+export const BLOG_API_LINK = import.meta.env.VITE_BLOG_LINK??"https://cfg8st-3333.csb.app";
 
 // const HOST = "http://prochesser.com"
 // const HOST = "https://chess.gramo37.com"

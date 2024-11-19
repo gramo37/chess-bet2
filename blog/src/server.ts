@@ -24,9 +24,7 @@ const start = async () => {
     },
   });
 
-  // Add your own express routes here
-
-  app.listen(3002);
+  app.listen(3333);
 };
 
 start();

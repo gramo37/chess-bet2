@@ -2,11 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../spinner";
-
-const deploy = true;
-const BLOG_API_LINK = deploy
-  ? "https://chess-bet2.onrender.com"
-  : "https://cfg8st-3002.csb.app";
+import { BLOG_API_LINK } from "../../constants/routes";
 
 const BlogContent = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +14,7 @@ const BlogContent = () => {
     const fetchPost = async () => {
       try {
         const response = await axios.get(`${BLOG_API_LINK}/api/posts/${id}`);
+        console.log(response.data);
         setPost(response.data);
       } catch (err) {
         setError("Failed to fetch post.");
@@ -61,7 +58,12 @@ const BlogContent = () => {
       {/* Blog Content */}
       <p className="text-gray-600 mb-4">{post.postMeta.description}</p>
       <p className="text-gray-500 mb-4 italic">
-        Keywords: {post.postMeta.keywords}
+        Keywords:{" "}
+        {post.postMeta.keywords.map((keyword: any, index: number) => (
+          <span key={index} className="m-1">
+            {keyword.keyword}
+          </span>
+        ))}
       </p>
 
       {post.layout.map((section: any, index: number) => (

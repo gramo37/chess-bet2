@@ -48,9 +48,6 @@ wss.on("connection", async function connection(ws, req) {
   if (!isAuthorizedUser)
     return ws.send(JSON.stringify({ message: "Unauthorized user!" }));
 
-  console.log("isAuthorizedUser", isAuthorizedUser);
-  console.log(token, stake, type, gameId, isVirtual);
-
   if (token && stake && type) {
     if (isVirtual && isVirtual == "true") {
       console.log("create virtual game", isVirtual);

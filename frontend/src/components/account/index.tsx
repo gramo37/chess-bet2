@@ -66,7 +66,7 @@ export default function Account() {
     <div className="text-white bg-black max-w-full min-h-screen w-full  m-auto px-4 py-3">
       <div className="flex justify-between mx-2 mb-3">
         <button
-          className=" p-2 bg-yellow-500 text-white rounded-full shadow-lg"
+          className=" p-2 bg-yellow-500 w-[50px] text-white rounded-full shadow-lg"
           onClick={() => {
             navigate("/game");
           }}
@@ -77,7 +77,7 @@ export default function Account() {
           {user && !user.emailVerified && (
             <button
               onClick={VerifiedEmail}
-              className="text-yellow-500 hover:text-yellow-400 hover:underline"
+              className="text-yellow-500 whitespace-nowrap hover:text-yellow-400 hover:underline"
             >
               Verify Email
             </button>

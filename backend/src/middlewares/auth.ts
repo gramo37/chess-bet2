@@ -50,6 +50,9 @@ export const authenticateJWT = async (
         OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
         isVirtual: true,
         status: "COMPLETED",
+        gameOutCome: {
+          not: "ABANDON",
+        },
       },
     });
 

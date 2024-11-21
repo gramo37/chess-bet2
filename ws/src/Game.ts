@@ -528,6 +528,9 @@ export class Game {
               virtualBalance: {
                 decrement: Number(this.stake),
               },
+              rating: {
+                decrement: 10,
+              },
             },
           }),
           // Increase 85 % of the stake amount (this.stake) from winner's account
@@ -538,6 +541,9 @@ export class Game {
             data: {
               virtualBalance: {
                 increment: 0.85 * Number(this.stake),
+              },
+              rating: {
+                increment: 10,
               },
             },
           }),

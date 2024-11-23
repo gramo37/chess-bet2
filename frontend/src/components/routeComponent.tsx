@@ -17,10 +17,10 @@ export const PrivateRoute = ({ children }: RouteProps) => {
   if (!user) return <Navigate to="/login" />;
 
   switch (user.role) {
-    case "ADMIN":
-      return <Navigate to="/dashboard" />;
-    case "MODRATOR":
-      return <ModratorDashboard />;
+    // case "ADMIN":
+    //   return <Navigate to="/dashboard" />;
+    // case "MODRATOR":
+    //   return <ModratorDashboard />;
     default:
       return <>{children}</>;
   }

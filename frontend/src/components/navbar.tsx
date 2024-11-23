@@ -3,6 +3,7 @@ import usePersonStore from "../contexts/auth";
 import { useGetUser } from "../hooks/useGetUser";
 import { Link } from "react-router-dom";
 import { ACADEMY_FRONTEND_URL } from "../constants/learner";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   useGetUser();
@@ -14,6 +15,7 @@ export default function NavBar() {
   const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
   const toggleLoginSubmenu = () => setLoginSubmenuOpen(!loginSubmenuOpen);
   const toggleMenu = () => setIsOpen(!isOpen);
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white w-full shadow-md" id="nav">
@@ -209,6 +211,22 @@ export default function NavBar() {
                   </Link>
                 </>
               )}
+              {user?.role === "ADMIN" && (
+                <>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => navigate("/game")}
+                    className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+                  >
+                    Game
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => {
                   localStorage.removeItem("token");
@@ -350,6 +368,22 @@ export default function NavBar() {
                   >
                     Account
                   </Link>
+                </>
+              )}
+              {user?.role === "ADMIN" && (
+                <>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => navigate("/game")}
+                    className="bg-yellow-500 text-black font-semibold py-2 px-3 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-yellow-400"
+                  >
+                    Game
+                  </button>
                 </>
               )}
               <button

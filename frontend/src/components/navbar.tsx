@@ -19,7 +19,7 @@ export default function NavBar() {
 
   return (
     <nav className="bg-white w-full shadow-md" id="nav">
-      <div className="flex justify-between items-center max-w-7xl mx-auto py-1 px-4">
+      <div className="flex justify-between items-center whitespace-nowrap max-w-7xl mx-auto py-1 px-4">
         <Link
           to="/"
           className="relative text-black hover:text-yellow-500 transition-colors duration-300"
@@ -37,7 +37,7 @@ export default function NavBar() {
 
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden focus:outline-none"
+          className="lg:hidden focus:outline-none w-fit p-3 hover:bg-gray-300"
           aria-label="Toggle Menu"
         >
           <svg

@@ -4,9 +4,11 @@ import FriendlyMatch from "./FriendlyMatch";
 import Lobby from "./Lobby";
 import Random from "./Random";
 import MainOptions from "./MainOptions";
+import usePersonStore from "../../../contexts/auth";
 
 const ChessOptions: React.FC = () => {
   const { isGameStarted, type } = useGameStore(["isGameStarted", "type"]);
+  const { isVirtualAccount } = usePersonStore();
 
   if (isGameStarted) return null;
 
@@ -16,7 +18,7 @@ const ChessOptions: React.FC = () => {
       <MainOptions />
       {/* Conditional rendering based on selected option */}
       {type === "friend" && <FriendlyMatch />}
-      {type === "lobby" && <Lobby />}
+      {type === "lobby" && !isVirtualAccount && <Lobby />}
       {type === "random" && <Random />}
     </div>
   );

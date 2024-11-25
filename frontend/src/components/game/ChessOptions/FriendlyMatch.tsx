@@ -46,7 +46,7 @@ const FriendlyMatch = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4   rounded-lg w-full w-full shadow-lg">
+    <div className="flex flex-col items-center space-y-4  whitespace-nowrap rounded-lg w-full w-full shadow-lg">
       <h3 className="text-white text-xl font-semibold mb-1">
         Friendly Match Options:
       </h3>

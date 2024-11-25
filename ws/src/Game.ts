@@ -89,6 +89,10 @@ export class Game {
     return this.player2;
   }
 
+  isAiGame() {
+    return this.isVirtual && !this.isFriendly;
+  }
+
   getGameId() {
     return this.gameId;
   }
@@ -179,7 +183,10 @@ export class Game {
     return this.player2TimeLeft;
   }
 
-  async makeMove(socket: WebSocket, move: TMove) {
+  getBoard() {
+    return this.board;
+  }
+  async makeMove(socket: WebSocket | null, move: TMove) {
     const player1 = this.player1.getPlayer();
     const player2 = this.player2.getPlayer();
     // Validate the move
@@ -317,6 +324,7 @@ export class Game {
   }
 
   async createGame() {
+    const isAiGame = this.player2.isAIOpponent();
     if (this.status === NOT_YET_STARTED) {
       const db_game = await db.game.create({
         data: {
@@ -329,20 +337,21 @@ export class Game {
               id: this.player1.getPlayerId(),
             },
           },
-          blackPlayer: {
-            connect: {
-              id: this.player2.getPlayerId(),
-            },
-          },
+          // Only connect blackPlayer if not an AI game
+          blackPlayer: isAiGame
+            ? {}
+            : {
+                connect: {
+                  id: this.player2.getPlayerId(),
+                },
+              },
           isVirtual: this.isVirtual,
         },
       });
+
       // this.gameId = db_game.id;
       this.status = IN_PROGRESS;
-      console.log(
-        "Sending message to player1 ->",
-        this.getPlayer1().getPlayerName()
-      );
+
       sendMessage(this.player1.getPlayer(), {
         type: GAMESTARTED,
         payload: {
@@ -364,22 +373,24 @@ export class Game {
         "Sending message to player2 ->",
         this.getPlayer2().getPlayerName()
       );
-      sendMessage(this.player2.getPlayer(), {
-        type: GAMESTARTED,
-        payload: {
-          color: this.gameId ? this.player2.getPlayerColor() : BLACK,
-          opponent: {
-            name: await this.getPlayer1().getPlayerUserName(),
-            rating: this.getPlayer1().getPlayerRating(),
+      if (!isAiGame || !this.player2.getPlayer()) {
+        sendMessage(this.player2.getPlayer(), {
+          type: GAMESTARTED,
+          payload: {
+            color: this.gameId ? this.player2.getPlayerColor() : BLACK,
+            opponent: {
+              name: await this.getPlayer1().getPlayerUserName(),
+              rating: this.getPlayer1().getPlayerRating(),
+            },
+            player: {
+              name: await this.getPlayer2().getPlayerUserName(),
+              rating: this.getPlayer2().getPlayerRating(),
+            },
+            player1TimeLeft: this.player1TimeLeft,
+            player2TimeLeft: this.player2TimeLeft,
           },
-          player: {
-            name: await this.getPlayer2().getPlayerUserName(),
-            rating: this.getPlayer2().getPlayerRating(),
-          },
-          player1TimeLeft: this.player1TimeLeft,
-          player2TimeLeft: this.player2TimeLeft,
-        },
-      });
+        });
+      }
 
       this.startPlayer1Timer();
       return;
@@ -413,63 +424,84 @@ export class Game {
       "Sending message to player1 ->",
       this.getPlayer2().getPlayerName()
     );
-    sendMessage(this.player2.getPlayer(), {
-      type: GAMERESTARTED,
-      payload: {
-        board: this.board,
-        moves: this.moves,
-        color: this.gameId ? this.player2.getPlayerColor() : BLACK,
-        sans: this.sans,
-        opponent: {
-          name: await this.getPlayer1().getPlayerUserName(),
-          rating: this.getPlayer1().getPlayerRating(),
+    if (!isAiGame || !this.player2.getPlayer()) {
+      sendMessage(this.player2.getPlayer(), {
+        type: GAMERESTARTED,
+        payload: {
+          board: this.board,
+          moves: this.moves,
+          color: this.gameId ? this.player2.getPlayerColor() : BLACK,
+          sans: this.sans,
+          opponent: {
+            name: await this.getPlayer1().getPlayerUserName(),
+            rating: this.getPlayer1().getPlayerRating(),
+          },
+          player: {
+            name: await this.getPlayer2().getPlayerUserName(),
+            rating: this.getPlayer2().getPlayerRating(),
+          },
+          player1TimeLeft: this.player1TimeLeft,
+          player2TimeLeft: this.player2TimeLeft,
         },
-        player: {
-          name: await this.getPlayer2().getPlayerUserName(),
-          rating: this.getPlayer2().getPlayerRating(),
-        },
-        player1TimeLeft: this.player1TimeLeft,
-        player2TimeLeft: this.player2TimeLeft,
-      },
-    });
+      });
+    }
     // this.startPlayer1Timer();
   }
 
-  async endGame(socket: WebSocket | null, payload: TEndGamePayload) {
-    const winner =
-      this.player1.getPlayer() === socket ? this.player2 : this.player1;
-    const loser =
-      this.player1.getPlayer() === socket ? this.player1 : this.player2;
-    let result: "WHITE_WINS" | "BLACK_WINS" | "DRAW" = sendGameOverMessage(
-      winner,
-      loser,
-      payload.status
-    );
-    if (payload.status === ACCEPT_DRAW) result = DRAW;
-    if (payload.status === ABANDON) result = DRAW;
-    if (result) {
-      console.log(`Game is ended. Result: ${result}.`);
-      // const areBalancesUpdated = await this.updateBalances(winner, loser);
-      let areBalancesUpdated = false;
-      if (result !== "DRAW")
+  async endGame(
+    socket: WebSocket | null,
+    payload: TEndGamePayload
+  ): Promise<void> {
+    try {
+      // Determine winner and loser based on the socket
+      const winner =
+        this.player1.getPlayer() === socket ? this.player2 : this.player1;
+      const loser =
+        this.player1.getPlayer() === socket ? this.player1 : this.player2;
+
+      // Determine game result
+      let result: "WHITE_WINS" | "BLACK_WINS" | "DRAW" = sendGameOverMessage(
+        winner,
+        loser,
+        payload.status
+      );
+      console.log(
+        "winner " + winner.getPlayerName(),
+        "loser " + loser.getPlayerName()
+      );
+      if (payload.status === ACCEPT_DRAW || payload.status === ABANDON) {
+        result = "DRAW";
+      }
+
+      console.log(`Game is ending. Result: ${result}.`);
+
+      // Update balances only if the result is not a draw
+      let areBalancesUpdated = true;
+      if (result !== "DRAW") {
         areBalancesUpdated = await this.updateBalances(winner, loser);
-      else areBalancesUpdated = true;
+      }
+
+      // Update game data in the database
       await db.game.update({
         data: {
           status: COMPLETED,
           result,
           gameOutCome: payload.status,
           board: this.board,
-          endTime: new Date(Date.now()),
+          endTime: new Date(),
           areBalancesUpdated,
         },
-        where: {
-          id: this.gameId,
-        },
+        where: { id: this.gameId },
       });
+
+      // Finalize game state
       this.status = COMPLETED;
       this.stopPlayer1Timer();
       this.stopPlayer2Timer();
+
+      console.log("Game has been successfully ended.");
+    } catch (error) {
+      console.error("Error ending game:", error);
     }
   }
 
@@ -499,91 +531,130 @@ export class Game {
     return isCloseTo(playerRating, rating);
   }
 
-  async updateBalances(winner: Player, loser: Player) {
+  async updateBalances(winner: Player, loser: Player): Promise<boolean> {
     try {
-      // Reduce stake amount (this.stake) from loser's account
-      // if(!this.stake || !Number.isNaN(Number(this.stake))) return false;
-      console.log("Updating balances");
-      console.log(
-        `Decrementing for Player ->`,
-        loser.getPlayerName(),
-        loser.getPlayerId(),
-        "Rating -> ",
-        loser.getPlayerRating()
-      );
-      console.log(
-        `Incrementing for Player ->`,
-        winner.getPlayerName(),
-        winner.getPlayerId(),
-        "Rating -> ",
-        loser.getPlayerRating()
-      );
-      if (this.isVirtual) {
-        await db.$transaction([
-          db.user.update({
-            where: {
-              id: loser.getPlayerId(),
-            },
-            data: {
-              virtualBalance: {
-                decrement: Number(this.stake),
-              },
-              rating: {
-                decrement: 10,
-              },
-            },
-          }),
-          // Increase 85 % of the stake amount (this.stake) from winner's account
-          db.user.update({
-            where: {
-              id: winner.getPlayerId(),
-            },
-            data: {
-              virtualBalance: {
-                increment: 0.85 * Number(this.stake),
-              },
-              rating: {
-                increment: 10,
-              },
-            },
-          }),
-        ]);
-      } else {
-        await db.$transaction([
-          db.user.update({
-            where: {
-              id: loser.getPlayerId(),
-            },
-            data: {
-              balance: {
-                decrement: Number(this.stake),
-              },
-              rating: {
-                decrement: 10,
-              },
-            },
-          }),
-          // Increase 85 % of the stake amount (this.stake) from winner's account
-          db.user.update({
-            where: {
-              id: winner.getPlayerId(),
-            },
-            data: {
-              balance: {
-                increment: 0.85 * Number(this.stake),
-              },
-              rating: {
-                increment: 10,
-              },
-            },
-          }),
-        ]);
+      // Ensure stake is a valid number
+      const stakeAmount = Number(this.stake);
+      if (!stakeAmount || isNaN(stakeAmount)) {
+        console.error("Invalid stake amount:", this.stake);
+        return false;
       }
 
-      return true;
+      console.log("Updating balances for game:", this.gameId);
+      console.log(
+        `Decrementing for Player -> ${loser.getPlayerName()} (${loser.getPlayerId()}), Rating -> ${loser.getPlayerRating()}`
+      );
+      console.log(
+        `Incrementing for Player -> ${winner.getPlayerName()} (${winner.getPlayerId()}), Rating -> ${winner.getPlayerRating()}`
+      );
+
+      const transactions = [];
+
+      if (this.isVirtual) {
+        if (loser.getPlayer()) {
+          transactions.push(
+            db.user.update({
+              where: { id: loser.getPlayerId() },
+              data: {
+                virtualBalance: { decrement: stakeAmount },
+                rating: { decrement: 10 },
+              },
+            })
+          );
+        }
+
+        if (winner.getPlayer()) {
+          transactions.push(
+            db.user.update({
+              where: { id: winner.getPlayerId() },
+              data: {
+                virtualBalance: { increment: 0.85 * stakeAmount },
+                rating: { increment: 10 },
+              },
+            })
+          );
+        }
+      } else {
+        if (loser.getPlayer()) {
+          transactions.push(
+            db.user.update({
+              where: { id: loser.getPlayerId() },
+              data: {
+                balance: { decrement: stakeAmount },
+                rating: { decrement: 10 },
+              },
+            })
+          );
+        }
+        if (winner.getPlayer()) {
+          transactions.push(
+            db.user.update({
+              where: { id: winner.getPlayerId() },
+              data: {
+                balance: { increment: 0.85 * stakeAmount },
+                rating: { increment: 10 },
+              },
+            })
+          );
+        }
+      }
+
+      if (transactions.length > 0) {
+        await db.$transaction(transactions);
+        console.log("Balances updated successfully for game:", this.gameId);
+        return true;
+      } else {
+        console.error("No transactions to process.");
+        return false;
+      }
     } catch (error) {
-      console.log("Error updating balance for ", this.gameId, error);
+      console.error("Error updating balances for game:", this.gameId, error);
       return false;
+    }
+  }
+
+  async makeAiMove() {
+    if (
+      this.chess.isGameOver() &&
+      this.isAiGame() &&
+      this.chess.turn() === "b"
+    ) {
+      console.log("Game is over. No moves can be made.");
+      return;
+    }
+
+    // Evaluate moves and pick the best one
+    const StockFishMove = await this.getStockFishMove();
+    const bestMove = StockFishMove ? StockFishMove : this.getRandomMove();
+    if (bestMove) {
+      // this.chess.move(bestMove);
+      console.log("move", bestMove);
+      this.makeMove(this.player2.getPlayer(), bestMove);
+      return bestMove;
+    }
+    return null;
+  }
+
+  private getRandomMove() {
+    let computerMove;
+
+    const moves = this.chess.moves({ verbose: true });
+    if (moves.length > 0) {
+      computerMove = moves[Math.floor(Math.random() * moves.length)];
+    }
+    console.log("Random Move", computerMove);
+    return computerMove;
+  }
+  async getStockFishMove() {
+    try {
+      const StockFish_API = `https://stockfish.online/api/s/v2.php?fen=${this.board}&depth=2`;
+      const response = await axios.get(StockFish_API);
+      const data = await response.data;
+      console.log(data);
+      return data.bestmove;
+    } catch (e) {
+      console.log("Error Fetch StockFishMove", e);
+      return null;
     }
   }
 }

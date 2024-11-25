@@ -19,11 +19,11 @@
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2"
+    "@prisma/client": "5.22.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "prisma": "^5.10.2",
+    "prisma": "5.22.0",
     "rimraf": "^5.0.5",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"

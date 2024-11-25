@@ -141,6 +141,8 @@ export const useSocketHandler = () => {
         startPlayer1Timer(message.payload.player1TimeLeft);
       } else if (message.type === GAMEOVER) {
         setMoves([]);
+        setSans([]);
+        setGameIdLocally("");
         setResult({
           winner: message.payload.winner?.color,
           loser: message.payload.loser?.color,

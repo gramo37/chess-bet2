@@ -118,10 +118,10 @@ model Webhook_retries {
 model Game {
   id                 String       @id @default(cuid())
   Move               Move[]
-  blackPlayerId      String
+  blackPlayerId      String?
   whitePlayerId      String
   whitePlayer        User         @relation("GamesAsWhite", fields: [whitePlayerId], references: [id])
-  blackPlayer        User         @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
+  blackPlayer        User?        @relation("GamesAsBlack", fields: [blackPlayerId], references: [id])
   board              String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   status             GameStatus?
   result             GameResult?

@@ -1,4 +1,5 @@
 import { ABORT_GAME, ENDGAME, OFFER_DRAW, RESIGN } from "../../constants";
+import usePersonStore from "../../contexts/auth";
 import { useGameStore } from "../../contexts/game.context";
 
 const processMoves = (moves: string[]) => {
@@ -21,6 +22,7 @@ const Moves = () => {
     "result",
     "type",
   ]);
+  const { isVirtualAccount } = usePersonStore();
   const processedMoves = processMoves(sans);
 
   const OfferDraw = () => {
@@ -100,7 +102,7 @@ const Moves = () => {
           </button>
         </>
       )}
-      {!color && type !== "random" && (
+      {!color && (!isVirtualAccount ? type !== "random" : true) && (
         <button
           onClick={abortGame}
           className="w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600"

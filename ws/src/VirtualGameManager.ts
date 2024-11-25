@@ -256,8 +256,11 @@ export class VirtualGameManager {
     const virtualGameCount = await db.game.count({
       where: {
         OR: [{ blackPlayerId: user.id }, { whitePlayerId: user.id }],
-        status: "COMPLETED",
         isVirtual: true,
+        status: "COMPLETED",
+        gameOutCome: {
+          not: "ABANDON",
+        },
       },
     });
     if (virtualGameCount >= 20) {
@@ -281,7 +284,7 @@ export class VirtualGameManager {
       },
     });
 
-    if (db_game) {
+    if (db_game && type !== "random") {
       console.log("Game is present in DB, recreating it");
       // Check for the game locally
       const game = this.games.find((item) => item.getGameId() === db_game?.id);
@@ -423,7 +426,7 @@ export class VirtualGameManager {
           },
         });
       }
-    } else if (["lobby", "random"].includes(type ?? "")) {
+    } else if (type === "random") {
       // Check for ratings and match the players
       // Also check for all non friendly matches
       let game;
@@ -441,10 +444,8 @@ export class VirtualGameManager {
             !game.isFriendly &&
             // Check nearest rating only if type === "random"
             game.matchRating(user.rating) &&
-            (type === "lobby" || (type === "random" && game.stake === stake))
-            // (type === "lobby" ||
-            //   (type === "random" && game.matchRating(user.rating))) &&
-            // game.stake === stake
+            type === "random" &&
+            game.stake === stake
           );
         });
       }
@@ -459,7 +460,7 @@ export class VirtualGameManager {
           user.id,
           user.rating
         );
-        const player2 = new Player(null, BLACK, null, "", "", 0);
+        const player2 = this.generateRandomPlayer(user.rating);
         const game = new Game(
           player1,
           player2,
@@ -472,7 +473,7 @@ export class VirtualGameManager {
         );
         console.log("Creating new game -> ", game.getGameId());
         this.games.push(game);
-        // SendRandomPlayNotificationToAdmin(game.getGameId()); //sends notification to the admin that player has created random play
+        await game?.createGame();
       } else {
         // match the opponent and start the game
 
@@ -491,23 +492,26 @@ export class VirtualGameManager {
         }
       }
     }
-    // Create a new game if no ongoing game found
-    // if (this.pendingUser === null) {
-    //   const player = new Player(socket, WHITE, token, user.name, user.id);
-    //   this.pendingUser = player;
-    //   this.users.push(player);
-    // } else {
-    //   const player = new Player(socket, BLACK, token, user.name, user.id);
-    //   // Avoid creating game between the same player.
-    //   // Eg -> When a player opens the same link in the same browser
-    //   if (this.pendingUser.getPlayerId() !== user.id) {
-    //     this.users.push(player);
-    //     const game = new Game(this.pendingUser, player);
-    //     await game.createGame();
-    //     this.games.push(game);
-    //     this.pendingUser = null;
-    //   }
-    // }
+  }
+
+  generateRandomPlayer(opponentRating: number): Player {
+    // Utility functions to generate random values
+    const generateRandomId = () => Math.random().toString(36).substring(2, 10);
+    const generateRandomName = () =>
+      `Player_${Math.random().toString(36).substring(2, 8)}`;
+    const generateRandomRating = () =>
+      Math.floor(Math.random() * 401) + (opponentRating - 200);
+
+    // Generate random values
+    const id = generateRandomId();
+    const color = "black";
+    const name = generateRandomName();
+    const rating = generateRandomRating();
+
+    // Create a new Player object
+    const randomPlayer = new Player(null, color, null, name, id, rating);
+    randomPlayer.setRandom(true);
+    return randomPlayer;
   }
 
   async makeMove(socket: WebSocket, move: TMove) {
@@ -517,8 +521,13 @@ export class VirtualGameManager {
           game.getPlayer2().getPlayer() === socket) &&
         game.getGameStatus() === IN_PROGRESS
     );
+    const isAiGame = !game?.isFriendly && game?.isVirtual;
     if (game) {
       await game.makeMove(socket, move);
+      if (isAiGame) {
+        console.log("aiMOve");
+        game.makeAiMove();
+      }
     } else
       sendMessage(socket, {
         type: GAMENOTFOUND,

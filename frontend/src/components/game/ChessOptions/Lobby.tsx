@@ -60,7 +60,6 @@ const Lobby = () => {
       })
     );
   };
-
   return (
     <>
       <button

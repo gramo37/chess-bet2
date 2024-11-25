@@ -11,7 +11,7 @@ import Board from "../components/game/Board";
 import Abondon from "../components/abondon";
 import { ABONDON_TIME } from "../constants";
 import CopyToClipboard from "../components/CopyToClipboard";
-import { useChatStore } from "../contexts/auth";
+import usePersonStore, { useChatStore } from "../contexts/auth";
 import { useEffect } from "react";
 
 export default function Game() {
@@ -31,6 +31,7 @@ export default function Game() {
     player2timeLeft,
   } = useSocketHandler();
   useGameLogic();
+  const { isVirtualAccount } = usePersonStore();
 
   const { setChatVisibility, isTawkLoaded } = useChatStore();
 
@@ -103,7 +104,7 @@ export default function Game() {
             )}
             <ChessOptions />
             <Moves />
-            <ChatContainer message={message} />
+            {!isVirtualAccount && <ChatContainer message={message} />}
           </div>
         </div>
       </div>

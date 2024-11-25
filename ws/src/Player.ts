@@ -8,7 +8,7 @@ export class Player {
   private token: string | null;
   private name: string;
   private rating: number;
-
+  private isAiOpponent = false;
   constructor(
     socket: WebSocket | null,
     color: string,
@@ -25,6 +25,12 @@ export class Player {
     this.rating = rating;
   }
 
+  setRandom(random: boolean) {
+    this.isAiOpponent = random;
+  }
+  isAIOpponent() {
+    return this.isAiOpponent;
+  }
   getPlayer() {
     return this.player;
   }
@@ -47,18 +53,19 @@ export class Player {
 
   async getPlayerUserName() {
     try {
+      if (this.isAiOpponent) return this.name;
       const user = await db.user.findFirst({
         where: {
           id: this.id,
         },
         select: {
-          username: true
+          username: true,
         },
       });
       return user?.username ?? null;
     } catch (error) {
-      console.log("Error fetching user name")
-      return null
+      console.log("Error fetching user name");
+      return null;
     }
   }
 
@@ -79,14 +86,14 @@ export class Player {
   }
 
   setPlayerName(name: string) {
-    this.name = name
+    this.name = name;
   }
 
   setPlayerRating(rating: number) {
-    this.rating = rating
+    this.rating = rating;
   }
 
   setPlayerId(id: string) {
-    this.id = id
+    this.id = id;
   }
 }

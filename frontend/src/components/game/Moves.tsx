@@ -88,12 +88,14 @@ const Moves = () => {
       </div>
       {color && (
         <>
-          <button
-            onClick={OfferDraw}
-            className="w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600"
-          >
-            Offer Draw
-          </button>
+          {!(isVirtualAccount && type === "random") && (
+            <button
+              onClick={OfferDraw}
+              className="w-full bg-yellow-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600"
+            >
+              Offer Draw
+            </button>
+          )}
           <button
             onClick={resign}
             className="w-full bg-red-700 text-gray-300 py-2 px-4 rounded mt-4 hover:bg-red-600 focus:outline-none focus:bg-red-600"

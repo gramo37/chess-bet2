@@ -95,10 +95,15 @@ const FriendlyMatch = () => {
                   $
                 </span>
                 <input
-                  type="number"
+                  type="text"
                   className="flex-1 p-2 text-black outline-none focus:ring-2 focus:ring-yellow-500"
                   value={stake}
-                  onChange={(e) => setStake(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*\.?\d*$/.test(value)) {
+                      setStake(Number(value));
+                    }
+                  }}
                   placeholder="0.00"
                 />
               </div>

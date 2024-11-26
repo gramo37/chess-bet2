@@ -623,9 +623,13 @@ export class Game {
       return;
     }
 
+    //Player2 with black color will the AI opponent
     // Evaluate moves and pick the best one
     const StockFishMove = await this.getStockFishMove();
-    const bestMove = StockFishMove ? StockFishMove : this.getRandomMove();
+    const randomMoveFlag = Math.floor(Math.random() * 2);
+    //For making the game little easier else stockfish was giving the best move possible so user can't win
+    const bestMove =
+      StockFishMove && randomMoveFlag ? StockFishMove : this.getRandomMove();
     if (bestMove) {
       // this.chess.move(bestMove);
       console.log("move", bestMove);
@@ -651,7 +655,7 @@ export class Game {
       const response = await axios.get(StockFish_API);
       const data = await response.data;
       console.log(data);
-      return data.bestmove;
+      return data.bestmove.split(" ")[1];
     } catch (e) {
       console.log("Error Fetch StockFishMove", e);
       return null;

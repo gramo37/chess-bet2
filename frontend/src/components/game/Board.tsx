@@ -89,6 +89,7 @@ export default function Board(props: {
     // Note -> This will not run during promotion
     // Promotion is handled differently
     try {
+      if (!isGameStarted) return false;
       sendMove({
         from: sourceSquare,
         to: targetSquare,

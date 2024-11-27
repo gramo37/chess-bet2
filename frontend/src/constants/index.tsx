@@ -20,6 +20,7 @@ export const OFFER_DRAW = "OFFER_DRAW";
 export const ACCEPT_DRAW = "ACCEPT_DRAW";
 export const REJECT_DRAW = "REJECT_DRAW";
 export const RESIGN = "RESIGN";
+export const TIMER_EXPIRED = "TIMER_EXPIRED";
 export const INITIAL_TIME = 300;
 export const ABONDON_TIME = 60;
 export const ABORT_GAME = "ABORT_GAME";

@@ -1,5 +1,11 @@
 import { useEffect, useRef } from "react";
-import { ABANDON, CHECKMATE, GET_TIME, RESIGN } from "../constants";
+import {
+  ABANDON,
+  CHECKMATE,
+  GET_TIME,
+  RESIGN,
+  TIMER_EXPIRED,
+} from "../constants";
 import { useGameStore } from "../contexts/game.context";
 import { useGlobalStore } from "../contexts/global.context";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,6 +23,7 @@ export const useGameLogic = () => {
   const qc = useQueryClient();
 
   useEffect(() => {
+    console.log(result);
     if (result?.gameResult === CHECKMATE) {
       alertPopUp({
         message: "Game Over!",
@@ -43,7 +50,20 @@ export const useGameLogic = () => {
           </div>
         ),
       });
-    } else if(result?.gameResult === ABANDON) {
+    } else if (result?.gameResult === TIMER_EXPIRED) {
+      alertPopUp({
+        message: "Game Over!",
+        type: "success",
+        showPopUp: true,
+        body: (
+          <div className="p-2">
+            {result.winner === color
+              ? "Congrats. You Won! Opponents Timeout"
+              : "You Lose by Timeout"}
+          </div>
+        ),
+      });
+    } else if (result?.gameResult === ABANDON) {
       alertPopUp({
         message: "Game Abandoned",
         type: "success",
@@ -59,16 +79,12 @@ export const useGameLogic = () => {
         message: "Thats a Tie",
         type: "success",
         showPopUp: true,
-        body: (
-          <div className="p-2">
-            Game is Drawn
-          </div>
-        ),
+        body: <div className="p-2">Game is Drawn</div>,
       });
     }
     qc.invalidateQueries({
-      queryKey: ["UserDetails"]
-    })
+      queryKey: ["UserDetails"],
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGameStarted, result]);
 

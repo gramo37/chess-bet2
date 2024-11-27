@@ -131,6 +131,7 @@ export const useSocketHandler = () => {
           stopPlayer2Timer();
         } else {
           startPlayer2Timer(message.payload.player2TimeLeft);
+          console.log("time:", message.payload.player2TimeLeft);
           stopPlayer1Timer();
         }
       } else if (message.type === GAMESTARTED) {

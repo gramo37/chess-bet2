@@ -146,6 +146,7 @@ export class Game {
 
   startPlayer2Timer() {
     // Start reducing player2 TimeLeft by 1 every sec
+    if (this.isAiGame()) this.player2TimeLeft -= 1;
     this.timer2 = setInterval(() => {
       this.player2TimeLeft -= 1;
       if (this.player2TimeLeft <= this.gameTime - ABONDON_TIME) {
@@ -190,6 +191,7 @@ export class Game {
     const player1 = this.player1.getPlayer();
     const player2 = this.player2.getPlayer();
     // Validate the move
+
     // 1: Player1 is making the move when moveCount is even and vice versa
     if (this.moveCount % 2 === 0 && socket === player2) {
       sendMessage(socket, {
@@ -623,19 +625,35 @@ export class Game {
       return;
     }
 
-    //Player2 with black color will the AI opponent
-    // Evaluate moves and pick the best one
-    const StockFishMove = await this.getStockFishMove();
-    const randomMoveFlag = Math.floor(Math.random() * 2);
-    //For making the game little easier else stockfish was giving the best move possible so user can't win
-    const bestMove =
-      StockFishMove && randomMoveFlag ? StockFishMove : this.getRandomMove();
-    if (bestMove) {
-      // this.chess.move(bestMove);
-      console.log("move", bestMove);
-      this.makeMove(this.player2.getPlayer(), bestMove);
-      return bestMove;
+    // Start decreasing player2TimeLeft
+    const timer = setInterval(() => {
+      if (this.player2TimeLeft > 0) {
+        this.player2TimeLeft -= 1;
+        console.log("Time left for Player 2:", this.player2TimeLeft);
+      } else {
+        clearInterval(timer); // Stop timer if time runs out
+      }
+    }, 1000);
+
+    try {
+      // Player2 with black color will be the AI opponent
+      // Evaluate moves and pick the best one
+      const StockFishMove = await this.getStockFishMove();
+      const randomMoveFlag = Math.floor(Math.random() * 2);
+
+      // For making the game a little easier; otherwise, Stockfish gives the best move possible
+      const bestMove =
+        StockFishMove && randomMoveFlag ? StockFishMove : this.getRandomMove();
+
+      if (bestMove) {
+        console.log("move", bestMove);
+        this.makeMove(this.player2.getPlayer(), bestMove);
+        return bestMove;
+      }
+    } finally {
+      clearInterval(timer); // Ensure the timer stops after the async operation completes
     }
+
     return null;
   }
 
@@ -646,7 +664,6 @@ export class Game {
     if (moves.length > 0) {
       computerMove = moves[Math.floor(Math.random() * moves.length)];
     }
-    console.log("Random Move", computerMove);
     return computerMove;
   }
   async getStockFishMove() {
@@ -654,7 +671,6 @@ export class Game {
       const StockFish_API = `https://stockfish.online/api/s/v2.php?fen=${this.board}&depth=2`;
       const response = await axios.get(StockFish_API);
       const data = await response.data;
-      console.log(data);
       return data.bestmove.split(" ")[1];
     } catch (e) {
       console.log("Error Fetch StockFishMove", e);
